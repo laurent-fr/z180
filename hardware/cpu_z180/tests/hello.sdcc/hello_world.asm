@@ -4,11 +4,11 @@
 
 .area CODE (ABS)
 
-.org 0H0000
+.org 0x0000
 
     jp reset
 
-.org 0H0100
+.org 0x0100
 
 reset:
 
@@ -18,16 +18,16 @@ reset:
     out0 (RCR),a    ; Refresh disable
 
     ; MMU 
-    ; 0H0000-0H0FFF = ROM ( 0H00000 - 0H00FFF )
-    ; 0H1000-0HFFFF = RAM ( 0H80000 - 0H8EFFF )
-    ld a,#0H11 ; Common Area 1 = Bank Area 1 = 4Kb
+    ; 0x0000-0x0FFF = ROM ( 0H00000 - 0H00FFF )
+    ; 0x1000-0xFFFF = RAM ( 0H80000 - 0H8EFFF )
+    ld a,#0x11 ; Common Area 1 = Bank Area 1 = 4Kb
     out0 (CBAR),a
 
-    ld a,#0H80 ; Common Area Base = 0H80000
+    ld a,#0x80 ; Common Area Base = 0x80000
     out0 (CBR),a
 
-    ; Stack pointer = 0H1100
-    ld sp,#0H1100
+    ; Stack pointer = 0x1100
+    ld sp,#0x1100
 
     call asci0_init
 
@@ -59,10 +59,10 @@ asci0_init:
     ; 9600 bauds : TC=415 (19FH) --> 9592 bauds
     ; TC = fphi/(2*baud rate*clock mode) - 2
     ; TC = 8000000/(2*9600*1) - 2
-    ld a,#0H9F
+    ld a,#0x9F
     out0 (ASTC0L),a
-    ld a,#0H01
-    out0 (ASTC0H),a
+    ld a,#0x01
+    out0 (ASTC0x),a
 
     ret
 
