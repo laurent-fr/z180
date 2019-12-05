@@ -26,7 +26,7 @@ Hexadecimal [16-Bits]
                      56DF    21 _VRFY   .equ     0x56DF          ; SCAL VERIFY
                      57DF    22 _WRIT   .equ     0x57DF          ; SCAL WRITE
                              23 
-                             24 ; GENERAL .equATES
+                             24 ; GENERAL EQUATES
                              25 
                      0001    26 UARTD   .equ     0x01             ; UART data port
                      0002    27 UARTS   .equ     0x02             ; UART status port

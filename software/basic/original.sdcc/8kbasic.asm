@@ -21,7 +21,7 @@ _RIN    .equ     0x62DF          ; SCAL RIN - Scan for input char
 _VRFY   .equ     0x56DF          ; SCAL VERIFY
 _WRIT   .equ     0x57DF          ; SCAL WRITE
 
-; GENERAL .equATES
+; GENERAL EQUATES
 
 UARTD   .equ     0x01             ; UART data port
 UARTS   .equ     0x02             ; UART status port
