@@ -293,7 +293,7 @@ FNCTAB: .dw      SGN
         .dw      STR
         .dw      VAL
         .dw      ASC
-        .dw      CR
+        .dw      CHR
         .dw      LEFT
         .dw      RIGHT
         .dw      MID
@@ -560,8 +560,8 @@ INITBE:                         ; END OF INITIALISATION TABLE
 ERRMSG: .ascii      " Error"
         .db 0
 INMSG:  .ascii      " in "
-        .db 0
-ZERBYT:  .dw     0             ; A zero byte
+ZERBYT:  .db 0
+           ; A zero byte
 OKMSG:  .ascii     "Ok"
         .db     CR,0,0
 BRKMSG: .ascii      "Break"
@@ -611,10 +611,10 @@ CHKSTK: PUSH    HL              ; Save code string address
         ADD     HL,BC
         .db      0x3E             ; Skip "PUSH HL"
 ENFMEM: PUSH    HL              ; Save code string address
-        LD      A,#-48   ;TODO   ; 48 Bytes minimum RAM
+        LD      A,#-48          ; LOW -48 Bytes minimum RAM
         SUB     L
         LD      L,A
-        LD      A,#-48   ;TODO   ; 48 Bytes minimum RAM
+        LD      A,#0xFF          ; HIGH -48 Bytes minimum RAM
         SBC     A,H
         JP      C,OMERR         ; Not enough - ?OM Error
         LD      H,A
@@ -681,7 +681,7 @@ GETCMD: LD      HL,#-1           ; Flag direct mode
         PUSH    AF              ; Save Carry status
         CALL    ATOH            ; Get line number into DE
         PUSH    DE              ; Save line number
-        CALL    CRUN0xC          ; Tokenise rest of line
+        CALL    CRUNCH          ; Tokenise rest of line
         LD      B,A             ; Length of tokenised line
         POP     DE              ; Restore line number
         POP     AF              ; Restore Carry
@@ -832,7 +832,7 @@ PROMPT: LD      A,#"?"           ; "?"
         CALL    OUTC            ; Output character
         JP      RINPUT          ; Get input line
 
-CRUN0xC: XOR     A               ; Tokenise line @ HL to BUFFER
+CRUNCH: XOR     A               ; Tokenise line @ HL to BUFFER
         LD      (DATFLG),A      ; Reset literal flag
         LD      C,#2+3           ; 2 byte number and 3 nulls
         LD      DE,#BUFFER       ; Start of input buffer

@@ -8,4 +8,4 @@
 	sdasz80 -x -l -o 8kbasic.rel 8kbasic.asm
 
 clean:
-	rm -f 8kbasic.bin 8kbasic.ihx 8kbasic.rel
+	rm -f *.bin *.ihx *.hex *.rel *.nas
