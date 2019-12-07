@@ -12,7 +12,7 @@ CNTLA0_MPE     .equ $80
 CNTLA0_RE      .equ $40
 CNTLA0_TE      .equ $20
 CNTLA0_RTS0    .equ $10
-CNTLA0_MPBR    .equ $08
+CNTLA0_EFR     .equ $08
 CNTLA0_MOD2    .equ $04
 CNTLA0_MOD1    .equ $02
 CNTLA0_MOD0    .equ $01
@@ -24,7 +24,7 @@ CNTLA1_MPE     .equ $80
 CNTLA1_RE      .equ $40
 CNTLA1_TE      .equ $20
 CNTLA1_CKA1D   .equ $10
-CNTLA1_MPBR    .equ $08
+CNTLA1_EFR     .equ $08
 CNTLA1_MOD2    .equ $04
 CNTLA1_MOD1    .equ $02
 CNTLA1_MOD0    .equ $01
@@ -202,6 +202,7 @@ CCR_LNAD       .equ $01
 ; ---------------------------------------------------------------------------
 
 ; Interrupt Vector Low Register (IL: 33H)
+IL              .equ $33
 
 ; INT/TRAP Control Register (ITC: 34H)
 
