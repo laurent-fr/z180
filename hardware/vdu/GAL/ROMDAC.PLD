@@ -1,0 +1,62 @@
+Name     ROMDAC ;
+PartNo   00 ;
+Date     04/01/2020 ;
+Revision 01 ;
+Designer LaurentFr ;
+Company  None ;
+Assembly None ;
+Location  ;
+Device   g16v8 ;
+
+
+/* *************** INPUT PINS *********************/
+PIN  2   = In0                        ; /*                                 */ 
+PIN  3   = In1                        ; /*                                 */ 
+PIN  4   = In2                        ; /*                                 */ 
+PIN  5   = In3                        ; /*                                 */ 
+PIN  6   = Blanking                        ; /*                                 */ 
+
+/* *************** OUTPUT PINS *********************/
+PIN  12   =  Out7                       ; /*                                 */ 
+PIN  13   =  Out6                       ; /*                                 */ 
+PIN  14   =  Out5                      ; /*                                 */ 
+PIN  15   =  Out4                       ; /*                                 */ 
+PIN  16   =  Out3                      ; /*                                 */ 
+PIN  17   =  Out2                       ; /*                                 */ 
+PIN  18   =  Out1                      ; /*                                 */ 
+PIN  19   =  Out0                      ; /*                                 */ 
+
+Out0 = rgb0 & !Blanking;
+Out1 = rgb1 & !Blanking;
+Out2 = rgb2 & !Blanking;
+Out3 = rgb3 & !Blanking;
+Out4 = rgb4 & !Blanking;
+Out5 = rgb5 & !Blanking;
+Out6 = rgb6 & !Blanking;
+Out7 = rgb7 & !Blanking;
+
+FIELD index = [In3..0];
+
+FIELD rgb = [rgb7..0];
+
+/* RRRGGGBB */
+
+TABLE index => rgb {
+	0=> 'b'00000000;
+	1=> 'b'10001000;
+	2=> 'b'01010000;
+	3=> 'b'11010000;
+	4=> 'b'00001110;
+	5=> 'b'10101100;
+	6=> 'b'00001110;
+	7=> 'b'11011010;
+	8=> 'b'10010010;
+	9=> 'b'11000100;
+	A=> 'b'10111000;
+	B=> 'b'11111000;
+	C=> 'b'00110111;
+	D=> 'b'11010110;
+	E=> 'b'00111011;
+	F=> 'b'11111111;
+}
+

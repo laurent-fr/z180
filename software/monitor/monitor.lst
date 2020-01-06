@@ -245,233 +245,465 @@
 0020-            I   243       ICR_IOSTP      .equ $20
 0000-                  9
 0000-                 10           .org $0000
-0000-C3 00 01         11 (  9)     jp reset        ; RESET
+0000-C3 00 01         11 (  9)     jp mreset        ; RESET
 0003-                 12
-0038-                 13           .org $0038
-0038-C3 E7 01         14 (  9)     jp int_noop    ; INT0
-003B-                 15
-0066-                 16           .org $0066
-0066-C3 E7 01         17 (  9)     jp int_noop    ; NMI
-0069-                 18
-0069-                 19       ; interrupt vector table
-0080-                 20           .org $0080
-0080-E7 01            21           .dw int_noop    ; INT1
-0082-E7 01            22           .dw int_noop    ; INT2
-0084-E7 01            23           .dw int_noop    ; PRT0
-0086-E7 01            24           .dw int_noop    ; PRT1
-0088-E7 01            25           .dw int_noop    ; DMA0
-008A-E7 01            26           .dw int_noop    ; DMA1
-008C-E7 01            27           .dw int_noop    ; CSIO
-008E-8F 01            28           .dw int_asci0   ; ASCI0
-0090-E7 01            29           .dw int_noop    ; ASCI1
-0092-                 30
-0100-                 31           .org $0100
-0100-                 32       reset:
-0100-                 33
-0100-F3               34 (  3)     di ; disable interrupts
-0101-                 35
-0101-                 36           ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
-0101-3E 80            37 (  6)     ld a,CMR_X2
-0103-ED 39 1E         38 ( 13)     out0 (CMR),a
-0106-                 39
-0106-                 40           ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
-0106-3E 80            41 (  6)     ld a,CCR_CD
-0108-ED 39 1F         42 ( 13)     out0 (CCR),a
-010B-                 43
-010B-3E 00            44 (  6)     ld  a,0
-010D-ED 39 36         45 ( 13)     out0 (RCR),a    ; Refresh disable
-0110-                 46
-0110-                 47           ; MMU
-0110-                 48           ; $0000-$0FFF = ROM ( $00000 - $00FFF )
-0110-                 49           ; $1000-$FFFF = RAM ( $80000 - $8EFFF )
-0110-3E 11            50 (  6)     ld a,$11 ; Common Area 1 = Bank Area 1 = 4Kb
-0112-ED 39 3A         51 ( 13)     out0 (CBAR),a
-0115-3E 80            52 (  6)     ld a,$80 ; Common Area Base = $80000
-0117-ED 39 38         53 ( 13)     out0 (CBR),a
-011A-                 54
-011A-                 55           ; Stack pointer = $10FF
-011A-31 FF 10         56 (  9)     ld sp,$10FF
-011D-                 57
-011D-CD 45 01         58 ( 16)     call asci0_init
-0120-                 59
-0120-                 60           ; setup interupts
-0120-ED 56            61 (  6)     im 1    ; interrupt mode 1
-0122-3E 00            62 (  6)     ld a,0  ; interrupts high order byte : 00H
-0124-ED 47            63 (  6)     ld i,a
-0126-3E 80            64 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
-0128-ED 39 33         65 ( 13)     out0 (IL),a
-012B-                 66
-012B-FB               67 (  3)     ei      ; enable interrupts
-012C-                 68
-012C-                 69       main:
-012C-21 E9 01         70 (  9)     ld hl,str_welcome ; show welcome message
-012F-CD 6F 01         71 ( 16)     call asci0_puts
-0132-                 72
-0132-                 73       prompt:
-0132-21 0C 02         74 (  9)     ld hl,str_prompt ; show prompt
-0135-CD 6F 01         75 ( 16)     call asci0_puts
-0138-                 76
-0138-                 77       waitcommand:
-0138-CD C5 01         78 ( 16)     call asci0_waitc
-013B-CD CD 01         79 ( 16)     call asci0_getc
-013E-4F               80 (  4)     ld c,a
-013F-CD 82 01         81 ( 16)     call asci0_putc
-0142-                 82
-0142-C3 38 01         83 (  9)     jp waitcommand
-0145-                 84
-0145-                 85       ; initialize asci0
-0145-                 86       asci0_init:
-0145-                 87
-0145-                 88           ; RE : Receiver Enable
-0145-                 89           ; TE : Transmitter Enable
-0145-                 90           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
-0145-3E 64            91 (  6)     ld a,CNTLA0_RE|CNTLA0_TE|CNTLA0_MOD2
-0147-ED 39 00         92 ( 13)     out0 (CNTLA0),a
-014A-                 93
-014A-                 94           ; DR=0
-014A-3E 00            95 (  6)     ld a,0
-014C-ED 39 02         96 ( 13)     out0 (CNTLB0),a
-014F-                 97
-014F-                 98           ; BRG0 : Enable 16 bit BRG counter
-014F-                 99           ; X1 ( + DR=0) : Clock mode = /1
-014F-3E 18           100 (  6)     ld a,ASEXT0_BRG0|ASEXT0_X1
-0151-ED 39 12        101 ( 13)     out0 (ASEXT0),a
-0154-                102
-0154-                103           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
-0154-                104           ; TC = fphi/(2*baud rate*clock mode) - 2
-0154-                105           ; TC = 32000000/(2*9600*1) - 2
-0154-3E 81           106 (  6)     ld a,$81
-0156-ED 39 1A        107 ( 13)     out0 (ASTC0L),a
-0159-3E 06           108 (  6)     ld a,$06
-015B-ED 39 1B        109 ( 13)     out0 (ASTC0H),a
-015E-                110
-015E-                111           ; RIE : enable Rx Interrupt
-015E-3E 08           112 (  6)     ld a,STAT0_RIE
-0160-ED 39 04        113 ( 13)     out0 (STAT0),a
-0163-                114
-0163-AF              115 (  4)     xor a                  ; init RX buffer
-0164-32 82 11        116 ( 13)     ld (rx0_buffer_cpt),a
-0167-21 00 11        117 (  9)     ld hl,rx0_buffer
-016A-2B              118 (  4)     dec hl
-016B-22 80 11        119 ( 20)     ld (rx0_buffer_ptr),hl
-016E-                120
-016E-C9              121 (  9)     ret
-016F-                122
-016F-                123       ; put a string on asci0
-016F-                124       ; input : (hl) = address of null terminated string
-016F-                125       asci0_puts:
-016F-C5              126 ( 11)     push bc
-0170-E5              127 ( 11)     push hl
-0171-F5              128 ( 11)     push af
-0172-                129
-0172-                130       asci0_puts_loop:
-0172-7E              131 (  6)     ld a,(hl)
-0173-F6 00           132 (  6)     or 0
-0175-28 07           133 ( 6+)     jr z,asci0_puts_exit
-0177-4F              134 (  4)     ld c,a
-0178-CD 82 01        135 ( 16)     call asci0_putc
-017B-23              136 (  4)     inc hl
-017C-18 F4           137 (  8)     jr asci0_puts_loop
-017E-                138
-017E-                139       asci0_puts_exit:
-017E-F1              140 (  9)     pop af
-017F-E1              141 (  9)     pop hl
-0180-C1              142 (  9)     pop bc
-0181-C9              143 (  9)     ret
-0182-                144
-0182-                145       ; put a char on asci0
-0182-                146       ; input : c = char ascii code
-0182-                147       asci0_putc:
-0182-F5              148 ( 11)     push af
-0183-                149
-0183-                150       asci0_putc_wait:  ; wait for asci0 TX ready
-0183-ED 38 04        151 ( 12)     in0 a,(STAT0) ; TDRE=1 -> empty
-0186-E6 02           152 (  6)     and STAT0_TDRE
-0188-28 F9           153 ( 6+)     jr Z,asci0_putc_wait
-018A-                154
-018A-ED 09 06        155 ( 13)     out0 (TDR0),c ; output the char to asci0
-018D-                156
-018D-F1              157 (  9)     pop af
-018E-C9              158 (  9)     ret
-018F-                159
-018F-                160       int_asci0:
-018F-F5              161 ( 11)     push af
-0190-C5              162 ( 11)     push bc
-0191-E5              163 ( 11)     push hl
-0192-                164
-0192-                165       int_asci0_test:
-0192-ED 38 04        166 ( 12)     in0 a,(STAT0)                ; check if there is a char in the FIFO
-0195-ED 64 80        167 (  9)     tst STAT0_RDRF
-0198-28 26           168 ( 6+)     jr Z,int_asci0_exit
-019A-                169
-019A-                170           ; check for error
-019A-E6 70           171 (  6)     and STAT0_OVRN|STAT0_PE|STAT0_FE
-019C-28 0A           172 ( 6+)     jr Z,int_asci0_ok
-019E-                173
-019E-ED 38 00        174 ( 12)     in0 a,(CNTLA0)           ; clear error
-01A1-E6 F7           175 (  6)     and CNTLA0_EFR!$FF
-01A3-ED 39 00        176 ( 13)     out0 (CNTLA0),a
-01A6-18 18           177 (  8)     jr int_asci0_exit                     ; exit
-01A8-                178
-01A8-                179       int_asci0_ok:
-01A8-ED 08 08        180 ( 12)     in0 c,(RDR0)
-01AB-                181
-01AB-3A 82 11        182 ( 12)     ld a,(rx0_buffer_cpt)
-01AE-FE 7F           183 (  6)     cp RX_BUFFER_SIZE
-01B0-28 0E           184 ( 6+)     jr Z,int_asci0_exit
-01B2-                185
-01B2-3C              186 (  4)     inc a
-01B3-32 82 11        187 ( 13)     ld (rx0_buffer_cpt),a
-01B6-                188
-01B6-2A 80 11        189 ( 15)     ld hl,(rx0_buffer_ptr)
-01B9-23              190 (  4)     inc hl
-01BA-22 80 11        191 ( 20)     ld (rx0_buffer_ptr),hl
-01BD-                192
-01BD-71              193 (  7)     ld (hl),c
-01BE-                194
-01BE-18 D2           195 (  8)     jr int_asci0_test           ; is there more characters ?
-01C0-                196
-01C0-                197       int_asci0_exit:
-01C0-E1              198 (  9)     pop hl
-01C1-C1              199 (  9)     pop bc
-01C2-F1              200 (  9)     pop af
-01C3-FB              201 (  3)     ei
-01C4-C9              202 (  9)     ret
-01C5-                203
-01C5-                204       asci0_waitc:
-01C5-                205
-01C5-3A 82 11        206 ( 12)     ld a,(rx0_buffer_cpt)
-01C8-FE 00           207 (  6)     cp 0
-01CA-28 F9           208 ( 6+)     jr Z,asci0_waitc
-01CC-C9              209 (  9)     ret
-01CD-                210
-01CD-                211       asci0_getc:
-01CD-C5              212 ( 11)     push bc
-01CE-E5              213 ( 11)     push hl
-01CF-F3              214 (  3)     di
-01D0-3A 82 11        215 ( 12)     ld a,(rx0_buffer_cpt)   ; get  buffer counter
-01D3-FE 00           216 (  6)     cp 0                    ; if 0 : nothing to get
-01D5-28 0D           217 ( 6+)     jr Z,asci0_getc_exit    ; exit
-01D7-                218
-01D7-3D              219 (  4)     dec a
-01D8-32 82 11        220 ( 13)     ld (rx0_buffer_cpt),a
-01DB-2A 80 11        221 ( 15)     ld hl,(rx0_buffer_ptr)
-01DE-7E              222 (  6)     ld a,(hl)
-01DF-                223
-01DF-2B              224 (  4)     dec hl
-01E0-22 80 11        225 ( 20)     ld (rx0_buffer_ptr),hl
-01E3-FB              226 (  3)     ei
-01E4-                227       asci0_getc_exit:
-01E4-E1              228 (  9)     pop hl
-01E5-C1              229 (  9)     pop bc
-01E6-C9              230 (  9)     ret
-01E7-                231
-01E7-                232
-01E7-                233       int_noop:
-01E7-ED 4D           234 (12+)     reti
-01E9-                235
-01E9-                236
-01E9-1B 5B 32 4A 
+0003-                 13       rst08:
+0008-                 14           .org $0008
+0008-C3 0B 02         15 (  9)     jp asci1_putc
+000B-                 16
+000B-                 17       rst10:
+0010-                 18           .org $0010
+0010-C3 A6 02         19 (  9)     jp asci1_getc
+0013-                 20
+0013-                 21       rst18:
+0018-                 22           .org $0018
+0018-3A 06 22         23 ( 12)     ld a,(rx1_buffer_cpt)
+001B-FE 00            24 (  6)     cp 0
+001D-C9               25 (  9)     ret
+001E-                 26
+001E-                 27
+0038-                 28           .org $0038
+0038-C3 C5 02         29 (  9)     jp int_noop    ; INT0
+003B-                 30
+0066-                 31           .org $0066
+0066-C3 C5 02         32 (  9)     jp int_noop    ; NMI
+0069-                 33
+0069-                 34       ; interrupt vector table
+0080-                 35           .org $0080
+0080-C5 02            36           .dw int_noop    ; INT1
+0082-C5 02            37           .dw int_noop    ; INT2
+0084-C5 02            38           .dw int_noop    ; PRT0
+0086-C5 02            39           .dw int_noop    ; PRT1
+0088-C5 02            40           .dw int_noop    ; DMA0
+008A-C5 02            41           .dw int_noop    ; DMA1
+008C-C5 02            42           .dw int_noop    ; CSIO
+008E-18 02            43           .dw int_asci0   ; ASCI0
+0090-51 02            44           .dw int_asci1    ; ASCI1
+0092-                 45
+0100-                 46           .org $0100
+0100-                 47       mreset:
+0100-                 48
+0100-F3               49 (  3)     di ; disable interrupts
+0101-                 50
+0101-                 51           ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
+0101-3E 80            52 (  6)      ld a,CMR_X2
+0103-ED 39 1E         53 ( 13)      out0 (CMR),a
+0106-                 54
+0106-                 55           ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
+0106-3E 80            56 (  6)      ld a,CCR_CD
+0108-ED 39 1F         57 ( 13)      out0 (CCR),a
+010B-                 58
+010B-3E 00            59 (  6)     ld  a,0
+010D-ED 39 36         60 ( 13)     out0 (RCR),a    ; Refresh disable
+0110-                 61
+0110-                 62           ; MMU
+0110-                 63           ; $F000-$FFFF = VDU ( $20000 - $20FFF ) - Common Area 1
+0110-                 64           ; $2000-$EFFF = RAM ( $80000 - $8EFFF ) - Bank Area
+0110-                 65           ; $0000-$1FFF = ROM ( $00000 - $01FFF ) - Common Area 0
+0110-                 66
+0110-3E F2            67 (  6)     ld a,$F2 ; Common Area 1 = $F000-$FFFF, Bank Area 1 =  $2000-$EFFF
+0112-ED 39 3A         68 ( 13)     out0 (CBAR),a
+0115-3E 11            69 (  6)     ld a,$11 ; Common Area Base = $20000
+0117-ED 39 38         70 ( 13)     out0 (CBR),a
+011A-3E 7E            71 (  6)     ld a,$7E ; Bank Area Base = $80000
+011C-ED 39 39         72 ( 13)     out0 (BBR),a
+011F-                 73
+011F-                 74           ; Stack pointer = $10FF
+011F-31 FF 20         75 (  9)     ld sp,$20FF
+0122-                 76
+0122-CD 8A 01         77 ( 16)     call asci0_init
+0125-CD B4 01         78 ( 16)     call asci1_init
+0128-                 79
+0128-                 80           ; setup interupts
+0128-ED 56            81 (  6)     im 1    ; interrupt mode 1
+012A-3E 00            82 (  6)     ld a,0  ; interrupts high order byte : 00H
+012C-ED 47            83 (  6)     ld i,a
+012E-3E 80            84 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
+0130-ED 39 33         85 ( 13)     out0 (IL),a
+0133-                 86
+0133-FB               87 (  3)     ei      ; enable interrupts
+0134-                 88
+0134-                 89       main:
+0134-3E 41            90 (  6)     ld a,'A'
+0136-CD 0B 02         91 ( 16)     call asci1_putc
+0139-21 C7 02         92 (  9)     ld hl,str_welcome ; show welcome message
+013C-CD EE 01         93 ( 16)     call asci1_puts
+013F-                 94
+013F-                 95           ; TEST VDU
+013F-                 96           ;ld hl,$F000
+013F-                 97           ;ld a,$55
+013F-                 98           ;testvdu:
+013F-                 99           ;ld (hl),a
+013F-                100           ;jr testvdu
+013F-                101           ;jp main
+013F-                102           ; BASIC
+013F-C3 00 03        103 (  9)     jp $0300
+0142-                104
+0142-                105       mprompt:
+0142-21 EA 02        106 (  9)     ld hl,str_prompt ; show prompt
+0145-CD DE 01        107 ( 16)     call asci0_puts
+0148-                108
+0148-                109       waitcommand:
+0148-                110          ; call asci0_getc
+0148-                111          ; ld c,a
+0148-                112          ; call asci0_putc
+0148-CD 18 02        113 ( 16)     call int_asci0
+014B-C3 48 01        114 (  9)     jp waitcommand
+014E-                115
+014E-                116
+014E-                117       ; -----------------------------------------------------------------
+014E-                118
+014E-                119       ; Load HEX file routine
+014E-                120       hex_load:
+014E-                121
+014E-                122       hex_load_new_line:
+014E-CD 87 02        123 ( 16)     call asci0_getc
+0151-FE 3A           124 (  6)     cp ':'                  ; start of line ':'
+0153-20 20           125 ( 6+)     jr NZ,hex_load_err
+0155-CD 7C 01        126 ( 16)     call get_byte           ; first byte = number of bytes per line
+0158-47              127 (  4)     ld b,a
+0159-CD 7C 01        128 ( 16)     call get_byte           ; 2 bytes address
+015C-67              129 (  4)     ld h,a
+015D-CD 7C 01        130 ( 16)     call get_byte
+0160-6F              131 (  4)     ld l,a
+0161-CD 7C 01        132 ( 16)     call get_byte           ; line type
+0164-FE 00           133 (  6)     cp 0
+0166-20 0D           134 ( 6+)     jr NZ,hex_load_end
+0168-                135
+0168-0E 00           136 (  6)     ld c,0          ; checksum
+016A-                137
+016A-                138       hex_line_bytes:
+016A-CD 7C 01        139 ( 16)     call get_byte
+016D-77              140 (  7)     ld (hl),a
+016E-23              141 (  4)     inc hl
+016F-81              142 (  4)     add a,c
+0170-4F              143 (  4)     ld c,a
+0171-10 F7           144 ( 7+)     djnz hex_line_bytes
+0173-                145
+0173-                146
+0173-ED 44           147 (  6)     neg c
+0175-                148
+0175-                149       hex_load_end:
+0175-                150
+0175-                151       hex_load_err:
+0175-21 ED 02        152 (  9)     ld hl,str_error
+0178-CD DE 01        153 ( 16)     call asci0_puts
+017B-C9              154 (  9)     ret
+017C-                155
+017C-                156       get_byte:
+017C-CD 87 02        157 ( 16)     call asci0_getc
+017F-51              158 (  4)     ld d,c
+0180-CD 87 02        159 ( 16)     call asci0_getc
+0183-59              160 (  4)     ld e,c
+0184-CD 88 01        161 ( 16)     call ascii_to_byte
+0187-C9              162 (  9)     ret
+0188-                163
+0188-                164       ; in : 2 ascii chars in de
+0188-                165       ; out : a = byte value
+0188-                166       ascii_to_byte:
+0188-7A              167 (  4)     ld a,d
+0189-                168
+0189-C9              169 (  9)     ret
+018A-                170
+018A-                171       ; -----------------------------------------------------------------
+018A-                172
+018A-                173       ; initialize asci0
+018A-                174       asci0_init:
+018A-                175
+018A-                176           ; RE : Receiver Enable
+018A-                177           ; TE : Transmitter Enable
+018A-                178           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+018A-3E 64           179 (  6)     ld a,CNTLA0_RE|CNTLA0_TE|CNTLA0_MOD2
+018C-ED 39 00        180 ( 13)     out0 (CNTLA0),a
+018F-                181
+018F-                182           ; DR=0
+018F-3E 00           183 (  6)     ld a,0
+0191-ED 39 02        184 ( 13)     out0 (CNTLB0),a
+0194-                185
+0194-                186           ; BRG0 : Enable 16 bit BRG counter
+0194-                187           ; X1 ( + DR=0) : Clock mode = /1
+0194-3E 18           188 (  6)     ld a,ASEXT0_BRG0|ASEXT0_X1
+0196-ED 39 12        189 ( 13)     out0 (ASEXT0),a
+0199-                190
+0199-                191           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+0199-                192           ; TC = fphi/(2*baud rate*clock mode) - 2
+0199-                193           ; TC = 32000000/(2*9600*1) - 2
+0199-3E 81           194 (  6)     ld a,$81
+019B-ED 39 1A        195 ( 13)     out0 (ASTC0L),a
+019E-3E 06           196 (  6)     ld a,$06
+01A0-ED 39 1B        197 ( 13)     out0 (ASTC0H),a
+01A3-                198
+01A3-                199           ; RIE : enable Rx Interrupt
+01A3-3E 08           200 (  6)     ld a,STAT0_RIE
+01A5-ED 39 04        201 ( 13)     out0 (STAT0),a
+01A8-                202
+01A8-AF              203 (  4)     xor a                  ; init RX buffer
+01A9-32 82 21        204 ( 13)     ld (rx0_buffer_cpt),a
+01AC-21 00 21        205 (  9)     ld hl,rx0_buffer
+01AF-2B              206 (  4)     dec hl
+01B0-22 80 21        207 ( 20)     ld (rx0_buffer_ptr),hl
+01B3-                208
+01B3-C9              209 (  9)     ret
+01B4-                210
+01B4-                211       ; initialize asci1
+01B4-                212       asci1_init:
+01B4-                213
+01B4-                214           ; RE : Receiver Enable
+01B4-                215           ; TE : Transmitter Enable
+01B4-                216           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+01B4-3E 64           217 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
+01B6-ED 39 01        218 ( 13)     out0 (CNTLA1),a
+01B9-                219
+01B9-                220           ; DR=0
+01B9-3E 00           221 (  6)     ld a,0
+01BB-ED 39 03        222 ( 13)     out0 (CNTLB1),a
+01BE-                223
+01BE-                224           ; BRG0 : Enable 16 bit BRG counter
+01BE-                225           ; X1 ( + DR=0) : Clock mode = /1
+01BE-3E 18           226 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
+01C0-ED 39 13        227 ( 13)     out0 (ASEXT1),a
+01C3-                228
+01C3-                229           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+01C3-                230           ; TC = fphi/(2*baud rate*clock mode) - 2
+01C3-                231           ; TC = 32000000/(2*9600*1) - 2
+01C3-3E 81           232 (  6)     ld a,$81
+01C5-ED 39 1C        233 ( 13)     out0 (ASTC1L),a
+01C8-3E 06           234 (  6)     ld a,$06
+01CA-ED 39 1D        235 ( 13)     out0 (ASTC1H),a
+01CD-                236
+01CD-                237           ; RIE : enable Rx Interrupt
+01CD-3E 08           238 (  6)     ld a,STAT1_RIE
+01CF-ED 39 05        239 ( 13)     out0 (STAT1),a
+01D2-                240
+01D2-AF              241 (  4)     xor a                  ; init RX buffer
+01D3-32 82 21        242 ( 13)     ld (rx0_buffer_cpt),a
+01D6-21 00 21        243 (  9)     ld hl,rx0_buffer
+01D9-2B              244 (  4)     dec hl
+01DA-22 80 21        245 ( 20)     ld (rx0_buffer_ptr),hl
+01DD-                246
+01DD-C9              247 (  9)     ret
+01DE-                248
+01DE-                249       ; put a string on asci0
+01DE-                250       ; input : (hl) = address of null terminated string
+01DE-                251       asci0_puts:
+01DE-E5              252 ( 11)     push hl
+01DF-F5              253 ( 11)     push af
+01E0-                254
+01E0-                255       asci0_puts_loop:
+01E0-7E              256 (  6)     ld a,(hl)
+01E1-F6 00           257 (  6)     or 0
+01E3-28 06           258 ( 6+)     jr z,asci0_puts_exit
+01E5-CD FE 01        259 ( 16)     call asci0_putc
+01E8-23              260 (  4)     inc hl
+01E9-18 F5           261 (  8)     jr asci0_puts_loop
+01EB-                262
+01EB-                263       asci0_puts_exit:
+01EB-F1              264 (  9)     pop af
+01EC-E1              265 (  9)     pop hl
+01ED-C9              266 (  9)     ret
+01EE-                267
+01EE-                268       ; put a string on asci1
+01EE-                269       ; input : (hl) = address of null terminated string
+01EE-                270       asci1_puts:
+01EE-E5              271 ( 11)     push hl
+01EF-F5              272 ( 11)     push af
+01F0-                273
+01F0-                274       asci1_puts_loop:
+01F0-7E              275 (  6)     ld a,(hl)
+01F1-F6 00           276 (  6)     or 0
+01F3-28 06           277 ( 6+)     jr z,asci1_puts_exit
+01F5-CD 0B 02        278 ( 16)     call asci1_putc
+01F8-23              279 (  4)     inc hl
+01F9-18 F5           280 (  8)     jr asci1_puts_loop
+01FB-                281
+01FB-                282       asci1_puts_exit:
+01FB-F1              283 (  9)     pop af
+01FC-E1              284 (  9)     pop hl
+01FD-C9              285 (  9)     ret
+01FE-                286
+01FE-                287       ; put a char on asci0
+01FE-                288       ; input : a = char ascii code
+01FE-                289       asci0_putc:
+01FE-F5              290 ( 11)     push af
+01FF-                291       asci0_putc_wait:  ; wait for asci0 TX ready
+01FF-                292
+01FF-ED 38 04        293 ( 12)     in0 a,(STAT0) ; TDRE=1 -> empty
+0202-E6 02           294 (  6)     and STAT0_TDRE
+0204-28 F9           295 ( 6+)     jr Z,asci0_putc_wait
+0206-F1              296 (  9)     pop af
+0207-ED 39 06        297 ( 13)     out0 (TDR0),a ; output the char to asci0
+020A-                298
+020A-C9              299 (  9)     ret
+020B-                300
+020B-                301       ; put a char on asci1
+020B-                302       ; input : c = char ascii code
+020B-                303       asci1_putc:
+020B-F5              304 ( 11)     push af
+020C-                305
+020C-                306       asci1_putc_wait:  ; wait for asci0 TX ready
+020C-ED 38 05        307 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
+020F-E6 02           308 (  6)     and STAT1_TDRE
+0211-28 F9           309 ( 6+)     jr Z,asci1_putc_wait
+0213-F1              310 (  9)     pop af
+0214-ED 39 07        311 ( 13)     out0 (TDR1),a ; output the char to asci0
+0217-                312
+0217-                313
+0217-C9              314 (  9)     ret
+0218-                315
+0218-                316       ; int asci0
+0218-                317       int_asci0:
+0218-F5              318 ( 11)     push af
+0219-C5              319 ( 11)     push bc
+021A-E5              320 ( 11)     push hl
+021B-                321
+021B-                322       int_asci0_test:
+021B-ED 38 04        323 ( 12)     in0 a,(STAT0)                ; check if there is a char in the FIFO
+021E-ED 64 80        324 (  9)     tst STAT0_RDRF
+0221-28 29           325 ( 6+)     jr Z,int_asci0_exit
+0223-                326
+0223-ED 08 08        327 ( 12)     in0 c,(RDR0)
+0226-                328
+0226-                329           ; check for error
+0226-E6 70           330 (  6)     and STAT0_OVRN|STAT0_PE|STAT0_FE
+0228-28 0A           331 ( 6+)     jr Z,int_asci0_ok
+022A-                332
+022A-ED 38 00        333 ( 12)     in0 a,(CNTLA0)           ; clear error
+022D-E6 F7           334 (  6)     and CNTLA0_EFR!$FF
+022F-ED 39 00        335 ( 13)     out0 (CNTLA0),a
+0232-18 E7           336 (  8)     jr int_asci0_test                    ; exit
+0234-                337
+0234-                338       int_asci0_ok:
+0234-                339
+0234-                340
+0234-3A 82 21        341 ( 12)     ld a,(rx0_buffer_cpt)
+0237-FE 7F           342 (  6)     cp RX_BUFFER_SIZE
+0239-28 11           343 ( 6+)     jr Z,int_asci0_exit
+023B-                344
+023B-3C              345 (  4)     inc a
+023C-32 82 21        346 ( 13)     ld (rx0_buffer_cpt),a
+023F-                347
+023F-2A 80 21        348 ( 15)     ld hl,(rx0_buffer_ptr)
+0242-23              349 (  4)     inc hl
+0243-22 80 21        350 ( 20)     ld (rx0_buffer_ptr),hl
+0246-                351
+0246-71              352 (  7)     ld (hl),c
+0247-CD FE 01        353 ( 16)     call asci0_putc
+024A-                354
+024A-18 CF           355 (  8)     jr int_asci0_test           ; is there more characters ?
+024C-                356
+024C-                357       int_asci0_exit:
+024C-E1              358 (  9)     pop hl
+024D-C1              359 (  9)     pop bc
+024E-F1              360 (  9)     pop af
+024F-FB              361 (  3)     ei
+0250-C9              362 (  9)     ret
+0251-                363
+0251-                364       ; int asci1
+0251-                365       int_asci1:
+0251-F5              366 ( 11)     push af
+0252-C5              367 ( 11)     push bc
+0253-E5              368 ( 11)     push hl
+0254-                369
+0254-                370       int_asci1_test:
+0254-ED 38 05        371 ( 12)     in0 a,(STAT1)                ; check if there is a char in the FIFO
+0257-ED 64 80        372 (  9)     tst STAT1_RDRF
+025A-28 26           373 ( 6+)     jr Z,int_asci1_exit
+025C-                374
+025C-ED 08 09        375 ( 12)     in0 c,(RDR1)
+025F-                376
+025F-                377           ; check for error
+025F-E6 70           378 (  6)     and STAT1_OVRN|STAT1_PE|STAT1_FE
+0261-28 0A           379 ( 6+)     jr Z,int_asci1_ok
+0263-                380
+0263-ED 38 01        381 ( 12)     in0 a,(CNTLA1)           ; clear error
+0266-E6 F7           382 (  6)     and CNTLA1_EFR!$FF
+0268-ED 39 01        383 ( 13)     out0 (CNTLA1),a
+026B-18 E7           384 (  8)     jr int_asci1_test                    ; exit
+026D-                385
+026D-                386       int_asci1_ok:
+026D-                387
+026D-3A 06 22        388 ( 12)     ld a,(rx1_buffer_cpt)
+0270-FE 7F           389 (  6)     cp RX_BUFFER_SIZE
+0272-28 0E           390 ( 6+)     jr Z,int_asci1_exit
+0274-                391
+0274-3C              392 (  4)     inc a
+0275-32 06 22        393 ( 13)     ld (rx1_buffer_cpt),a
+0278-                394
+0278-2A 04 22        395 ( 15)     ld hl,(rx1_buffer_ptr)
+027B-23              396 (  4)     inc hl
+027C-22 04 22        397 ( 20)     ld (rx1_buffer_ptr),hl
+027F-                398
+027F-71              399 (  7)     ld (hl),c
+0280-                400
+0280-18 D2           401 (  8)     jr int_asci1_test           ; is there more characters ?
+0282-                402
+0282-                403       int_asci1_exit:
+0282-E1              404 (  9)     pop hl
+0283-C1              405 (  9)     pop bc
+0284-F1              406 (  9)     pop af
+0285-FB              407 (  3)     ei
+0286-C9              408 (  9)     ret
+0287-                409
+0287-                410
+0287-                411       asci0_getc:
+0287-C5              412 ( 11)     push bc
+0288-E5              413 ( 11)     push hl
+0289-                414
+0289-                415       asci0_getc_wait:
+0289-3A 82 21        416 ( 12)     ld a,(rx0_buffer_cpt)
+028C-FE 00           417 (  6)     cp 0
+028E-28 F9           418 ( 6+)     jr Z,asci0_getc_wait
+0290-                419
+0290-3A 82 21        420 ( 12)     ld a,(rx0_buffer_cpt)   ; get  buffer counter
+0293-FE 00           421 (  6)     cp 0                    ; if 0 : nothing to get
+0295-28 0C           422 ( 6+)     jr Z,asci0_getc_exit    ; exit
+0297-                423
+0297-3D              424 (  4)     dec a
+0298-32 82 21        425 ( 13)     ld (rx0_buffer_cpt),a
+029B-2A 80 21        426 ( 15)     ld hl,(rx0_buffer_ptr)
+029E-7E              427 (  6)     ld a,(hl)
+029F-                428
+029F-2B              429 (  4)     dec hl
+02A0-22 80 21        430 ( 20)     ld (rx0_buffer_ptr),hl
+02A3-                431
+02A3-                432       asci0_getc_exit:
+02A3-E1              433 (  9)     pop hl
+02A4-C1              434 (  9)     pop bc
+02A5-C9              435 (  9)     ret
+02A6-                436
+02A6-                437       asci1_getc:
+02A6-C5              438 ( 11)     push bc
+02A7-E5              439 ( 11)     push hl
+02A8-                440
+02A8-                441       asci1_getc_wait:
+02A8-3A 06 22        442 ( 12)     ld a,(rx1_buffer_cpt)
+02AB-FE 00           443 (  6)     cp 0
+02AD-28 F9           444 ( 6+)     jr Z,asci1_getc_wait
+02AF-                445
+02AF-3A 06 22        446 ( 12)     ld a,(rx1_buffer_cpt)   ; get  buffer counter
+02B2-FE 00           447 (  6)     cp 0                    ; if 0 : nothing to get
+02B4-28 0C           448 ( 6+)     jr Z,asci1_getc_exit    ; exit
+02B6-                449
+02B6-3D              450 (  4)     dec a
+02B7-32 06 22        451 ( 13)     ld (rx1_buffer_cpt),a
+02BA-2A 04 22        452 ( 15)     ld hl,(rx1_buffer_ptr)
+02BD-7E              453 (  6)     ld a,(hl)
+02BE-                454
+02BE-2B              455 (  4)     dec hl
+02BF-22 04 22        456 ( 20)     ld (rx1_buffer_ptr),hl
+02C2-                457
+02C2-                458       asci1_getc_exit:
+02C2-E1              459 (  9)     pop hl
+02C3-C1              460 (  9)     pop bc
+02C4-C9              461 (  9)     ret
+02C5-                462
+02C5-                463
+02C5-                464
+02C5-                465       int_noop:
+02C5-ED 4D           466 (12+)     reti
+02C7-                467
+02C7-                468
+02C7-1B 5B 32 4A 
      1B 5B 48 5A 
      31 38 30 20 
      43 50 55 20 
@@ -479,13 +711,21 @@
      6E 69 74 6F 
      72 20 56 30 
      2E 31 0D 0A 
-     0D 0A 00        237       str_welcome:    .DB $1B,"[2J",$1B,"[H","Z180 CPU - Monitor V0.1",13,10,13,10,0
-020C-3F 20 00        238       str_prompt:     .DB "? ",0
-020F-                239
-1100-                240           .org $1100
-1100-                241
-007F-                242       RX_BUFFER_SIZE: .equ 127
-1100-                243
-1100-                244       rx0_buffer:     .bs RX_BUFFER_SIZE+1
-1180-                245       rx0_buffer_ptr: .bs 2
-1182-                246       rx0_buffer_cpt: .bs 2
+     0D 0A 00        469       str_welcome:    .db $1B,"[2J",$1B,"[H","Z180 CPU - Monitor V0.1",13,10,13,10,0
+02EA-3F 20 00        470       str_prompt:     .db "? ",0
+02ED-0D 0A 45 72 
+     72 2E 0D 0A 
+     00              471       str_error:       .db 13,10,"Err.",13,10,0
+02F6-                472
+2100-                473           .org $2100
+2100-                474
+007F-                475       RX_BUFFER_SIZE: .equ 127
+2100-                476
+2100-                477       rx0_buffer:     .bs RX_BUFFER_SIZE+1
+2180-                478       rx0_buffer_ptr: .bs 2
+2182-                479       rx0_buffer_cpt: .bs 2
+2184-                480       rx1_buffer:     .bs RX_BUFFER_SIZE+1
+2204-                481       rx1_buffer_ptr: .bs 2
+2206-                482       rx1_buffer_cpt: .bs 2
+2208-                483
+2208-                484
