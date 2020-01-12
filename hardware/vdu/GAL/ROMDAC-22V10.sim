@@ -1,0 +1,248 @@
+%SIGNAL
+PIN   3 =  Blanking 
+PIN  11 =  In0 
+PIN  10 =  In1 
+PIN   9 =  In2 
+PIN   8 =  In3 
+PIN   7 =  In4 
+PIN   6 =  In5 
+PIN   5 =  In6 
+PIN   4 =  In7 
+PIN  22 =  Out0 
+PIN  21 =  Out1 
+PIN  20 =  Out2 
+PIN  19 =  Out3 
+PIN  18 =  Out4 
+PIN  17 =  Out5 
+PIN  16 =  Out6 
+PIN  15 =  Out7 
+PIN  14 =  Out8 
+PIN   2 =  Video 
+%END
+
+%FIELD
+FIELD index = Col3,Col2,Col1,Col0
+FIELD rgb = r2,r1,r0,g2,g1,g0,b2,b1,b0
+%END
+
+%EQUATION
+Col0 =>
+    In0 & Video
+  # In4 & !Video
+
+Col1 =>
+    In1 & Video
+  # In5 & !Video
+
+Col2 =>
+    In2 & Video
+  # In6 & !Video
+
+Col3 =>
+    In3 & Video
+  # In7 & !Video
+
+Out0 =>
+    !Blanking & In4 & In6 & In7 & !Video
+  # !Blanking & In0 & In2 & In3 & Video
+  # !Blanking & !In0 & !In1 & In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In4 & In5 & !In6 & In7 & !Video
+  # !Blanking & In0 & In1 & !In2 & In3 & Video
+  # !Blanking & !In0 & In1 & !In2 & !In3 & Video
+  # !Blanking & !In4 & In5 & !In6 & !In7 & !Video
+  # !Blanking & In4 & !In5 & !In6 & !In7 & !Video
+  # !Blanking & In0 & !In1 & !In2 & !In3 & Video
+
+Out1 =>
+    !Blanking & In0 & !In1 & !In2 & !In3 & Video
+  # !Blanking & In4 & !In5 & !In6 & !In7 & !Video
+  # !Blanking & In4 & In7 & !Video
+  # !Blanking & In0 & In3 & Video
+  # !Blanking & In4 & In5 & !In7 & !Video
+  # !Blanking & In0 & In1 & !In3 & Video
+
+Out2 =>
+    !Blanking & In5 & In6 & In7 & !Video
+  # !Blanking & In1 & In2 & In3 & Video
+  # !Blanking & In4 & !In5 & In7 & !Video
+  # !Blanking & In0 & !In1 & In3 & Video
+  # !Blanking & In4 & In5 & !In6 & !Video
+  # !Blanking & In0 & In1 & !In2 & Video
+  # !Blanking & !In0 & !In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & !In6 & In7 & !Video
+  # !Blanking & In4 & In6 & !In7 & !Video
+  # !Blanking & In0 & In2 & !In3 & Video
+
+Out3 =>
+    !Blanking & In0 & !In1 & !In2 & !In3 & Video
+  # !Blanking & In4 & !In5 & !In6 & !In7 & !Video
+  # !Blanking & In6 & In7 & !Video
+  # !Blanking & In2 & In3 & Video
+  # !Blanking & In4 & !In6 & In7 & !Video
+  # !Blanking & In0 & !In2 & In3 & Video
+  # !Blanking & !In0 & In2 & !In3 & Video
+  # !Blanking & !In4 & In6 & !In7 & !Video
+
+Out4 =>
+    !Blanking & !In4 & In5 & !In6 & !In7 & !Video
+  # !Blanking & !In0 & In1 & !In2 & !In3 & Video
+  # !Blanking & !In0 & !In1 & In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In5 & In7 & !Video
+  # !Blanking & In1 & In3 & Video
+  # !Blanking & In5 & In6 & !In7 & !Video
+  # !Blanking & In1 & In2 & !In3 & Video
+
+Out5 =>
+    !Blanking & In0 & In1 & !In3 & Video
+  # !Blanking & In4 & In5 & !In7 & !Video
+  # !Blanking & In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In0 & !In1 & In2 & In3 & Video
+  # !Blanking & In5 & In7 & !Video
+  # !Blanking & In1 & In3 & Video
+  # !Blanking & !In0 & !In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & !In6 & In7 & !Video
+
+Out6 =>
+    !Blanking & In0 & !In1 & In2 & !In3 & Video
+  # !Blanking & In4 & !In5 & In6 & !In7 & !Video
+  # !Blanking & In6 & In7 & !Video
+  # !Blanking & In2 & In3 & Video
+  # !Blanking & !In0 & In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & In5 & !In6 & In7 & !Video
+
+Out7 =>
+    !Blanking & In5 & In6 & In7 & !Video
+  # !Blanking & In1 & In2 & In3 & Video
+  # !Blanking & !In0 & !In1 & In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In4 & In5 & In6 & !In7 & !Video
+  # !Blanking & In0 & In1 & In2 & !In3 & Video
+
+Out8 =>
+    !Blanking & !In4 & !In5 & In6 & !In7 & !Video
+  # !Blanking & !In0 & !In1 & In2 & !In3 & Video
+  # !Blanking & In6 & In7 & !Video
+  # !Blanking & In2 & In3 & Video
+  # !Blanking & !In0 & !In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & !In6 & In7 & !Video
+  # !Blanking & In5 & In6 & !In7 & !Video
+  # !Blanking & In1 & In2 & !In3 & Video
+
+b0 =>
+    In4 & In5 & In6 & In7 & !Video
+  # In0 & !In1 & In2 & Video
+  # In4 & !In5 & In6 & !Video
+  # !In4 & In5 & In7 & !Video
+  # !In0 & In1 & In3 & Video
+  # !In4 & !In5 & In6 & In7 & !Video
+  # !In0 & !In1 & In2 & In3 & Video
+  # In0 & In1 & In2 & In3 & Video
+
+b1 =>
+    !In0 & In2 & In3 & Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # !In4 & In6 & In7 & !Video
+
+b2 =>
+    !In0 & In1 & In2 & In3 & Video
+  # !In4 & In6 & !In7 & !Video
+  # !In0 & In2 & !In3 & Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # !In4 & !In5 & In7 & !Video
+  # !In0 & !In1 & In3 & Video
+  # In0 & !In1 & In2 & In3 & Video
+  # In4 & !In5 & In6 & In7 & !Video
+  # !In4 & In5 & In6 & In7 & !Video
+
+g0 =>
+    !In0 & In1 & In2 & In3 & Video
+  # In0 & !In1 & !In2 & Video
+  # In4 & !In5 & !In6 & !Video
+  # !In4 & In6 & !In7 & !Video
+  # !In0 & In2 & !In3 & Video
+  # In0 & In1 & In3 & Video
+  # In4 & In5 & In7 & !Video
+  # !In5 & In6 & In7 & !Video
+  # !In1 & In2 & In3 & Video
+  # !In4 & In5 & In6 & In7 & !Video
+
+g1 =>
+    !In0 & In2 & In3 & Video
+  # !In4 & In5 & !In7 & !Video
+  # !In0 & In1 & !In3 & Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # In5 & !In6 & In7 & !Video
+  # In1 & !In2 & In3 & Video
+  # !In4 & In6 & In7 & !Video
+
+g2 =>
+    !In0 & In1 & In2 & In3 & Video
+  # !In4 & In5 & In6 & In7 & !Video
+  # In4 & !In5 & In6 & In7 & !Video
+  # !In4 & !In6 & In7 & !Video
+  # !In0 & !In2 & In3 & Video
+  # In0 & In1 & Video
+  # In4 & In5 & !Video
+  # In0 & !In1 & In2 & In3 & Video
+
+r0 =>
+    !In1 & In2 & In3 & Video
+  # In0 & !In1 & !In2 & !In3 & Video
+  # In4 & !In5 & !In6 & !In7 & !Video
+  # !In4 & In5 & !In6 & !In7 & !Video
+  # !In0 & In1 & !In2 & !In3 & Video
+  # In0 & In1 & In3 & Video
+  # In4 & In5 & In7 & !Video
+  # !In5 & In6 & In7 & !Video
+
+r1 =>
+    In4 & !In5 & In6 & In7 & !Video
+  # In0 & !In1 & In2 & In3 & Video
+  # In4 & !In6 & !Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # In0 & !In2 & Video
+
+r2 =>
+    !In0 & In1 & In2 & In3 & Video
+  # !In4 & In5 & In6 & In7 & !Video
+  # In4 & In5 & !Video
+  # In0 & !In1 & In2 & Video
+  # In4 & !In5 & In6 & !Video
+  # !In5 & !In6 & In7 & !Video
+  # !In1 & !In2 & In3 & Video
+  # In0 & In1 & Video
+
+Out0.oe  =>
+    1 
+
+Out1.oe  =>
+    1 
+
+Out2.oe  =>
+    1 
+
+Out3.oe  =>
+    1 
+
+Out4.oe  =>
+    1 
+
+Out5.oe  =>
+    1 
+
+Out6.oe  =>
+    1 
+
+Out7.oe  =>
+    1 
+
+Out8.oe  =>
+    1 
+
+%END

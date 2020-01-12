@@ -1,0 +1,145 @@
+Name     ROMDAC ;
+PartNo   00 ;
+Date     11/01/2020 ;
+Revision 01 ;
+Designer LaurentFr ;
+Company  None ;
+Assembly None ;
+Location  ;
+Device   p22v10 ;
+
+
+/* *************** INPUT PINS *********************/
+PIN  4   = In7 ;            
+PIN  5   = In6 ;           
+PIN  6   = In5 ;                 
+PIN  7   = In4 ;
+PIN  8   = In3 ;
+PIN  9   = In2 ;  
+PIN  10  = In1 ;  
+PIN  11  = In0 ;  
+                     
+PIN  3   = Blanking  ;                  
+PIN  2   = Video ;
+/* *************** OUTPUT PINS *********************/
+PIN  22   =  Out0 ;                  
+PIN  21   =  Out1 ;               
+PIN  20   =  Out2 ;                   
+PIN  19   =  Out3 ;                  
+PIN  18   =  Out4 ;                     
+PIN  17   =  Out5 ;                     
+PIN  16   =  Out6 ;                  
+PIN  15   =  Out7 ; 
+PIN  14   =  Out8  ;             
+
+
+
+Col0 = ((In0 & Video) # (In4 & !Video));
+Col1 = ((In1 & Video) # (In5 & !Video));
+Col2 = ((In2 & Video) # (In6 & !Video));
+Col3 = ((In3 & Video) # (In7 & !Video));
+
+FIELD index = [Col3..0];
+
+FIELD rgb = [r2..0,g2..0,b2..0];
+
+$DEFINE   L   'b'0
+$DEFINE   H   'b'1
+
+rgb 	= index:0 & [L,L,L, L,L,L, L,L,L] 
+	# index:1 & [L,H,H, L,L,H, L,L,L] 
+	# index:2 & [L,L,H, L,H,L, L,L,L] 
+	# index:3 & [H,H,L, H,L,L, L,L,L]
+	# index:4 & [L,L,L, L,L,H, H,L,L] 
+	# index:5 & [H,L,L, L,L,L, L,L,H] 
+	# index:6 & [L,L,L, L,H,H, H,L,L] 
+	# index:7 & [H,H,L, H,H,L, H,H,L] 
+	# index:8 & [H,L,L, H,L,L, H,L,L] 
+	# index:9 & [H,H,L, L,L,H, L,L,L] 
+	# index:A & [L,L,L, H,H,L, L,L,H] 
+	# index:B & [H,H,H, H,H,H, L,L,L] 
+	# index:C & [L,L,H, L,H,H, H,H,H]
+	# index:D & [H,H,H, H,L,H, H,L,H] 
+	# index:E & [H,L,L, H,H,H, H,H,H] 
+	# index:F & [H,H,H, H,H,H, H,H,H] 
+ ;
+
+/*
+rgb 	= index:0 & [L,L,L, L,L,L, L,L,L] 
+	# index:1 & [L,L,H, L,L,L, L,L,L] 
+	# index:2 & [L,H,L, L,L,L, L,L,L] 
+	# index:3 & [L,H,H, L,L,L, L,L,L]
+	# index:4 & [H,L,L, L,L,L, L,L,L] 
+	# index:5 & [H,L,H, L,L,L, L,L,L] 
+	# index:6 & [H,H,L, L,L,L, L,L,L] 
+	# index:7 & [H,H,H, L,L,L, L,L,L] 
+	# index:8 & [L,L,L, L,L,L, L,L,L] 
+	# index:9 & [L,L,L, L,L,H, L,L,L] 
+	# index:A & [L,L,L, L,H,L, L,L,L] 
+	# index:B & [L,L,L, L,H,H, L,L,L] 
+	# index:C & [L,L,L, H,L,L, L,L,L]
+	# index:D & [L,L,L, H,L,H, L,L,L] 
+	# index:E & [L,L,L, H,H,L, L,L,L] 
+	# index:F & [L,L,L, H,H,H, L,L,L] 
+ ;
+*/
+
+/*
+rgb 	= index:0 & [L,L,L, L,L,L, L,L,L] 
+	# index:1 & [L,L,L, L,L,L, L,L,H] 
+	# index:2 & [L,L,L, L,L,L, L,H,L] 
+	# index:3 & [L,L,L, L,L,L, L,H,H]
+	# index:4 & [L,L,L, L,L,L, H,L,L] 
+	# index:5 & [L,L,L, L,L,L, H,L,H] 
+	# index:6 & [L,L,L, L,L,L, H,H,L] 
+	# index:7 & [L,L,L, L,L,L, H,H,H] 
+	# index:8 & [L,L,L, L,L,L, L,L,L] 
+	# index:9 & [L,L,L, L,L,H, L,L,L] 
+	# index:A & [L,L,L, L,H,L, L,L,L] 
+	# index:B & [L,L,L, L,H,H, L,L,L] 
+	# index:C & [L,L,L, H,L,L, L,L,L]
+	# index:D & [L,L,L, H,L,H, L,L,L] 
+	# index:E & [L,L,L, H,H,L, L,L,L] 
+	# index:F & [L,L,L, H,H,H, L,L,L] 
+ ;
+*/
+
+
+
+
+
+/*
+TABLE index => rgb {
+	'h'0=> 'b'000000000;
+	'h'1=> 'b'100010000;
+	'h'2=> 'b'010100000;
+	'h'3=> 'b'111100000;
+	'h'4=> 'b'000001101;
+	'h'5=> 'b'101000011;
+	'h'6=> 'b'000011100;
+	'h'7=> 'b'110110110;
+	'h'8=> 'b'100100010;
+	'h'9=> 'b'110001000;
+	'h'A=> 'b'011100000;
+	'h'B=> 'b'111110000;
+	'h'C=> 'b'001011111;
+	'h'D=> 'b'111101101;
+	'h'E=> 'b'001111111;
+	'h'F=> 'b'111111111;
+}*/
+
+
+Out0 = r0 & !Blanking;
+Out1 = r1 & !Blanking;
+Out2 = r2 & !Blanking;
+Out3 = g0 & !Blanking;
+Out4 = g1 & !Blanking;
+Out5 = g2 & !Blanking;
+Out6 = b0 & !Blanking;
+Out7 = b1 & !Blanking;
+Out8 = b2 & !Blanking;
+
+
+/* RRRGGGBB */
+
+

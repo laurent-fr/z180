@@ -1,0 +1,481 @@
+
+*******************************************************************************
+                                    ROMDAC
+*******************************************************************************
+
+CUPL(WM)        5.0a Serial# 60008009
+Device          p22v10  Library DLIB-h-40-17
+Created         Sat Jan 11 14:10:44 2020
+Name            ROMDAC 
+Partno          00 
+Revision        01 
+Date            11/01/2020 
+Designer        LaurentFr 
+Company         None 
+Assembly        None 
+Location        
+
+===============================================================================
+                            Expanded Product Terms
+===============================================================================
+
+Col0 =>
+    In0 & Video
+  # In4 & !Video
+
+Col1 =>
+    In1 & Video
+  # In5 & !Video
+
+Col2 =>
+    In2 & Video
+  # In6 & !Video
+
+Col3 =>
+    In3 & Video
+  # In7 & !Video
+
+Out0 =>
+    !Blanking & In4 & In6 & In7 & !Video
+  # !Blanking & In0 & In2 & In3 & Video
+  # !Blanking & !In0 & !In1 & In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In4 & In5 & !In6 & In7 & !Video
+  # !Blanking & In0 & In1 & !In2 & In3 & Video
+  # !Blanking & !In0 & In1 & !In2 & !In3 & Video
+  # !Blanking & !In4 & In5 & !In6 & !In7 & !Video
+  # !Blanking & In4 & !In5 & !In6 & !In7 & !Video
+  # !Blanking & In0 & !In1 & !In2 & !In3 & Video
+
+Out1 =>
+    !Blanking & In0 & !In1 & !In2 & !In3 & Video
+  # !Blanking & In4 & !In5 & !In6 & !In7 & !Video
+  # !Blanking & In4 & In7 & !Video
+  # !Blanking & In0 & In3 & Video
+  # !Blanking & In4 & In5 & !In7 & !Video
+  # !Blanking & In0 & In1 & !In3 & Video
+
+Out2 =>
+    !Blanking & In5 & In6 & In7 & !Video
+  # !Blanking & In1 & In2 & In3 & Video
+  # !Blanking & In4 & !In5 & In7 & !Video
+  # !Blanking & In0 & !In1 & In3 & Video
+  # !Blanking & In4 & In5 & !In6 & !Video
+  # !Blanking & In0 & In1 & !In2 & Video
+  # !Blanking & !In0 & !In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & !In6 & In7 & !Video
+  # !Blanking & In4 & In6 & !In7 & !Video
+  # !Blanking & In0 & In2 & !In3 & Video
+
+Out3 =>
+    !Blanking & In0 & !In1 & !In2 & !In3 & Video
+  # !Blanking & In4 & !In5 & !In6 & !In7 & !Video
+  # !Blanking & In6 & In7 & !Video
+  # !Blanking & In2 & In3 & Video
+  # !Blanking & In4 & !In6 & In7 & !Video
+  # !Blanking & In0 & !In2 & In3 & Video
+  # !Blanking & !In0 & In2 & !In3 & Video
+  # !Blanking & !In4 & In6 & !In7 & !Video
+
+Out4 =>
+    !Blanking & !In4 & In5 & !In6 & !In7 & !Video
+  # !Blanking & !In0 & In1 & !In2 & !In3 & Video
+  # !Blanking & !In0 & !In1 & In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In5 & In7 & !Video
+  # !Blanking & In1 & In3 & Video
+  # !Blanking & In5 & In6 & !In7 & !Video
+  # !Blanking & In1 & In2 & !In3 & Video
+
+Out5 =>
+    !Blanking & In0 & In1 & !In3 & Video
+  # !Blanking & In4 & In5 & !In7 & !Video
+  # !Blanking & In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In0 & !In1 & In2 & In3 & Video
+  # !Blanking & In5 & In7 & !Video
+  # !Blanking & In1 & In3 & Video
+  # !Blanking & !In0 & !In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & !In6 & In7 & !Video
+
+Out6 =>
+    !Blanking & In0 & !In1 & In2 & !In3 & Video
+  # !Blanking & In4 & !In5 & In6 & !In7 & !Video
+  # !Blanking & In6 & In7 & !Video
+  # !Blanking & In2 & In3 & Video
+  # !Blanking & !In0 & In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & In5 & !In6 & In7 & !Video
+
+Out7 =>
+    !Blanking & In5 & In6 & In7 & !Video
+  # !Blanking & In1 & In2 & In3 & Video
+  # !Blanking & !In0 & !In1 & In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & In6 & In7 & !Video
+  # !Blanking & In4 & In5 & In6 & !In7 & !Video
+  # !Blanking & In0 & In1 & In2 & !In3 & Video
+
+Out8 =>
+    !Blanking & !In4 & !In5 & In6 & !In7 & !Video
+  # !Blanking & !In0 & !In1 & In2 & !In3 & Video
+  # !Blanking & In6 & In7 & !Video
+  # !Blanking & In2 & In3 & Video
+  # !Blanking & !In0 & !In1 & !In2 & In3 & Video
+  # !Blanking & !In4 & !In5 & !In6 & In7 & !Video
+  # !Blanking & In5 & In6 & !In7 & !Video
+  # !Blanking & In1 & In2 & !In3 & Video
+
+b0 =>
+    In4 & In5 & In6 & In7 & !Video
+  # In0 & !In1 & In2 & Video
+  # In4 & !In5 & In6 & !Video
+  # !In4 & In5 & In7 & !Video
+  # !In0 & In1 & In3 & Video
+  # !In4 & !In5 & In6 & In7 & !Video
+  # !In0 & !In1 & In2 & In3 & Video
+  # In0 & In1 & In2 & In3 & Video
+
+b1 =>
+    !In0 & In2 & In3 & Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # !In4 & In6 & In7 & !Video
+
+b2 =>
+    !In0 & In1 & In2 & In3 & Video
+  # !In4 & In6 & !In7 & !Video
+  # !In0 & In2 & !In3 & Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # !In4 & !In5 & In7 & !Video
+  # !In0 & !In1 & In3 & Video
+  # In0 & !In1 & In2 & In3 & Video
+  # In4 & !In5 & In6 & In7 & !Video
+  # !In4 & In5 & In6 & In7 & !Video
+
+g0 =>
+    !In0 & In1 & In2 & In3 & Video
+  # In0 & !In1 & !In2 & Video
+  # In4 & !In5 & !In6 & !Video
+  # !In4 & In6 & !In7 & !Video
+  # !In0 & In2 & !In3 & Video
+  # In0 & In1 & In3 & Video
+  # In4 & In5 & In7 & !Video
+  # !In5 & In6 & In7 & !Video
+  # !In1 & In2 & In3 & Video
+  # !In4 & In5 & In6 & In7 & !Video
+
+g1 =>
+    !In0 & In2 & In3 & Video
+  # !In4 & In5 & !In7 & !Video
+  # !In0 & In1 & !In3 & Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # In5 & !In6 & In7 & !Video
+  # In1 & !In2 & In3 & Video
+  # !In4 & In6 & In7 & !Video
+
+g2 =>
+    !In0 & In1 & In2 & In3 & Video
+  # !In4 & In5 & In6 & In7 & !Video
+  # In4 & !In5 & In6 & In7 & !Video
+  # !In4 & !In6 & In7 & !Video
+  # !In0 & !In2 & In3 & Video
+  # In0 & In1 & Video
+  # In4 & In5 & !Video
+  # In0 & !In1 & In2 & In3 & Video
+
+index =>
+    Col3 , Col2 , Col1 , Col0
+
+r0 =>
+    !In1 & In2 & In3 & Video
+  # In0 & !In1 & !In2 & !In3 & Video
+  # In4 & !In5 & !In6 & !In7 & !Video
+  # !In4 & In5 & !In6 & !In7 & !Video
+  # !In0 & In1 & !In2 & !In3 & Video
+  # In0 & In1 & In3 & Video
+  # In4 & In5 & In7 & !Video
+  # !In5 & In6 & In7 & !Video
+
+r1 =>
+    In4 & !In5 & In6 & In7 & !Video
+  # In0 & !In1 & In2 & In3 & Video
+  # In4 & !In6 & !Video
+  # In0 & In1 & In2 & Video
+  # In4 & In5 & In6 & !Video
+  # In0 & !In2 & Video
+
+r2 =>
+    !In0 & In1 & In2 & In3 & Video
+  # !In4 & In5 & In6 & In7 & !Video
+  # In4 & In5 & !Video
+  # In0 & !In1 & In2 & Video
+  # In4 & !In5 & In6 & !Video
+  # !In5 & !In6 & In7 & !Video
+  # !In1 & !In2 & In3 & Video
+  # In0 & In1 & Video
+
+rgb =>
+    r2 , r1 , r0 , g2 , g1 , g0 , b2 , b1 , b0
+
+Out0.oe  =>
+    1 
+
+Out1.oe  =>
+    1 
+
+Out2.oe  =>
+    1 
+
+Out3.oe  =>
+    1 
+
+Out4.oe  =>
+    1 
+
+Out5.oe  =>
+    1 
+
+Out6.oe  =>
+    1 
+
+Out7.oe  =>
+    1 
+
+Out8.oe  =>
+    1 
+
+
+===============================================================================
+                                 Symbol Table
+===============================================================================
+
+Pin Variable                                    Pterms   Max     Min    
+Pol   Name              Ext     Pin     Type     Used   Pterms  Level   
+--- --------            ---     ---     ----    ------  ------  -----   
+
+    Blanking                    3        V        -       -       -     
+    Col0                        0        I        2       -       -     
+    Col1                        0        I        2       -       -     
+    Col2                        0        I        2       -       -     
+    Col3                        0        I        2       -       -     
+    In0                         11       V        -       -       -     
+    In1                         10       V        -       -       -     
+    In2                         9        V        -       -       -     
+    In3                         8        V        -       -       -     
+    In4                         7        V        -       -       -     
+    In5                         6        V        -       -       -     
+    In6                         5        V        -       -       -     
+    In7                         4        V        -       -       -     
+    Out0                        22       V        10      10      1     
+    Out1                        21       V        6       12      1     
+    Out2                        20       V        10      14      1     
+    Out3                        19       V        8       16      1     
+    Out4                        18       V        8       16      1     
+    Out5                        17       V        8       14      1     
+    Out6                        16       V        6       12      1     
+    Out7                        15       V        6       10      1     
+    Out8                        14       V        8       8       1     
+    Video                       2        V        -       -       -     
+    b0                          0        I        8       -       -     
+    b1                          0        I        4       -       -     
+    b2                          0        I        10      -       -     
+    g0                          0        I        10      -       -     
+    g1                          0        I        8       -       -     
+    g2                          0        I        8       -       -     
+    index                       0        F        -       -       -     
+    r0                          0        I        8       -       -     
+    r1                          0        I        6       -       -     
+    r2                          0        I        8       -       -     
+    rgb                         0        F        -       -       -     
+    Out0                oe      22       D        1       1       0     
+    Out1                oe      21       D        1       1       0     
+    Out2                oe      20       D        1       1       0     
+    Out3                oe      19       D        1       1       0     
+    Out4                oe      18       D        1       1       0     
+    Out5                oe      17       D        1       1       0     
+    Out6                oe      16       D        1       1       0     
+    Out7                oe      15       D        1       1       0     
+    Out8                oe      14       D        1       1       0     
+
+
+LEGEND    D : default variable         F : field      G : group
+          I : intermediate variable    N : node       M : extended node
+          U : undefined                V : variable   X : extended variable
+          T : function
+
+
+===============================================================================
+                                   Fuse Plot
+===============================================================================
+
+SP 
+ 05764 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+
+AR 
+ 00000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+
+Pin #23  05808 Mode  xx 
+ 00044 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00088 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00132 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00176 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00220 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00264 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00308 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00352 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 00396 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #22  05810 Mode  -- 
+ 00440 -------------------------------------------- 
+ 00484 -----x---x--x---x-------x------------------- 
+ 00528 ----x----x------------------x---x-------x--- 
+ 00572 ----x----x------------------x---x----x---x-- 
+ 00616 -----x---x--x---x----x---x------------------ 
+ 00660 -----x---x--x----x--x---x------------------- 
+ 00704 ----x----x------------------x----x--x---x--- 
+ 00748 ----x----x-------------------x---x--x----x-- 
+ 00792 -----x---x---x---x--x----x------------------ 
+ 00836 -----x---x---x---x---x--x------------------- 
+ 00880 ----x----x-------------------x---x---x--x--- 
+Pin #21  05812 Mode  -- 
+ 00924 -------------------------------------------- 
+ 00968 ----x----x-------------------x---x---x--x--- 
+ 01012 -----x---x---x---x---x--x------------------- 
+ 01056 -----x---x--x-----------x------------------- 
+ 01100 ----x----x------------------x-----------x--- 
+ 01144 -----x---x---x------x---x------------------- 
+ 01188 ----x----x-------------------x------x---x--- 
+ 01232 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01276 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01320 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01364 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01408 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 01452 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #20  05814 Mode  -- 
+ 01496 -------------------------------------------- 
+ 01540 -----x---x--x---x---x----------------------- 
+ 01584 ----x----x------------------x---x---x------- 
+ 01628 -----x---x--x--------x--x------------------- 
+ 01672 ----x----x------------------x--------x--x--- 
+ 01716 -----x---x-------x--x---x------------------- 
+ 01760 ----x----x-----------------------x--x---x--- 
+ 01804 ----x----x------------------x----x---x---x-- 
+ 01848 -----x---x--x----x---x---x------------------ 
+ 01892 -----x---x---x--x-------x------------------- 
+ 01936 ----x----x-------------------x--x-------x--- 
+ 01980 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02024 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02068 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02112 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #19  05816 Mode  -- 
+ 02156 -------------------------------------------- 
+ 02200 ----x----x-------------------x---x---x--x--- 
+ 02244 -----x---x---x---x---x--x------------------- 
+ 02288 -----x---x--x---x--------------------------- 
+ 02332 ----x----x------------------x---x----------- 
+ 02376 -----x---x--x----x------x------------------- 
+ 02420 ----x----x------------------x----x------x--- 
+ 02464 ----x----x-------------------x--x--------x-- 
+ 02508 -----x---x---x--x--------x------------------ 
+ 02552 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02596 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02640 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02684 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02728 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02772 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02816 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 02860 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #18  05818 Mode  -- 
+ 02904 -------------------------------------------- 
+ 02948 -----x---x---x---x--x----x------------------ 
+ 02992 ----x----x-------------------x---x--x----x-- 
+ 03036 ----x----x------------------x---x----x---x-- 
+ 03080 -----x---x--x---x----x---x------------------ 
+ 03124 -----x---x--x-------x----------------------- 
+ 03168 ----x----x------------------x-------x------- 
+ 03212 -----x---x---x--x---x----------------------- 
+ 03256 ----x----x-------------------x--x---x------- 
+ 03300 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03344 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03388 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03432 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03476 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03520 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03564 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 03608 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #17  05820 Mode  -- 
+ 03652 -------------------------------------------- 
+ 03696 ----x----x-------------------x------x---x--- 
+ 03740 -----x---x---x------x---x------------------- 
+ 03784 -----x---x--x---x----x--x------------------- 
+ 03828 ----x----x------------------x---x----x--x--- 
+ 03872 -----x---x--x-------x----------------------- 
+ 03916 ----x----x------------------x-------x------- 
+ 03960 ----x----x------------------x----x---x---x-- 
+ 04004 -----x---x--x----x---x---x------------------ 
+ 04048 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04092 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04136 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04180 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04224 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04268 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #16  05822 Mode  -- 
+ 04312 -------------------------------------------- 
+ 04356 ----x----x-------------------x--x----x--x--- 
+ 04400 -----x---x---x--x----x--x------------------- 
+ 04444 -----x---x--x---x--------------------------- 
+ 04488 ----x----x------------------x---x----------- 
+ 04532 ----x----x------------------x----x--x----x-- 
+ 04576 -----x---x--x----x--x----x------------------ 
+ 04620 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04664 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04708 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04752 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04796 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 04840 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #15  05824 Mode  -- 
+ 04884 -------------------------------------------- 
+ 04928 -----x---x--x---x---x----------------------- 
+ 04972 ----x----x------------------x---x---x------- 
+ 05016 ----x----x------------------x---x----x---x-- 
+ 05060 -----x---x--x---x----x---x------------------ 
+ 05104 -----x---x---x--x---x---x------------------- 
+ 05148 ----x----x-------------------x--x---x---x--- 
+ 05192 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 05236 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 05280 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+ 05324 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+Pin #14  05826 Mode  -- 
+ 05368 -------------------------------------------- 
+ 05412 -----x---x---x--x----x---x------------------ 
+ 05456 ----x----x-------------------x--x----x---x-- 
+ 05500 -----x---x--x---x--------------------------- 
+ 05544 ----x----x------------------x---x----------- 
+ 05588 ----x----x------------------x----x---x---x-- 
+ 05632 -----x---x--x----x---x---x------------------ 
+ 05676 -----x---x---x--x---x----------------------- 
+ 05720 ----x----x-------------------x--x---x------- 
+
+
+LEGEND    X : fuse not blown 
+          - : fuse blown 
+
+===============================================================================
+                                 Chip Diagram
+===============================================================================
+
+                               ______________
+                              |    ROMDAC    |
+                          x---|1           24|---x Vcc                      
+                    Video x---|2           23|---x                          
+                 Blanking x---|3           22|---x Out0                     
+                      In7 x---|4           21|---x Out1                     
+                      In6 x---|5           20|---x Out2                     
+                      In5 x---|6           19|---x Out3                     
+                      In4 x---|7           18|---x Out4                     
+                      In3 x---|8           17|---x Out5                     
+                      In2 x---|9           16|---x Out6                     
+                      In1 x---|10          15|---x Out7                     
+                      In0 x---|11          14|---x Out8                     
+                      GND x---|12          13|---x                          
+                              |______________|
+

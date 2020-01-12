@@ -15,11 +15,14 @@
 	reg [6:0] r_offset =0;
 	reg [9:0] r_x =0;
 	reg [9:0] r_y =0;
+	reg [3:0] r_row=0;
 	
 	assign addr = r_addr;
-	assign row = r_y[3:0];
+	assign row = r_row;
 	
-	assign loadc = !((r_x[2:0]==3'b000)&clk);
+	//assign loadc = !((r_x[2:0]==3'b000)&!clk);
+	assign loadc = ((r_x[2:0]==3'b000)&clk);
+	
 	assign vsync = (r_y==450) | (r_y==451);
 	assign hsync = (r_x[9:4]>41) & (r_x[9:4]<47);
 	assign blank = !((r_y<400) & (r_x<640));
@@ -50,6 +53,11 @@
 			r_offset <= r_offset + 5;
 	end
 	
+	always @(posedge hsync)
+	begin
+		r_row=r_y[3:0]+1;
+	end
+	
 	always @(posedge clk)
 	begin
 	if (r_x[2:0]==3'b100)
@@ -60,7 +68,6 @@
 			begin
 				r_addr[10:4]<=r_offset;
 				r_addr[3:0]<=4'b0;
-		
 		   end
 		end
 	end
