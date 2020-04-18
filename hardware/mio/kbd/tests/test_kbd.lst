@@ -1,0 +1,552 @@
+0000-                  7
+0000-                  8           .include ../../../../include/z180_defs.asm
+0000-            I     1       ; ------------------------------------
+0000-            I     2       ; Z180 constants
+0000-            I     3       ; ------------------------------------
+0000-            I     4
+0000-            I     5       ; ASCI
+0000-            I     6       ; ----------
+0000-            I     7
+0000-            I     8       ; ASCI Control Register A 0 (CNTLA0: 00H)
+0000-            I     9       CNTLA0         .equ $00
+0000-            I    10
+0080-            I    11       CNTLA0_MPE     .equ $80
+0040-            I    12       CNTLA0_RE      .equ $40
+0020-            I    13       CNTLA0_TE      .equ $20
+0010-            I    14       CNTLA0_RTS0    .equ $10
+0008-            I    15       CNTLA0_EFR     .equ $08
+0004-            I    16       CNTLA0_MOD2    .equ $04
+0002-            I    17       CNTLA0_MOD1    .equ $02
+0001-            I    18       CNTLA0_MOD0    .equ $01
+0000-            I    19
+0000-            I    20       ; ASCI Control Register A 1 (CNTLA1: 01H)
+0001-            I    21       CNTLA1         .equ $01
+0000-            I    22
+0080-            I    23       CNTLA1_MPE     .equ $80
+0040-            I    24       CNTLA1_RE      .equ $40
+0020-            I    25       CNTLA1_TE      .equ $20
+0010-            I    26       CNTLA1_CKA1D   .equ $10
+0008-            I    27       CNTLA1_EFR     .equ $08
+0004-            I    28       CNTLA1_MOD2    .equ $04
+0002-            I    29       CNTLA1_MOD1    .equ $02
+0001-            I    30       CNTLA1_MOD0    .equ $01
+0000-            I    31
+0000-            I    32       ; ASCI Control Register B 0 (CNTLB0: 02H)
+0002-            I    33       CNTLB0         .equ $02
+0000-            I    34
+0080-            I    35       CNTLB0_MPBT    .equ $80
+0040-            I    36       CNTLB0_MP      .equ $40
+0020-            I    37       CNTLB0_CTS     .equ $20
+0010-            I    38       CNTLB0_PEO     .equ $10
+0008-            I    39       CNTLB0_DR      .equ $08
+0004-            I    40       CNTLB0_SS2     .equ $04
+0002-            I    41       CNTLB0_SS1     .equ $02
+0001-            I    42       CNTLB0_SS0     .equ $01
+0000-            I    43
+0000-            I    44       ; ASCI Control Register B 1 (CNTLB1: 03H)
+0003-            I    45       CNTLB1         .equ $03
+0000-            I    46
+0080-            I    47       CNTLB1_MPBT    .equ $80
+0040-            I    48       CNTLB1_MP      .equ $40
+0020-            I    49       CNTLB1_CTS     .equ $20
+0010-            I    50       CNTLB1_PEO     .equ $10
+0008-            I    51       CNTLB1_DR      .equ $08
+0004-            I    52       CNTLB1_SS2     .equ $04
+0002-            I    53       CNTLB1_SS1     .equ $02
+0001-            I    54       CNTLB1_SS0     .equ $01
+0000-            I    55
+0000-            I    56       ; ASCI Status Register 0 (STAT0: 04H)
+0004-            I    57       STAT0          .equ $04
+0000-            I    58
+0080-            I    59       STAT0_RDRF     .equ $80
+0040-            I    60       STAT0_OVRN     .equ $40
+0020-            I    61       STAT0_PE       .equ $20
+0010-            I    62       STAT0_FE       .equ $10
+0008-            I    63       STAT0_RIE      .equ $08
+0004-            I    64       STAT0_DCD0     .equ $04
+0002-            I    65       STAT0_TDRE     .equ $02
+0001-            I    66       STAT0_TIE      .equ $01
+0000-            I    67
+0000-            I    68       ; ASCI Status Register 1 (STAT1: 05H)
+0005-            I    69       STAT1          .equ $05
+0000-            I    70
+0080-            I    71       STAT1_RDRF     .equ $80
+0040-            I    72       STAT1_OVRN     .equ $40
+0020-            I    73       STAT1_PE       .equ $20
+0010-            I    74       STAT1_FE       .equ $10
+0008-            I    75       STAT1_RIE      .equ $08
+0004-            I    76       STAT1_CTS1E    .equ $04
+0002-            I    77       STAT1_TDRE     .equ $02
+0001-            I    78       STAT1_TIE      .equ $01
+0000-            I    79
+0000-            I    80       ; ASCI Transmit Data Register Ch. 0 (TDR0: 06H)
+0006-            I    81       TDR0           .equ $06
+0000-            I    82
+0000-            I    83       ; ASCI Transmit Data Register Ch. 1 (TDR1: 07H)
+0007-            I    84       TDR1           .equ $07
+0000-            I    85
+0000-            I    86       ; ASCI Receive Data Register Ch. 0 (RDR0: 08H)
+0008-            I    87       RDR0           .equ $08
+0000-            I    88
+0000-            I    89       ; ASCI Receive Data Register Ch. 1 (RDR1: 09H)
+0009-            I    90       RDR1           .equ $09
+0000-            I    91
+0000-            I    92       ; ASCI0 Extension Control Register 0 (ASEXT0: 12H)
+0012-            I    93       ASEXT0         .equ $12
+0000-            I    94
+0080-            I    95       ASEXT0_RDRFI   .equ $80
+0040-            I    96       ASEXT0_DCD0D   .equ $40
+0020-            I    97       ASEXT0_CTS0D   .equ $20
+0010-            I    98       ASEXT0_X1      .equ $10
+0008-            I    99       ASEXT0_BRG0    .equ $08
+0004-            I   100       ASEXT0_BRKE    .equ $04
+0002-            I   101       ASEXT0_BRK     .equ $02
+0001-            I   102       ASEXT0_SBRK    .equ $01
+0000-            I   103
+0000-            I   104       ; ASCI1 Extension Control Register 1 (ASEXT1: 13H)
+0013-            I   105       ASEXT1         .equ $13
+0000-            I   106
+0080-            I   107       ASEXT1_RDRFI   .equ $80
+0010-            I   108       ASEXT1_X1      .equ $10
+0008-            I   109       ASEXT1_BRG1    .equ $08
+0004-            I   110       ASEXT1_BRKE    .equ $04
+0002-            I   111       ASEXT1_BRK     .equ $02
+0001-            I   112       ASEXT1_SBRK    .equ $01
+0000-            I   113
+0000-            I   114       ; ASCI0 Time Constant Low Register (ASTC0L : 1AH)
+001A-            I   115       ASTC0L         .equ $1A
+0000-            I   116       ; ASCI0 Time Constant High Register (ASTC0H: 1BH)
+001B-            I   117       ASTC0H         .equ $1B
+0000-            I   118       ; ASCI1 Time Constant Low Register (ASTC1L : 1AH)
+001C-            I   119       ASTC1L         .equ $1C
+0000-            I   120       ; ASCI1 Time Constant High Register (ASTC1H: 1BH)
+001D-            I   121       ASTC1H         .equ $1D
+0000-            I   122
+0000-            I   123       ; CSI/0
+0000-            I   124       ; ------------------------------------
+0000-            I   125
+0000-            I   126       ; CSI/O Control Register (CNTR: 0AH)
+000A-            I   127       CNTR           .equ $0A
+0000-            I   128
+0080-            I   129       CNTR_EF        .equ $80
+0040-            I   130       CNTR_EIE       .equ $40
+0020-            I   131       CNTR_RE        .equ $20
+0010-            I   132       CNTR_TE        .equ $10
+0004-            I   133       CNTR_SS2       .equ $04
+0002-            I   134       CNTR_SS1       .equ $02
+0001-            I   135       CNTR_SS0       .equ $01
+0000-            I   136
+0000-            I   137       ; CSI/O Transmit/Receive Data Register (TRD: 0BH)
+000B-            I   138       TRDR           .equ $0B
+0000-            I   139
+0000-            I   140       ; Timer
+0000-            I   141       ; ------------------------------------
+0000-            I   142
+0000-            I   143       ; Data Register Ch 0 L (TMDR0L: 0CH)
+000C-            I   144       TMDR0L         .equ $0C
+0000-            I   145       ; Data Register Ch 0 H (TMDR0H: 0DH)
+000D-            I   146       TMDR0H         .equ $0D
+0000-            I   147       ; Reload Register Ch 0 L (RLDR0L: OEH)
+000E-            I   148       RLDR0L         .equ $0E
+0000-            I   149       ; Reload Register Ch 0 H (RLDR0H: 0FH)
+000F-            I   150       RLDR0H         .equ $0F
+0000-            I   151
+0000-            I   152       ; Timer Control Register (TCR: 10H)
+0010-            I   153       TCR            .equ $10
+0000-            I   154
+0080-            I   155       TCR_TF1        .equ $80
+0040-            I   156       TCR_TF0        .equ $40
+0020-            I   157       TCR_TE1        .equ $20
+0010-            I   158       TCR_TE0        .equ $10
+0008-            I   159       TCR_TOC1       .equ $08
+0004-            I   160       TCR_TOC0       .equ $04
+0002-            I   161       TCR_TDE1       .equ $02
+0001-            I   162       TCR_TDE0       .equ $01
+0000-            I   163
+0000-            I   164       ; Data Register Ch 1 L (TMDR1L: 14h)
+0014-            I   165       TMDR1L         .equ $14
+0000-            I   166       ; Data Register Ch 1 H (TMDR1H: 15H)
+0015-            I   167       TMDR1H         .equ $15
+0000-            I   168       ; Reload Register Ch 1 L (RLDR1L: 16H)
+0016-            I   169       RLDR1L         .equ $16
+0000-            I   170       ; Reload Register Ch 1 H (RLDR1H: 17H)
+0017-            I   171       RLDR1H         .equ $17
+0000-            I   172
+0000-            I   173       ; Others
+0000-            I   174       ; ------------------------------------
+0000-            I   175
+0000-            I   176       ; Clock Multiplier Register (CMR: 1EH)
+001E-            I   177       CMR            .equ $1E
+0000-            I   178
+0080-            I   179       CMR_X2         .equ $80
+0000-            I   180
+0000-            I   181       ; Free Running Counter (FRC: 18H)
+0018-            I   182       FRC            .equ $18
+0000-            I   183
+0000-            I   184       ; CPU Control Register (CCR: 1FH)
+001F-            I   185       CCR            .equ $1F
+0080-            I   186       CCR_CD         .equ $80
+0040-            I   187       CCR_SB1        .equ $40
+0020-            I   188       CCR_BREXT      .equ $20
+0010-            I   189       CCR_LNPHI      .equ $10
+0008-            I   190       CCR_SB2        .equ $08
+0004-            I   191       CCR_LNIO       .equ $04
+0002-            I   192       CCR_LNCPU      .equ $02
+0001-            I   193       CCR_LNAD       .equ $01
+0000-            I   194
+0000-            I   195       ; DMA
+0000-            I   196       ; ---------------------------------------------------------------------------
+0000-            I   197
+0000-            I   198
+0000-            I   199       ; DMA/WAIT Control Register (DCNTL: 32H)
+0000-            I   200
+0000-            I   201       ; INT
+0000-            I   202       ; ---------------------------------------------------------------------------
+0000-            I   203
+0000-            I   204       ; Interrupt Vector Low Register (IL: 33H)
+0033-            I   205       IL              .equ $33
+0000-            I   206
+0000-            I   207       ; INT/TRAP Control Register (ITC: 34H)
+0034-            I   208       ITC             .equ $34
+0000-            I   209
+0080-            I   210       ITC_TRAP        .equ $80
+0040-            I   211       ITC_UFO         .equ $40
+0004-            I   212       ITC_ITE2        .equ $04
+0002-            I   213       ITC_ITE1        .equ $02
+0001-            I   214       ITC_ITE0        .equ $01
+0000-            I   215
+0000-            I   216
+0000-            I   217       ; Refresh
+0000-            I   218       ; ---------------------------------------------------------------------------
+0000-            I   219
+0000-            I   220       ; Refresh Control Register (RCR: 36H)
+0036-            I   221       RCR            .equ $36
+0080-            I   222       RCR_REFE       .equ $80
+0040-            I   223       RCR_REFW       .equ $40
+0002-            I   224       RCR_CYC1       .equ $02
+0001-            I   225       RCR_CYC0       .equ $01
+0000-            I   226
+0000-            I   227       ; MMU
+0000-            I   228       ; ---------------------------------------------------------------------------
+0000-            I   229
+0000-            I   230       ; MMU Common Base Register (CBR: 38H)
+0038-            I   231       CBR            .equ $38
+0000-            I   232       ; MMU Bank Base Register (BBR: 39H)
+0039-            I   233       BBR            .equ $39
+0000-            I   234       ; MMU Common/Bank Register (CBAR: 3AH)
+003A-            I   235       CBAR           .equ $3A
+0000-            I   236       ; I/O
+0000-            I   237       ; ---------------------------------------------------------------------------
+0000-            I   238
+0000-            I   239       ; Operation Mode Control Register (OMCR: 3EH)
+003E-            I   240       OMCR           .equ $3E
+0000-            I   241
+0080-            I   242       OMCR_M1E       .equ $80
+0040-            I   243       OMCR_M1TE      .equ $40
+0000-            I   244       ;OMCR_M1E       .equ $20
+0000-            I   245
+0000-            I   246       ; I/O Control Register (ICR: 3FH)
+003F-            I   247       ICR            .equ $3F
+0000-            I   248
+0080-            I   249       ICR_IOA7       .equ $80
+0040-            I   250       ICR_IOA6       .equ $40
+0020-            I   251       ICR_IOSTP      .equ $20
+0000-                  9
+0000-                 10           .org $0000
+0000-C3 00 01         11 (  9)     jp mreset        ; RESET
+0003-                 12
+0038-                 13           .org $0038
+0038-C3 CF 01         14 (  9)     jp int_noop    ; INT0
+003B-                 15
+0066-                 16           .org $0066
+0066-C3 CF 01         17 (  9)     jp int_noop    ; NMI
+0069-                 18
+0069-                 19       ; interrupt vector table
+0080-                 20           .org $0080
+0080-5C 01            21           .dw int_kbd    ; INT1
+0082-CF 01            22           .dw int_noop    ; INT2
+0084-CF 01            23           .dw int_noop    ; PRT0
+0086-CF 01            24           .dw int_noop    ; PRT1
+0088-CF 01            25           .dw int_noop    ; DMA0
+008A-CF 01            26           .dw int_noop    ; DMA1
+008C-CF 01            27           .dw int_noop    ; CSIO
+008E-CF 01            28           .dw int_noop   ; ASCI0
+0090-CF 01            29           .dw int_noop    ; ASCI1
+0092-                 30
+0100-                 31           .org $0100
+0100-                 32       mreset:
+0100-                 33
+0100-F3               34 (  3)     di ; disable interrupts
+0101-                 35
+0101-                 36           ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
+0101-                 37           ;ld a,CMR_X2
+0101-                 38           ;out0 (CMR),a
+0101-                 39
+0101-                 40           ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
+0101-                 41           ;ld a,CCR_CD
+0101-                 42           ;out0 (CCR),a
+0101-                 43
+0101-3E 00            44 (  6)     ld  a,0
+0103-ED 39 36         45 ( 13)     out0 (RCR),a    ; Refresh disable
+0106-                 46
+0106-                 47           ; MMU
+0106-                 48           ; $F000-$FFFF = VDU ( $20000 - $20FFF ) - Common Area 1
+0106-                 49           ; $2000-$EFFF = RAM ( $80000 - $8EFFF ) - Bank Area
+0106-                 50           ; $0000-$1FFF = ROM ( $00000 - $01FFF ) - Common Area 0
+0106-                 51
+0106-3E F2            52 (  6)     ld a,$F2 ; Common Area 1 = $F000-$FFFF, Bank Area 1 =  $2000-$EFFF
+0108-ED 39 3A         53 ( 13)     out0 (CBAR),a
+010B-3E 11            54 (  6)     ld a,$11 ; Common Area Base = $20000
+010D-ED 39 38         55 ( 13)     out0 (CBR),a
+0110-3E 7E            56 (  6)     ld a,$7E ; Bank Area Base = $80000
+0112-ED 39 39         57 ( 13)     out0 (BBR),a
+0115-                 58
+0115-                 59           ; Stack pointer = $10FF
+0115-31 FF 20         60 (  9)     ld sp,$20FF
+0118-                 61
+0118-CD 98 01         62 ( 16)     call asci1_init
+011B-                 63
+011B-                 64           ; setup interupts
+011B-ED 56            65 (  6)     im 1    ; interrupt mode 1
+011D-3E 00            66 (  6)     ld a,0  ; interrupts high order byte : 00H
+011F-ED 47            67 (  6)     ld i,a
+0121-3E 80            68 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
+0123-ED 39 33         69 ( 13)     out0 (IL),a
+0126-                 70
+0126-                 71           ; enable INT1
+0126-3E 02            72 (  6)     ld a,ITC_ITE1
+0128-ED 39 34         73 ( 13)     out0 (ITC),a
+012B-                 74
+012B-FB               75 (  3)    ei      ; enable interrupts
+012C-                 76
+0080-                 77       KBD_DATA    .equ $80
+0081-                 78       KBD_STATUS  .equ $81
+012C-                 79
+012C-                 80       main:
+012C-21 D1 01         81 (  9)     ld hl,str_welcome ; show welcome message
+012F-CD B2 01         82 ( 16)     call asci1_puts
+0132-                 83
+0132-3E 00            84 (  6)     ld a,0
+0134-32 01 21         85 ( 13)     ld (kbd_buffer_pos),a
+0137-                 86
+0137-                 87       loop:
+0137-                 88        ;in0 a,(KBD_DATA)
+0137-                 89        ;   call decode_scancode
+0137-3A 01 21         90 ( 12)     ld a,(kbd_buffer_pos)
+013A-FE 00            91 (  6)     cp $0
+013C-CA 37 01         92 ( 6+)     jp Z,loop
+013F-CD 48 01         93 ( 16)     call kbd_get_key
+0142-                 94          ; ld a,(kbd_buffer_pos)
+0142-CD C2 01         95 ( 16)     call asci1_putc
+0145-C3 37 01         96 (  9)     jp loop
+0148-                 97
+0148-                 98
+0148-                 99       kbd_get_key:
+0148-E5              100 ( 11)     push hl
+0149-D5              101 ( 11)     push de
+014A-3A 01 21        102 ( 12)     ld a,(kbd_buffer_pos)
+014D-3D              103 (  4)     dec a
+014E-32 01 21        104 ( 13)     ld (kbd_buffer_pos),a
+0151-16 00           105 (  6)     ld d,0
+0153-5F              106 (  4)     ld e,a
+0154-21 02 21        107 (  9)     ld hl,kbd_buffer
+0157-19              108 (  7)     add hl,de
+0158-7E              109 (  6)     ld a,(hl)
+0159-                110
+0159-D1              111 (  9)     pop de
+015A-E1              112 (  9)     pop hl
+015B-C9              113 (  9)     ret
+015C-                114
+015C-                115       int_kbd:
+015C-F5              116 ( 11)     push af
+015D-E5              117 ( 11)     push hl
+015E-D5              118 ( 11)     push de
+015F-                119
+015F-ED 38 80        120 ( 12)     in0 a,(KBD_DATA)
+0162-FE 70           121 (  6)     cp $70                      ; F0 = release key
+0164-CA 8E 01        122 ( 6+)     jp Z,int_kbd_release_key
+0167-                123
+0167-3A 00 21        124 ( 12)     ld a,(kbd_state)            ; state==1 -> released key scancode after $F0
+016A-FE 01           125 (  6)     cp $01
+016C-CA 87 01        126 ( 6+)     jp Z,int_kbd_release_key_2
+016F-                127
+016F-16 00           128 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
+0171-3A 01 21        129 ( 12)     ld a,(kbd_buffer_pos)
+0174-5F              130 (  4)     ld e,a
+0175-21 02 21        131 (  9)     ld hl,kbd_buffer
+0178-19              132 (  7)     add hl,de
+0179-                133
+0179-ED 38 80        134 ( 12)     in0 a,(KBD_DATA)            ; get ASCII code
+017C-CD E5 01        135 ( 16)     call decode_scancode
+017F-77              136 (  7)     ld (hl),a
+0180-                137
+0180-7B              138 (  4)     ld a,e                      ; inc kbd_buffer_pos
+0181-3C              139 (  4)     inc a
+0182-32 01 21        140 ( 13)     ld (kbd_buffer_pos),a
+0185-                141
+0185-18 0C           142 (  8)     jr int_kbd_exit
+0187-                143
+0187-                144       int_kbd_release_key_2:
+0187-3E 00           145 (  6)     ld a,0
+0189-32 00 21        146 ( 13)     ld (kbd_state),a
+018C-18 05           147 (  8)     jr int_kbd_exit
+018E-                148
+018E-                149       int_kbd_release_key:
+018E-3E 01           150 (  6)     ld a,1
+0190-32 00 21        151 ( 13)     ld (kbd_state),a
+0193-                152
+0193-                153       int_kbd_exit:
+0193-D1              154 (  9)     pop de
+0194-E1              155 (  9)     pop hl
+0195-F1              156 (  9)     pop af
+0196-FB              157 (  3)     ei
+0197-C9              158 (  9)     ret
+0198-                159
+0198-                160
+0198-                161       ; -----------------------------------------------------------------
+0198-                162
+0198-                163       ; initialize asci1
+0198-                164       asci1_init:
+0198-                165
+0198-                166           ; RE : Receiver Enable
+0198-                167           ; TE : Transmitter Enable
+0198-                168           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+0198-3E 64           169 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
+019A-ED 39 01        170 ( 13)     out0 (CNTLA1),a
+019D-                171
+019D-                172           ; DR=0
+019D-3E 00           173 (  6)     ld a,0
+019F-ED 39 03        174 ( 13)     out0 (CNTLB1),a
+01A2-                175
+01A2-                176           ; BRG0 : Enable 16 bit BRG counter
+01A2-                177           ; X1 ( + DR=0) : Clock mode = /1
+01A2-3E 18           178 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
+01A4-ED 39 13        179 ( 13)     out0 (ASEXT1),a
+01A7-                180
+01A7-                181           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+01A7-                182           ; TC = fphi/(2*baud rate*clock mode) - 2
+01A7-                183           ; TC = 32000000/(2*9600*1) - 2
+01A7-3E 81           184 (  6)     ld a,$81
+01A9-ED 39 1C        185 ( 13)     out0 (ASTC1L),a
+01AC-3E 06           186 (  6)     ld a,$06
+01AE-ED 39 1D        187 ( 13)     out0 (ASTC1H),a
+01B1-                188
+01B1-C9              189 (  9)     ret
+01B2-                190
+01B2-                191       ; put a string on asci1
+01B2-                192       ; input : (hl) = address of null terminated string
+01B2-                193       asci1_puts:
+01B2-E5              194 ( 11)     push hl
+01B3-F5              195 ( 11)     push af
+01B4-                196
+01B4-                197       asci1_puts_loop:
+01B4-7E              198 (  6)     ld a,(hl)
+01B5-F6 00           199 (  6)     or 0
+01B7-28 06           200 ( 6+)     jr z,asci1_puts_exit
+01B9-CD C2 01        201 ( 16)     call asci1_putc
+01BC-23              202 (  4)     inc hl
+01BD-18 F5           203 (  8)     jr asci1_puts_loop
+01BF-                204
+01BF-                205       asci1_puts_exit:
+01BF-F1              206 (  9)     pop af
+01C0-E1              207 (  9)     pop hl
+01C1-C9              208 (  9)     ret
+01C2-                209
+01C2-                210
+01C2-                211
+01C2-                212       ; put a char on asci1
+01C2-                213       ; input : a = char ascii code
+01C2-                214       asci1_putc:
+01C2-F5              215 ( 11)     push af
+01C3-                216
+01C3-                217       asci1_putc_wait:  ; wait for asci0 TX ready
+01C3-ED 38 05        218 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
+01C6-E6 02           219 (  6)     and STAT1_TDRE
+01C8-28 F9           220 ( 6+)     jr Z,asci1_putc_wait
+01CA-F1              221 (  9)     pop af
+01CB-ED 39 07        222 ( 13)     out0 (TDR1),a ; output the char to asci0
+01CE-C9              223 (  9)     ret
+01CF-                224
+01CF-                225
+01CF-                226       int_noop:
+01CF-FB              227 (  3)     ei
+01D0-C9              228 (  9)     ret
+01D1-                229
+01D1-                230
+01D1-1B 5B 32 4A 
+     1B 5B 48 54 
+     65 73 74 20 
+     4B 62 64 0D 
+     0A 0D 0A 00     231       str_welcome:    .db $1B,"[2J",$1B,"[H","Test Kbd",13,10,13,10,0
+01E5-                232
+01E5-                233
+01E5-                234       ; input : a = last scan code
+01E5-                235       ; output : a = decodes scan code
+01E5-                236       decode_scancode:
+01E5-E5              237 ( 11)     push hl
+01E6-D5              238 ( 11)     push de
+01E7-                239
+01E7-21 F2 01        240 (  9)     ld hl,scan_codes
+01EA-16 00           241 (  6)     ld d,0
+01EC-5F              242 (  4)     ld e,a
+01ED-19              243 (  7)     add hl,de
+01EE-7E              244 (  6)     ld a,(hl)
+01EF-                245
+01EF-                246       decode_scancode_exit:
+01EF-                247
+01EF-D1              248 (  9)     pop de
+01F0-E1              249 (  9)     pop hl
+01F1-C9              250 (  9)     ret
+01F2-                251
+01F2-                252
+01F2-                253       scan_codes:
+01F2-                254           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
+01F2-00 00 00 00 
+     00 00 00 00 
+     00 00 00 00 
+     00 C2 B2 00     255           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,'²',0
+0202-                256           ; 10-1F : n/a n/a LSHIFT n/a n/a a 1 n/a n/a n/a n/a w s q z 2 n/a
+0202-00 00 00 00 
+     00 61 31 00 
+     00 00 77 73 
+     71 7A 32 00     257           .db 0,0,0,0,0,'a','1',0,0,0,'w','s','q','z','2',0
+0212-                258           ; 20-2F : n/a c x d e 4 3 n/a n/a SPACE v f t r 5 n/a
+0212-00 63 78 64 
+     65 34 33 00 
+     00 20 76 66 
+     74 72 35 00     259           .db 0,'c','x','d','e','4','3',0,0,' ','v','f','t','r','5',0
+0222-                260           ; 30-3F : n/a n b h g y 6 n/a n/a n/a , j u 7 8 n/a
+0222-00 6E 62 68 
+     67 79 36 00 
+     00 00 2C 6A 
+     75 37 38 00     261           .db 0,'n','b','h','g','y','6',0,0,0,',','j','u','7','8',0
+0232-                262           ; 40-4F : n/a ; k i o 0 9 n/a n/a : ! l m p ) n/a
+0232-00 3A 6B 69 
+     6F 30 39 00 
+     00 3A 21 6C 
+     6D 70 29 00     263           .db 0,58,'k','i','o','0','9',0,0,':','!','l','m','p',')',0
+0242-                264           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
+0242-00 00 C3 B9 
+     00 5E 3D 00 
+     00 00 00 00 
+     24 00 2A 00 
+     00              265           .db 0,0,'ù',0,'^','=',0,0,0,0,0,'$',0,'*',0,0
+0253-                266           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 n/a n/a n/a
+0253-00 3C 00 00 
+     00 00 00 00 
+     00 31 00 34 
+     00 00 00        267           .db 0,'<',0,0,0,0,0,0,0,'1',0,'4',0,0,0
+0262-                268           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+0262-30 2C 32 35 
+     36 38 00 00 
+     00 2B 33 2D 
+     2A 39 00        269           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+0271-                270           ; 80-83 : n/a n/a n/a F7
+0271-00 00 00 00     271           .db 0,0,0,0
+0275-                272
+0275-                273
+2100-                274           .org $2100
+2100-                275
+2100-                276       kbd_state: .bs 1
+2101-                277       kbd_buffer_pos:    .bs 1
+2102-                278       kbd_buffer: .bs 64

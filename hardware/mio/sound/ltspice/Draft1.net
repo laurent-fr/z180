@@ -1,0 +1,11 @@
+* C:\Users\Laurent\Documents\git_z180\hardware\mio\sound\Draft1.asc
+V1 N001 0 12
+V2 N003 0 PWL file=C:\Users\Laurent\Desktop\out.pwl
+R1 N004 N003 1K
+R3 N002 0 100K
+C1 N004 0 10n
+XU1 N004 N002 N001 0 N002 LT1677
+.tran 0.04
+.lib LTC.lib
+.backanno
+.end

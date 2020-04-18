@@ -49,12 +49,12 @@ mreset:
     di ; disable interrupts
 
     ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
-     ld a,CMR_X2
-     out0 (CMR),a
+    ; ld a,CMR_X2
+    ; out0 (CMR),a
 
     ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
-     ld a,CCR_CD
-     out0 (CCR),a
+    ; ld a,CCR_CD
+    ; out0 (CCR),a
 
     ld  a,0
     out0 (RCR),a    ; Refresh disable
@@ -87,7 +87,7 @@ mreset:
     ei      ; enable interrupts
 
 main:
-    ld a,'A'
+    ld a,'B'
     call asci1_putc
     ld hl,str_welcome ; show welcome message
     call asci1_puts
@@ -99,8 +99,9 @@ main:
     ;ld (hl),a
     ;jr testvdu
     ;jp main
+    
     ; BASIC
-    jp $0300
+    ;jp $0300
 
 mprompt:
     ld hl,str_prompt ; show prompt
