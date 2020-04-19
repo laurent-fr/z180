@@ -81,8 +81,10 @@ main:
     ld hl,str_welcome ; show welcome message
     call asci1_puts
 
+    ; init kbd
     ld a,0
     ld (kbd_buffer_pos),a
+    ld (kbd_state),a
 
 loop:
  ;in0 a,(KBD_DATA)
@@ -95,7 +97,7 @@ loop:
     call asci1_putc
     jp loop
 
-
+; Get next key in buffer
 kbd_get_key:
     push hl
     push de
@@ -112,43 +114,154 @@ kbd_get_key:
     pop hl
     ret
 
+; Keyboard Interruption
 int_kbd:
     push af
     push hl
     push de
 
-    in0 a,(KBD_DATA)
-    cp $70                      ; F0 = release key
-    jp Z,int_kbd_release_key
+    in0 a,(KBD_DATA)            ; read scancode
+    ld b,a                      ; stored in B register
 
-    ld a,(kbd_state)            ; state==1 -> released key scancode after $F0
-    cp $01
-    jp Z,int_kbd_release_key_2
   
+
+int_kbd_test_F0:
+    cp $70                      ; F0 = release key
+    jp NZ,int_kbd_test_E0
+ 
+    ld hl,kbd_state             ; set F0 flag in kbd_state
+    set KBD_STATE_F0,(hl)
+    jp int_kbd_exit
+
+int_kbd_test_E0:
+
+    cp $60                      ; E0 = extended scancodes
+    jp NZ,int_kbd_check_state
+ 
+    ld hl,kbd_state             ; set F0 flag in kbd_state
+    set KBD_STATE_E0,(hl)
+    jp int_kbd_exit
+
+int_kbd_check_state:
+    ld a,(kbd_state)            
+
+    bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
+    jp NZ,int_kbd_F0             ; (release key)
+
+    bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
+    jp NZ,int_kbd_E0             ; (extended scancode)
+
+   
+
+int_kbd_shift:    ; SHIFT
+     ld a,b
+    cp $12 ; lshift
+    jp Z,int_kbd_is_shift
+    cp $59 ; rshift
+    jp NZ,int_kbd_alt
+
+int_kbd_is_shift:
+    ld hl,kbd_state
+    set KBD_STATE_SHIFT,(hl)
+
+    jr int_kbd_exit
+
+int_kbd_alt:    ; ALT
+    cp $11
+    jp NZ,int_kbd_capslock
+
+    ld hl,kbd_state
+    set KBD_STATE_ALT,(hl)
+
+    jr int_kbd_exit
+
+int_kbd_capslock    ; CAPS LOCK
+    cp $58
+    jp NZ,int_kbd_get_key
+
+int_kbd_get_key:
     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
     ld a,(kbd_buffer_pos)
     ld e,a
     ld hl,kbd_buffer
     add hl,de
 
-    in0 a,(KBD_DATA)            ; get ASCII code
-    call decode_scancode
-    ld (hl),a
+    ld a,b                      ; get ASCII code from scancode
+    push hl
 
-    ld a,e                      ; inc kbd_buffer_pos 
+    ld hl,(kbd_state)
+
+    bit KBD_STATE_SHIFT,(hl)
+    jp NZ,int_kbd_get_key_alt
+    ld hl,scan_codes_shift
+    jr int_kbd_get_key_scancode
+
+int_kbd_get_key_alt:
+    bit KBD_STATE_ALT,(hl)
+    jp NZ,int_kbd_get_key_lowercase
+    ld hl,scan_codes_alt
+    jr int_kbd_get_key_scancode
+
+int_kbd_get_key_lowercase:
+    ld hl,scan_codes
+
+int_kbd_get_key_scancode:
+    call decode_scancode
+    pop hl
+
+    cp 0                        ; do nothing if no code found
+    jp Z,int_kbd_exit
+
+    ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
+          
+    cp 13                       ; insert LF if ASCII code == CR (13)
+    jp NZ,kbd_int_incr_buffer_pos
+
+    inc hl
+    ld a,10 
+    ld (hl),a
+    ld a,e
+    inc a 
+    ld (kbd_buffer_pos),a
+
+kbd_int_incr_buffer_pos:
+     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos 
     inc a
     ld (kbd_buffer_pos),a
 
+   
+
     jr int_kbd_exit
 
-int_kbd_release_key_2:
-    ld a,0
-    ld (kbd_state),a
+int_kbd_E0:
+
+    ld hl,kbd_state
+    res KBD_STATE_E0,(hl)
+
     jr int_kbd_exit
 
-int_kbd_release_key:
-    ld a,1
-    ld (kbd_state),a
+int_kbd_F0:
+
+   ld hl,kbd_state
+   res KBD_STATE_F0,(hl)
+
+   ld a,b
+   cp $12 ; LSHIFT
+   jp NZ,int_kbd_F0_rshift
+   res KBD_STATE_SHIFT,(hl)
+   jr int_kbd_exit
+
+int_kbd_F0_rshift:
+   cp $59 ; RSHIFT
+   jp NZ,int_kbd_F0_alt
+   res KBD_STATE_SHIFT,(hl)
+   jr int_kbd_exit
+
+int_kbd_F0_alt:
+   cp $11 ; ALT
+   jp NZ,int_kbd_exit
+   res KBD_STATE_ALT,(hl)
+
 
 int_kbd_exit:
     pop de
@@ -231,13 +344,13 @@ int_noop:
 str_welcome:    .db $1B,"[2J",$1B,"[H","Test Kbd",13,10,13,10,0
 
     
-; input : a = last scan code
-; output : a = decodes scan code
+; input : a = scan code, hl = pointer to scan code table
+; output : a = decoded scan code
 decode_scancode:
     push hl
     push de
 
-    ld hl,scan_codes
+    ;ld hl,scan_codes
     ld d,0  
     ld e,a
     add hl,de
@@ -252,27 +365,77 @@ decode_scancode_exit:
 
 scan_codes:
     ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
-    .db 0,0,0,0,0,0,0,0,0,0,0,0,0,'²',0
-    ; 10-1F : n/a n/a LSHIFT n/a n/a a 1 n/a n/a n/a n/a w s q z 2 n/a
-    .db 0,0,0,0,0,'a','1',0,0,0,'w','s','q','z','2',0
-    ; 20-2F : n/a c x d e 4 3 n/a n/a SPACE v f t r 5 n/a
-    .db 0,'c','x','d','e','4','3',0,0,' ','v','f','t','r','5',0
-    ; 30-3F : n/a n b h g y 6 n/a n/a n/a , j u 7 8 n/a
-    .db 0,'n','b','h','g','y','6',0,0,0,',','j','u','7','8',0
-    ; 40-4F : n/a ; k i o 0 9 n/a n/a : ! l m p ) n/a
-    .db 0,58,'k','i','o','0','9',0,0,':','!','l','m','p',')',0
+    .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
+    ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
+    .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
+    ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
+    .db 0,'c','x','d','e',38,34,0,0,' ','v','f','t','r','(',0
+    ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
+    .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
+    ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
+    .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
     ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
-    .db 0,0,'ù',0,'^','=',0,0,0,0,0,'$',0,'*',0,0
-    ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 n/a n/a n/a
-    .db 0,'<',0,0,0,0,0,0,0,'1',0,'4',0,0,0
+    .db 0,0,151,0,'^','=',0,0,0,0,13,'$',0,'*',0,0
+    ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+    .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
     ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
     .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+    ; 80-83 : n/a n/a n/a F7
+    .db 0,0,0,0
+
+scan_codes_shift:
+    ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
+    .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
+    ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
+    .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
+    ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
+    .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
+    ; 30-3F : n/a N B H G Y 6 n/a n/a n/a , J U 7 8 n/a
+    .db 0,'N','B','H','G','Y','6',0,0,0,',','J','U','7','8',0
+    ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
+    .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
+    ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
+    .db 0,0,'%',0,126,'+',0,0,0,0,13,156,0,230,0,0
+    ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+    .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+    ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+    .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+    ; 80-83 : n/a n/a n/a F7
+    .db 0,0,0,0
+
+scan_codes_alt:
+    ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+    .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
+    .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
+    ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
+    .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
+    ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
+    .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
+    ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
+    .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
+    ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+    .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
+    ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+    .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+    .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     ; 80-83 : n/a n/a n/a F7
     .db 0,0,0,0
 
 
     .org $2100
 
+; bit 0 : shift
+; bit 1 : alt
+; bit 2 : caps lock
+KBD_STATE_SHIFT .equ 0
+KBD_STATE_ALT .equ 1
+KBD_STATE_CAPS .equ 2
+KBD_STATE_F0   .equ 3
+KBD_STATE_E0  .equ 4
+
 kbd_state: .bs 1
+
 kbd_buffer_pos:    .bs 1
 kbd_buffer: .bs 64
