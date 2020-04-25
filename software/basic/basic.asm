@@ -12,9 +12,9 @@
 ; updated the web page hosting service.
 ;
 ;==================================================================================
-        .CR z180
-        .TF basic.hex,INT,24
-        .LF basic.lst
+ ;       .CR z180
+ ;       .TF basic.hex,INT,24
+ ;       .LF basic.lst
 ; NASCOM ROM BASIC Ver 4.7, (C) 1978 Microsoft
 ; Scanned from source published in 80-BUS NEWS from Vol 2, Issue 3
 ; (May-June 1983) to Vol 3, Issue 3 (May-June 1984)
@@ -128,9 +128,8 @@ MO      .EQU    24H             ; Missing operand
 HX      .EQU    26H             ; HEX error
 BN      .EQU    28H             ; BIN error
 
-        ;.ORG    00150H
-        .ORG    00300H
-
+        .ORG    00150H
+        
 COLD:   JP      STARTB          ; Jump for cold start
 WARM:   JP      WARMST          ; Jump for warm start
 STARTB: 

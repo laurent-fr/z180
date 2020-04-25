@@ -1,0 +1,621 @@
+0000-                  6
+0000-                  7           .include ../../include/z180_defs.asm
+0000-            I     1       ; ------------------------------------
+0000-            I     2       ; Z180 constants
+0000-            I     3       ; ------------------------------------
+0000-            I     4
+0000-            I     5       ; ASCI
+0000-            I     6       ; ----------
+0000-            I     7
+0000-            I     8       ; ASCI Control Register A 0 (CNTLA0: 00H)
+0000-            I     9       CNTLA0         .equ $00
+0000-            I    10
+0080-            I    11       CNTLA0_MPE     .equ $80
+0040-            I    12       CNTLA0_RE      .equ $40
+0020-            I    13       CNTLA0_TE      .equ $20
+0010-            I    14       CNTLA0_RTS0    .equ $10
+0008-            I    15       CNTLA0_EFR     .equ $08
+0004-            I    16       CNTLA0_MOD2    .equ $04
+0002-            I    17       CNTLA0_MOD1    .equ $02
+0001-            I    18       CNTLA0_MOD0    .equ $01
+0000-            I    19
+0000-            I    20       ; ASCI Control Register A 1 (CNTLA1: 01H)
+0001-            I    21       CNTLA1         .equ $01
+0000-            I    22
+0080-            I    23       CNTLA1_MPE     .equ $80
+0040-            I    24       CNTLA1_RE      .equ $40
+0020-            I    25       CNTLA1_TE      .equ $20
+0010-            I    26       CNTLA1_CKA1D   .equ $10
+0008-            I    27       CNTLA1_EFR     .equ $08
+0004-            I    28       CNTLA1_MOD2    .equ $04
+0002-            I    29       CNTLA1_MOD1    .equ $02
+0001-            I    30       CNTLA1_MOD0    .equ $01
+0000-            I    31
+0000-            I    32       ; ASCI Control Register B 0 (CNTLB0: 02H)
+0002-            I    33       CNTLB0         .equ $02
+0000-            I    34
+0080-            I    35       CNTLB0_MPBT    .equ $80
+0040-            I    36       CNTLB0_MP      .equ $40
+0020-            I    37       CNTLB0_CTS     .equ $20
+0010-            I    38       CNTLB0_PEO     .equ $10
+0008-            I    39       CNTLB0_DR      .equ $08
+0004-            I    40       CNTLB0_SS2     .equ $04
+0002-            I    41       CNTLB0_SS1     .equ $02
+0001-            I    42       CNTLB0_SS0     .equ $01
+0000-            I    43
+0000-            I    44       ; ASCI Control Register B 1 (CNTLB1: 03H)
+0003-            I    45       CNTLB1         .equ $03
+0000-            I    46
+0080-            I    47       CNTLB1_MPBT    .equ $80
+0040-            I    48       CNTLB1_MP      .equ $40
+0020-            I    49       CNTLB1_CTS     .equ $20
+0010-            I    50       CNTLB1_PEO     .equ $10
+0008-            I    51       CNTLB1_DR      .equ $08
+0004-            I    52       CNTLB1_SS2     .equ $04
+0002-            I    53       CNTLB1_SS1     .equ $02
+0001-            I    54       CNTLB1_SS0     .equ $01
+0000-            I    55
+0000-            I    56       ; ASCI Status Register 0 (STAT0: 04H)
+0004-            I    57       STAT0          .equ $04
+0000-            I    58
+0080-            I    59       STAT0_RDRF     .equ $80
+0040-            I    60       STAT0_OVRN     .equ $40
+0020-            I    61       STAT0_PE       .equ $20
+0010-            I    62       STAT0_FE       .equ $10
+0008-            I    63       STAT0_RIE      .equ $08
+0004-            I    64       STAT0_DCD0     .equ $04
+0002-            I    65       STAT0_TDRE     .equ $02
+0001-            I    66       STAT0_TIE      .equ $01
+0000-            I    67
+0000-            I    68       ; ASCI Status Register 1 (STAT1: 05H)
+0005-            I    69       STAT1          .equ $05
+0000-            I    70
+0080-            I    71       STAT1_RDRF     .equ $80
+0040-            I    72       STAT1_OVRN     .equ $40
+0020-            I    73       STAT1_PE       .equ $20
+0010-            I    74       STAT1_FE       .equ $10
+0008-            I    75       STAT1_RIE      .equ $08
+0004-            I    76       STAT1_CTS1E    .equ $04
+0002-            I    77       STAT1_TDRE     .equ $02
+0001-            I    78       STAT1_TIE      .equ $01
+0000-            I    79
+0000-            I    80       ; ASCI Transmit Data Register Ch. 0 (TDR0: 06H)
+0006-            I    81       TDR0           .equ $06
+0000-            I    82
+0000-            I    83       ; ASCI Transmit Data Register Ch. 1 (TDR1: 07H)
+0007-            I    84       TDR1           .equ $07
+0000-            I    85
+0000-            I    86       ; ASCI Receive Data Register Ch. 0 (RDR0: 08H)
+0008-            I    87       RDR0           .equ $08
+0000-            I    88
+0000-            I    89       ; ASCI Receive Data Register Ch. 1 (RDR1: 09H)
+0009-            I    90       RDR1           .equ $09
+0000-            I    91
+0000-            I    92       ; ASCI0 Extension Control Register 0 (ASEXT0: 12H)
+0012-            I    93       ASEXT0         .equ $12
+0000-            I    94
+0080-            I    95       ASEXT0_RDRFI   .equ $80
+0040-            I    96       ASEXT0_DCD0D   .equ $40
+0020-            I    97       ASEXT0_CTS0D   .equ $20
+0010-            I    98       ASEXT0_X1      .equ $10
+0008-            I    99       ASEXT0_BRG0    .equ $08
+0004-            I   100       ASEXT0_BRKE    .equ $04
+0002-            I   101       ASEXT0_BRK     .equ $02
+0001-            I   102       ASEXT0_SBRK    .equ $01
+0000-            I   103
+0000-            I   104       ; ASCI1 Extension Control Register 1 (ASEXT1: 13H)
+0013-            I   105       ASEXT1         .equ $13
+0000-            I   106
+0080-            I   107       ASEXT1_RDRFI   .equ $80
+0010-            I   108       ASEXT1_X1      .equ $10
+0008-            I   109       ASEXT1_BRG1    .equ $08
+0004-            I   110       ASEXT1_BRKE    .equ $04
+0002-            I   111       ASEXT1_BRK     .equ $02
+0001-            I   112       ASEXT1_SBRK    .equ $01
+0000-            I   113
+0000-            I   114       ; ASCI0 Time Constant Low Register (ASTC0L : 1AH)
+001A-            I   115       ASTC0L         .equ $1A
+0000-            I   116       ; ASCI0 Time Constant High Register (ASTC0H: 1BH)
+001B-            I   117       ASTC0H         .equ $1B
+0000-            I   118       ; ASCI1 Time Constant Low Register (ASTC1L : 1AH)
+001C-            I   119       ASTC1L         .equ $1C
+0000-            I   120       ; ASCI1 Time Constant High Register (ASTC1H: 1BH)
+001D-            I   121       ASTC1H         .equ $1D
+0000-            I   122
+0000-            I   123       ; CSI/0
+0000-            I   124       ; ------------------------------------
+0000-            I   125
+0000-            I   126       ; CSI/O Control Register (CNTR: 0AH)
+000A-            I   127       CNTR           .equ $0A
+0000-            I   128
+0080-            I   129       CNTR_EF        .equ $80
+0040-            I   130       CNTR_EIE       .equ $40
+0020-            I   131       CNTR_RE        .equ $20
+0010-            I   132       CNTR_TE        .equ $10
+0004-            I   133       CNTR_SS2       .equ $04
+0002-            I   134       CNTR_SS1       .equ $02
+0001-            I   135       CNTR_SS0       .equ $01
+0000-            I   136
+0000-            I   137       ; CSI/O Transmit/Receive Data Register (TRD: 0BH)
+000B-            I   138       TRDR           .equ $0B
+0000-            I   139
+0000-            I   140       ; Timer
+0000-            I   141       ; ------------------------------------
+0000-            I   142
+0000-            I   143       ; Data Register Ch 0 L (TMDR0L: 0CH)
+000C-            I   144       TMDR0L         .equ $0C
+0000-            I   145       ; Data Register Ch 0 H (TMDR0H: 0DH)
+000D-            I   146       TMDR0H         .equ $0D
+0000-            I   147       ; Reload Register Ch 0 L (RLDR0L: OEH)
+000E-            I   148       RLDR0L         .equ $0E
+0000-            I   149       ; Reload Register Ch 0 H (RLDR0H: 0FH)
+000F-            I   150       RLDR0H         .equ $0F
+0000-            I   151
+0000-            I   152       ; Timer Control Register (TCR: 10H)
+0010-            I   153       TCR            .equ $10
+0000-            I   154
+0080-            I   155       TCR_TF1        .equ $80
+0040-            I   156       TCR_TF0        .equ $40
+0020-            I   157       TCR_TE1        .equ $20
+0010-            I   158       TCR_TE0        .equ $10
+0008-            I   159       TCR_TOC1       .equ $08
+0004-            I   160       TCR_TOC0       .equ $04
+0002-            I   161       TCR_TDE1       .equ $02
+0001-            I   162       TCR_TDE0       .equ $01
+0000-            I   163
+0000-            I   164       ; Data Register Ch 1 L (TMDR1L: 14h)
+0014-            I   165       TMDR1L         .equ $14
+0000-            I   166       ; Data Register Ch 1 H (TMDR1H: 15H)
+0015-            I   167       TMDR1H         .equ $15
+0000-            I   168       ; Reload Register Ch 1 L (RLDR1L: 16H)
+0016-            I   169       RLDR1L         .equ $16
+0000-            I   170       ; Reload Register Ch 1 H (RLDR1H: 17H)
+0017-            I   171       RLDR1H         .equ $17
+0000-            I   172
+0000-            I   173       ; Others
+0000-            I   174       ; ------------------------------------
+0000-            I   175
+0000-            I   176       ; Clock Multiplier Register (CMR: 1EH)
+001E-            I   177       CMR            .equ $1E
+0000-            I   178
+0080-            I   179       CMR_X2         .equ $80
+0000-            I   180
+0000-            I   181       ; Free Running Counter (FRC: 18H)
+0018-            I   182       FRC            .equ $18
+0000-            I   183
+0000-            I   184       ; CPU Control Register (CCR: 1FH)
+001F-            I   185       CCR            .equ $1F
+0080-            I   186       CCR_CD         .equ $80
+0040-            I   187       CCR_SB1        .equ $40
+0020-            I   188       CCR_BREXT      .equ $20
+0010-            I   189       CCR_LNPHI      .equ $10
+0008-            I   190       CCR_SB2        .equ $08
+0004-            I   191       CCR_LNIO       .equ $04
+0002-            I   192       CCR_LNCPU      .equ $02
+0001-            I   193       CCR_LNAD       .equ $01
+0000-            I   194
+0000-            I   195       ; DMA
+0000-            I   196       ; ---------------------------------------------------------------------------
+0000-            I   197
+0000-            I   198
+0000-            I   199       ; DMA/WAIT Control Register (DCNTL: 32H)
+0000-            I   200
+0000-            I   201       ; INT
+0000-            I   202       ; ---------------------------------------------------------------------------
+0000-            I   203
+0000-            I   204       ; Interrupt Vector Low Register (IL: 33H)
+0033-            I   205       IL              .equ $33
+0000-            I   206
+0000-            I   207       ; INT/TRAP Control Register (ITC: 34H)
+0034-            I   208       ITC             .equ $34
+0000-            I   209
+0080-            I   210       ITC_TRAP        .equ $80
+0040-            I   211       ITC_UFO         .equ $40
+0004-            I   212       ITC_ITE2        .equ $04
+0002-            I   213       ITC_ITE1        .equ $02
+0001-            I   214       ITC_ITE0        .equ $01
+0000-            I   215
+0000-            I   216
+0000-            I   217       ; Refresh
+0000-            I   218       ; ---------------------------------------------------------------------------
+0000-            I   219
+0000-            I   220       ; Refresh Control Register (RCR: 36H)
+0036-            I   221       RCR            .equ $36
+0080-            I   222       RCR_REFE       .equ $80
+0040-            I   223       RCR_REFW       .equ $40
+0002-            I   224       RCR_CYC1       .equ $02
+0001-            I   225       RCR_CYC0       .equ $01
+0000-            I   226
+0000-            I   227       ; MMU
+0000-            I   228       ; ---------------------------------------------------------------------------
+0000-            I   229
+0000-            I   230       ; MMU Common Base Register (CBR: 38H)
+0038-            I   231       CBR            .equ $38
+0000-            I   232       ; MMU Bank Base Register (BBR: 39H)
+0039-            I   233       BBR            .equ $39
+0000-            I   234       ; MMU Common/Bank Register (CBAR: 3AH)
+003A-            I   235       CBAR           .equ $3A
+0000-            I   236       ; I/O
+0000-            I   237       ; ---------------------------------------------------------------------------
+0000-            I   238
+0000-            I   239       ; Operation Mode Control Register (OMCR: 3EH)
+003E-            I   240       OMCR           .equ $3E
+0000-            I   241
+0080-            I   242       OMCR_M1E       .equ $80
+0040-            I   243       OMCR_M1TE      .equ $40
+0000-            I   244       ;OMCR_M1E       .equ $20
+0000-            I   245
+0000-            I   246       ; I/O Control Register (ICR: 3FH)
+003F-            I   247       ICR            .equ $3F
+0000-            I   248
+0080-            I   249       ICR_IOA7       .equ $80
+0040-            I   250       ICR_IOA6       .equ $40
+0020-            I   251       ICR_IOSTP      .equ $20
+0000-                  8
+0000-                  9
+0000-                 10
+E000-                 11           .org $E000
+E000-                 12
+E000-                 13           ; SYSTEM
+E000-C9               14 (  9) .int_noop:      ret
+E001-                 15
+E001-                 16           ; ASCI
+E001-C3 2E E0         17 (  9) .asci0_init:        jp _asci0_init
+E004-C3 51 E0         18 (  9) .int_asci0:         jp _int_asci0
+E007-                 19
+E007-C3 84 E0         20 (  9) .asci0_getc:        jp _asci0_getc
+E00A-C3 9D E0         21 (  9) .asci0_rx_empty:    jp _asci0_rx_empty
+E00D-C3 A3 E0         22 (  9) .asci0_putc:        jp _asci0_putc
+E010-C3 B0 E0         23 (  9) .asci0_puts:        jp _asci0_puts
+E013-                 24
+E013-C3 C0 E0         25 (  9) .asci1_init:        jp _asci1_init
+E016-C3 E3 E0         26 (  9) .int_asci1:         jp _int_asci1
+E019-                 27
+E019-C3 16 E1         28 (  9) .asci1_getc:        jp _asci1_getc
+E01C-C3 2F E1         29 (  9) .asci1_rx_empty:    jp _asci1_rx_empty
+E01F-C3 35 E1         30 (  9) .asci1_putc:        jp _asci1_putc
+E022-C3 42 E1         31 (  9) .asci1_puts:        jp _asci1_puts
+E025-                 32
+E025-                 33           ; VDU
+E025-C3 52 E1         34 (  9) .vdu_init:          jp _vdu_init
+E028-                 35
+E028-                 36           ; KBD
+E028-C3 53 E1         37 (  9) .kbd_init:          jp _kbd_init
+E02B-C3 54 E1         38 (  9) .int_kbd            jp _int_kbd
+E02E-                 39
+E02E-                 40           ; SND
+E02E-                 41
+E02E-                 42           ; RTC
+E02E-                 43
+E02E-                 44
+E02E-                 45           ; SYSTEM
+E02E-                 46
+E02E-                 47
+E02E-                 48           ; ASCI
+E02E-                 49
+E02E-                 50       ; init ASCI0
+E02E-                 51       ; input : none
+E02E-                 52       ; output : none
+E02E-                 53       _asci0_init:
+E02E-                 54           ; RE : Receiver Enable
+E02E-                 55           ; TE : Transmitter Enable
+E02E-                 56           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+E02E-3E 64            57 (  6)     ld a,CNTLA0_RE|CNTLA0_TE|CNTLA0_MOD2
+E030-ED 39 00         58 ( 13)     out0 (CNTLA0),a
+E033-                 59
+E033-                 60           ; DR=0
+E033-3E 00            61 (  6)     ld a,0
+E035-ED 39 02         62 ( 13)     out0 (CNTLB0),a
+E038-                 63
+E038-                 64           ; BRG0 : Enable 16 bit BRG counter
+E038-                 65           ; X1 ( + DR=0) : Clock mode = /1
+E038-3E 18            66 (  6)     ld a,ASEXT0_BRG0|ASEXT0_X1
+E03A-ED 39 12         67 ( 13)     out0 (ASEXT0),a
+E03D-                 68
+E03D-                 69           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+E03D-                 70           ; TC = fphi/(2*baud rate*clock mode) - 2
+E03D-                 71           ; TC = 32000000/(2*9600*1) - 2
+E03D-3E 81            72 (  6)     ld a,$81
+E03F-ED 39 1A         73 ( 13)     out0 (ASTC0L),a
+E042-3E 06            74 (  6)     ld a,$06
+E044-ED 39 1B         75 ( 13)     out0 (ASTC0H),a
+E047-                 76
+E047-                 77           ; RIE : enable Rx Interrupt
+E047-3E 08            78 (  6)     ld a,STAT0_RIE
+E049-ED 39 04         79 ( 13)     out0 (STAT0),a
+E04C-                 80
+E04C-AF               81 (  4)     xor a                  ; init RX buffer
+E04D-32 58 E1         82 ( 13)     ld (asci0_buffer_pos),a
+E050-                 83
+E050-C9               84 (  9)     ret
+E051-                 85
+E051-                 86       ; INT ASCI0
+E051-                 87       ; put received char in ASCI0 RX buffer
+E051-                 88       _int_asci0:
+E051-F5               89 ( 11)     push af
+E052-C5               90 ( 11)     push bc
+E053-D5               91 ( 11)     push de
+E054-E5               92 ( 11)     push hl
+E055-                 93
+E055-                 94       _int_asci0_test:
+E055-ED 38 04         95 ( 12)     in0 a,(STAT0)                ; check if there is a char in the FIFO
+E058-ED 64 80         96 (  9)     tst STAT0_RDRF
+E05B-28 21            97 ( 6+)     jr Z,_int_asci0_exit
+E05D-                 98
+E05D-ED 08 08         99 ( 12)     in0 c,(RDR0)                ; c <- received char
+E060-                100
+E060-                101           ; check for error
+E060-E6 70           102 (  6)     and STAT0_OVRN|STAT0_PE|STAT0_FE
+E062-28 0A           103 ( 6+)     jr Z,_int_asci0_ok
+E064-                104
+E064-ED 38 00        105 ( 12)     in0 a,(CNTLA0)           ; clear error
+E067-E6 F7           106 (  6)     and CNTLA0_EFR!$FF
+E069-ED 39 00        107 ( 13)     out0 (CNTLA0),a
+E06C-18 E7           108 (  8)     jr _int_asci0_test                    ; exit
+E06E-                109
+E06E-                110       _int_asci0_ok:
+E06E-16 00           111 (  6)     ld d,0                      ; hl <- asci0_buffer+(asci0_buffer_pos)
+E070-3A 58 E1        112 ( 12)     ld a,(asci0_buffer_pos)
+E073-5F              113 (  4)     ld e,a
+E074-21 59 E1        114 (  9)     ld hl,asci0_buffer
+E077-19              115 (  7)     add hl,de
+E078-                116
+E078-3C              117 (  4)     inc a                       ; ; inc kbd_buffer_pos
+E079-32 58 E1        118 ( 13)     ld (asci0_buffer_pos),a
+E07C-                119
+E07C-79              120 (  4)     ld a,c                      ; a <- received char
+E07D-77              121 (  7)     ld (hl),a                   ; save it to asci0_buffer+(asci0_buffer_pos)
+E07E-                122
+E07E-                123       _int_asci0_exit:
+E07E-E1              124 (  9)     pop hl
+E07F-D1              125 (  9)     pop de
+E080-C1              126 (  9)     pop bc
+E081-F1              127 (  9)     pop af
+E082-FB              128 (  3)     ei
+E083-C9              129 (  9)     ret
+E084-                130
+E084-                131       ; get a char on ASCI0 RX buffer
+E084-                132       ; input : none
+E084-                133       ; output : a <- received char
+E084-                134       _asci0_getc:
+E084-E5              135 ( 11)     push hl
+E085-D5              136 ( 11)     push de
+E086-                137
+E086-3A 58 E1        138 ( 12)     ld a,(asci0_buffer_pos)     ; load buffer position
+E089-F6 00           139 (  6)     or 0
+E08B-CA 9A E0        140 ( 6+)     jp  Z,_asci0_getc_exit      ; exit if 0
+E08E-                141
+E08E-3D              142 (  4)     dec a                       ; decrement and update buffer position
+E08F-32 58 E1        143 ( 13)     ld (asci0_buffer_pos),a
+E092-                144
+E092-16 00           145 (  6)     ld d,0                      ; get char in buffer
+E094-5F              146 (  4)     ld e,a
+E095-21 59 E1        147 (  9)     ld hl,asci0_buffer
+E098-19              148 (  7)     add hl,de
+E099-7E              149 (  6)     ld a,(hl)                   ; into A register
+E09A-                150
+E09A-                151       _asci0_getc_exit:
+E09A-                152
+E09A-D1              153 (  9)     pop de
+E09B-E1              154 (  9)     pop hl
+E09C-C9              155 (  9)     ret
+E09D-                156
+E09D-                157       ; check if rx buffer is empty
+E09D-                158       ; input : NONE
+E09D-                159       ; output : flag=Z if empty
+E09D-                160       _asci0_rx_empty:
+E09D-3A 58 E1        161 ( 12)     ld a,(asci0_buffer_pos)
+E0A0-FE 00           162 (  6)     cp 0
+E0A2-C9              163 (  9)     ret
+E0A3-                164
+E0A3-                165       ; put a char on asci0
+E0A3-                166       ; input : a = char ascii code
+E0A3-                167       ; output : none
+E0A3-                168       _asci0_putc:
+E0A3-F5              169 ( 11)     push af
+E0A4-                170
+E0A4-                171       _asci0_putc_wait:  ; wait for asci0 TX ready
+E0A4-ED 38 04        172 ( 12)     in0 a,(STAT0) ; TDRE=1 -> empty
+E0A7-E6 02           173 (  6)     and STAT0_TDRE
+E0A9-28 F9           174 ( 6+)     jr Z,_asci0_putc_wait
+E0AB-                175
+E0AB-F1              176 (  9)     pop af
+E0AC-ED 39 06        177 ( 13)     out0 (TDR0),a ; output the char to asci0
+E0AF-                178
+E0AF-C9              179 (  9)     ret
+E0B0-                180
+E0B0-                181       ; put a string on asci0
+E0B0-                182       ; input : (hl) = address of null terminated string
+E0B0-                183       ; output : none
+E0B0-                184       _asci0_puts:
+E0B0-E5              185 ( 11)     push hl
+E0B1-F5              186 ( 11)     push af
+E0B2-                187
+E0B2-                188       _asci0_puts_loop:
+E0B2-7E              189 (  6)     ld a,(hl)
+E0B3-F6 00           190 (  6)     or 0
+E0B5-28 06           191 ( 6+)     jr z,_asci0_puts_exit
+E0B7-CD A3 E0        192 ( 16)     call _asci0_putc
+E0BA-23              193 (  4)     inc hl
+E0BB-18 F5           194 (  8)     jr _asci0_puts_loop
+E0BD-                195
+E0BD-                196       _asci0_puts_exit:
+E0BD-F1              197 (  9)     pop af
+E0BE-E1              198 (  9)     pop hl
+E0BF-C9              199 (  9)     ret
+E0C0-                200
+E0C0-                201       _asci1_init:
+E0C0-                202           ; RE : Receiver Enable
+E0C0-                203           ; TE : Transmitter Enable
+E0C0-                204           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+E0C0-3E 64           205 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
+E0C2-ED 39 01        206 ( 13)     out0 (CNTLA1),a
+E0C5-                207
+E0C5-                208           ; DR=0
+E0C5-3E 00           209 (  6)     ld a,0
+E0C7-ED 39 03        210 ( 13)     out0 (CNTLB1),a
+E0CA-                211
+E0CA-                212           ; BRG0 : Enable 16 bit BRG counter
+E0CA-                213           ; X1 ( + DR=0) : Clock mode = /1
+E0CA-3E 18           214 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
+E0CC-ED 39 13        215 ( 13)     out0 (ASEXT1),a
+E0CF-                216
+E0CF-                217           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+E0CF-                218           ; TC = fphi/(2*baud rate*clock mode) - 2
+E0CF-                219           ; TC = 32000000/(2*9600*1) - 2
+E0CF-3E 81           220 (  6)     ld a,$81
+E0D1-ED 39 1C        221 ( 13)     out0 (ASTC1L),a
+E0D4-3E 06           222 (  6)     ld a,$06
+E0D6-ED 39 1D        223 ( 13)     out0 (ASTC1H),a
+E0D9-                224
+E0D9-                225           ; RIE : enable Rx Interrupt
+E0D9-3E 08           226 (  6)     ld a,STAT1_RIE
+E0DB-ED 39 05        227 ( 13)     out0 (STAT1),a
+E0DE-                228
+E0DE-AF              229 (  4)     xor a                  ; init RX buffer
+E0DF-32 99 E1        230 ( 13)     ld (asci1_buffer_pos),a
+E0E2-                231
+E0E2-C9              232 (  9)     ret
+E0E3-                233
+E0E3-                234       _int_asci1:
+E0E3-F5              235 ( 11)     push af
+E0E4-C5              236 ( 11)     push bc
+E0E5-D5              237 ( 11)     push de
+E0E6-E5              238 ( 11)     push hl
+E0E7-                239
+E0E7-                240       _int_asci1_test:
+E0E7-ED 38 05        241 ( 12)     in0 a,(STAT1)                ; check if there is a char in the FIFO
+E0EA-ED 64 80        242 (  9)     tst STAT1_RDRF
+E0ED-28 21           243 ( 6+)     jr Z,_int_asci1_exit
+E0EF-                244
+E0EF-ED 08 09        245 ( 12)     in0 c,(RDR1)                ; c <- received char
+E0F2-                246
+E0F2-                247           ; check for error
+E0F2-E6 70           248 (  6)     and STAT1_OVRN|STAT1_PE|STAT1_FE
+E0F4-28 0A           249 ( 6+)     jr Z,_int_asci1_ok
+E0F6-                250
+E0F6-ED 38 01        251 ( 12)     in0 a,(CNTLA1)           ; clear error
+E0F9-E6 F7           252 (  6)     and CNTLA1_EFR!$FF
+E0FB-ED 39 01        253 ( 13)     out0 (CNTLA1),a
+E0FE-18 E7           254 (  8)     jr _int_asci1_test                    ; exit
+E100-                255
+E100-                256       _int_asci1_ok:
+E100-16 00           257 (  6)     ld d,0                      ; hl <- asci0_buffer+(asci0_buffer_pos)
+E102-3A 99 E1        258 ( 12)     ld a,(asci1_buffer_pos)
+E105-5F              259 (  4)     ld e,a
+E106-21 9A E1        260 (  9)     ld hl,asci1_buffer
+E109-19              261 (  7)     add hl,de
+E10A-                262
+E10A-3C              263 (  4)     inc a                       ; ; inc kbd_buffer_pos
+E10B-32 99 E1        264 ( 13)     ld (asci1_buffer_pos),a
+E10E-                265
+E10E-79              266 (  4)     ld a,c                      ; a <- received char
+E10F-77              267 (  7)     ld (hl),a                   ; save it to  asci1_buffer+(asci1_buffer_pos)
+E110-                268
+E110-                269       _int_asci1_exit:
+E110-E1              270 (  9)     pop hl
+E111-D1              271 (  9)     pop de
+E112-C1              272 (  9)     pop bc
+E113-F1              273 (  9)     pop af
+E114-FB              274 (  3)     ei
+E115-C9              275 (  9)     ret
+E116-                276
+E116-                277       _asci1_getc:
+E116-E5              278 ( 11)     push hl
+E117-D5              279 ( 11)     push de
+E118-                280
+E118-3A 99 E1        281 ( 12)     ld a,(asci1_buffer_pos)     ; load buffer position
+E11B-F6 00           282 (  6)     or 0
+E11D-CA 2C E1        283 ( 6+)     jp  Z,_asci1_getc_exit      ; exit if 0
+E120-                284
+E120-3D              285 (  4)     dec a                       ; decrement and update buffer position
+E121-32 99 E1        286 ( 13)     ld (asci1_buffer_pos),a
+E124-                287
+E124-16 00           288 (  6)     ld d,0                      ; get char in buffer
+E126-5F              289 (  4)     ld e,a
+E127-21 9A E1        290 (  9)     ld hl,asci1_buffer
+E12A-19              291 (  7)     add hl,de
+E12B-7E              292 (  6)     ld a,(hl)                   ; into A register
+E12C-                293
+E12C-                294       _asci1_getc_exit:
+E12C-                295
+E12C-D1              296 (  9)     pop de
+E12D-E1              297 (  9)     pop hl
+E12E-C9              298 (  9)     ret
+E12F-                299
+E12F-                300       ; check if rx buffer is empty
+E12F-                301       ; input : NONE
+E12F-                302       ; output : flag=Z if empty
+E12F-                303       _asci1_rx_empty:
+E12F-3A 99 E1        304 ( 12)     ld a,(asci1_buffer_pos)
+E132-FE 00           305 (  6)     cp 0
+E134-C9              306 (  9)     ret
+E135-                307
+E135-                308       ; put a char on asci1
+E135-                309       ; input : a = char ascii code
+E135-                310       ; output : none
+E135-                311       _asci1_putc:
+E135-F5              312 ( 11)     push af
+E136-                313
+E136-                314       _asci1_putc_wait:  ; wait for asci0 TX ready
+E136-ED 38 05        315 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
+E139-E6 02           316 (  6)     and STAT1_TDRE
+E13B-28 F9           317 ( 6+)     jr Z,_asci1_putc_wait
+E13D-                318
+E13D-F1              319 (  9)     pop af
+E13E-ED 39 07        320 ( 13)     out0 (TDR1),a ; output the char to asci0
+E141-                321
+E141-C9              322 (  9)     ret
+E142-                323
+E142-                324       ; put a string on asci1
+E142-                325       ; input : (hl) = address of null terminated string
+E142-                326       ; output : none
+E142-                327       _asci1_puts:
+E142-E5              328 ( 11)     push hl
+E143-F5              329 ( 11)     push af
+E144-                330
+E144-                331       _asci1_puts_loop:
+E144-7E              332 (  6)     ld a,(hl)
+E145-F6 00           333 (  6)     or 0
+E147-28 06           334 ( 6+)     jr z,_asci1_puts_exit
+E149-CD 35 E1        335 ( 16)     call _asci1_putc
+E14C-23              336 (  4)     inc hl
+E14D-18 F5           337 (  8)     jr _asci1_puts_loop
+E14F-                338
+E14F-                339       _asci1_puts_exit:
+E14F-F1              340 (  9)     pop af
+E150-E1              341 (  9)     pop hl
+E151-C9              342 (  9)     ret
+E152-                343
+E152-                344
+E152-                345           ; VDU
+E152-                346
+E152-                347       _vdu_init:
+E152-C9              348 (  9)     ret
+E153-                349           ; KBD
+E153-                350
+E153-                351       _kbd_init:
+E153-C9              352 (  9)     ret
+E154-                353
+E154-                354       _int_kbd:
+E154-C9              355 (  9)     ret
+E155-                356
+E155-                357           ; SND
+E155-                358
+E155-                359       _snd_init:
+E155-C9              360 (  9)     ret
+E156-                361
+E156-                362       _snd_play_wav:
+E156-C9              363 (  9)     ret
+E157-                364
+E157-                365       _snd_beep:
+E157-C9              366 (  9)     ret
+E158-                367
+E158-                368            ; RAM
+E158-                369       asci0_buffer_pos:   .bs 1
+E159-                370       asci0_buffer:       .bs 64
+E199-                371       asci1_buffer_pos:   .bs 1
+E19A-                372       asci1_buffer:       .bs 64
+E1DA-                373
+E1DA-                374       kbd_buffer_pos:     .bs 1
+E1DB-                375       kbd_buffer:         .bs 64
