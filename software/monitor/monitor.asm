@@ -482,4 +482,6 @@ rx1_buffer:     .bs RX_BUFFER_SIZE+1
 rx1_buffer_ptr: .bs 2
 rx1_buffer_cpt: .bs 2
 
-   
+kbd_state: .bs 1
+kbd_buffer_pos:    .bs 1
+kbd_buffer: .bs 64

@@ -154,10 +154,10 @@
 0000-            I   152       ; Timer Control Register (TCR: 10H)
 0010-            I   153       TCR            .equ $10
 0000-            I   154
-0080-            I   155       TCR_TF1        .equ $80
-0040-            I   156       TCR_TF0        .equ $40
-0020-            I   157       TCR_TE1        .equ $20
-0010-            I   158       TCR_TE0        .equ $10
+0080-            I   155       TCR_TIF1        .equ $80
+0040-            I   156       TCR_TIF0        .equ $40
+0020-            I   157       TCR_TIE1        .equ $20
+0010-            I   158       TCR_TIE0        .equ $10
 0008-            I   159       TCR_TOC1       .equ $08
 0004-            I   160       TCR_TOC0       .equ $04
 0002-            I   161       TCR_TDE1       .equ $02
@@ -261,99 +261,117 @@ E004-                 14       int_asci0 .equ $E004
 E016-                 15       int_asci1 .equ $E016
 E001-                 16       asci0_init .equ $E001
 E013-                 17       asci1_init .equ $E013
-0000-                 18
-0000-                 19           .org $0000
-0000-C3 00 01         20 (  9)     jp  mreset
-0003-                 21
-0003-                 22       rst08:
-0008-                 23           .org $0008
-0008-C3 1F E0         24 (  9)     jp asci1_putc
-000B-                 25
-000B-                 26       rst10:
-0010-                 27           .org $0010
-0010-C3 19 E0         28 (  9)     jp asci1_getc
-0013-                 29
-0013-                 30       rst18:
-0018-                 31           .org $0018
-0018-C3 1C E0         32 (  9)     jp asci1_rx_empty
-001B-                 33
-0038-                 34           .org $0038
-0038-C3 00 E0         35 (  9)     jp int_noop    ; INT0
-003B-                 36
-0066-                 37           .org $0066
-0066-C3 00 E0         38 (  9)     jp int_noop    ; NMI
-0069-                 39
-0069-                 40       ; interrupt vector table
-0080-                 41           .org $0080
-0080-00 E0            42           .dw int_noop    ; INT1
-0082-00 E0            43           .dw int_noop    ; INT2
-0084-00 E0            44           .dw int_noop    ; PRT0
-0086-00 E0            45           .dw int_noop    ; PRT1
-0088-00 E0            46           .dw int_noop    ; DMA0
-008A-00 E0            47           .dw int_noop    ; DMA1
-008C-00 E0            48           .dw int_noop    ; CSIO
-008E-04 E0            49           .dw int_asci0   ; ASCI0
-0090-16 E0            50           .dw int_asci1    ; ASCI1
-0092-                 51
-0100-                 52           .org $0100
-0100-                 53       mreset:
-0100-                 54
-0100-F3               55 (  3)     di ; disable interrupts
-0101-                 56
-0101-                 57           ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
-0101-                 58           ; ld a,CMR_X2
-0101-                 59           ; out0 (CMR),a
-0101-                 60
-0101-                 61           ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
-0101-                 62           ; ld a,CCR_CD
-0101-                 63           ; out0 (CCR),a
-0101-                 64
-0101-3E 00            65 (  6)     ld  a,0
-0103-ED 39 36         66 ( 13)     out0 (RCR),a    ; Refresh disable
-0106-                 67
-0106-                 68           ; Temporary stack pointer = $DFFF
-0106-31 FF DF         69 (  9)     ld sp,$DFFF
-0109-                 70
-0109-CD 01 E0         71 ( 16)     call asci0_init
-010C-CD 13 E0         72 ( 16)     call asci1_init
-010F-                 73
-010F-                 74           ; setup interupts
-010F-ED 56            75 (  6)     im 1    ; interrupt mode 1
-0111-3E 00            76 (  6)     ld a,0  ; interrupts high order byte : 00H
-0113-ED 47            77 (  6)     ld i,a
-0115-3E 80            78 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
-0117-ED 39 33         79 ( 13)     out0 (IL),a
-011A-                 80
-011A-FB               81 (  3)     ei      ; enable interrupts
-011B-                 82
-011B-C3 50 01         83 (  9)     jp COLD
-011E-                 84
-011E-                 85           .include basic.asm
-011E-            I     1       ;==================================================================================
-011E-            I     2       ; The updates to the original BASIC within this file are copyright Grant Searle
-011E-            I     3       ;
-011E-            I     4       ; You have permission to use this for NON COMMERCIAL USE ONLY
-011E-            I     5       ; If you wish to use it elsewhere, please include an acknowledgement to myself.
-011E-            I     6       ;
-011E-            I     7       ; http://searle.hostei.com/grant/index.html
-011E-            I     8       ;
-011E-            I     9       ; eMail: home.micros01@btinternet.com
-011E-            I    10       ;
-011E-            I    11       ; If the above don't work, please perform an Internet search to see if I have
-011E-            I    12       ; updated the web page hosting service.
-011E-            I    13       ;
-011E-            I    14       ;==================================================================================
-011E-            I    15        ;       .CR z180
-011E-            I    16        ;       .TF basic.hex,INT,24
-011E-            I    17        ;       .LF basic.lst
-011E-            I    18       ; NASCOM ROM BASIC Ver 4.7, (C) 1978 Microsoft
-011E-            I    19       ; Scanned from source published in 80-BUS NEWS from Vol 2, Issue 3
-011E-            I    20       ; (May-June 1983) to Vol 3, Issue 3 (May-June 1984)
-011E-            I    21       ; Adapted for the freeware Zilog Macro Assembler 2.10 to produce
-011E-            I    22       ; the original ROM code (checksum A934H). PA
-011E-            I    23
-011E-            I    24       ; GENERAL EQUATES
-011E-            I    25
+E025-                 18       vdu_init .equ $E025
+E028-                 19       int_vdu .equ $E028
+E02B-                 20       vdu_set_attr .equ $E02B
+E02E-                 21       vdu_cls .equ $E02E
+E034-                 22       vdu_putc_term .equ $E034
+E040-                 23       kbd_init .equ $E040
+E043-                 24       int_kbd .equ $E043
+E046-                 25       kbd_is_empty .equ $E046
+E049-                 26       kbd_get_key .equ $E049
+0000-                 27
+0000-                 28           .org $0000
+0000-C3 00 01         29 (  9)     jp  mreset
+0003-                 30
+0003-                 31       rst08:
+0008-                 32           .org $0008
+0008-                 33           ;jp asci1_putc
+0008-C3 34 E0         34 (  9)     jp vdu_putc_term
+000B-                 35
+000B-                 36       rst10:
+0010-                 37           .org $0010
+0010-C3 19 E0         38 (  9)     jp asci1_getc
+0013-                 39           ;jp kbd_get_key
+0013-                 40
+0013-                 41       rst18:
+0018-                 42           .org $0018
+0018-C3 1C E0         43 (  9)     jp asci1_rx_empty
+001B-                 44           ;jp kbd_is_empty
+001B-                 45
+0038-                 46           .org $0038
+0038-C3 00 E0         47 (  9)     jp int_noop    ; INT0
+003B-                 48
+0066-                 49           .org $0066
+0066-C3 00 E0         50 (  9)     jp int_noop    ; NMI
+0069-                 51
+0069-                 52       ; interrupt vector table
+0080-                 53           .org $0080
+0080-43 E0            54           .dw int_kbd    ; INT1
+0082-00 E0            55           .dw int_noop    ; INT2
+0084-28 E0            56           .dw int_vdu    ; PRT0
+0086-00 E0            57           .dw int_noop    ; PRT1
+0088-00 E0            58           .dw int_noop    ; DMA0
+008A-00 E0            59           .dw int_noop    ; DMA1
+008C-00 E0            60           .dw int_noop    ; CSIO
+008E-04 E0            61           .dw int_asci0   ; ASCI0
+0090-16 E0            62           .dw int_asci1    ; ASCI1
+0092-                 63
+0100-                 64           .org $0100
+0100-                 65       mreset:
+0100-                 66
+0100-F3               67 (  3)     di ; disable interrupts
+0101-                 68
+0101-                 69           ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
+0101-                 70           ; ld a,CMR_X2
+0101-                 71           ; out0 (CMR),a
+0101-                 72
+0101-                 73           ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
+0101-                 74           ; ld a,CCR_CD
+0101-                 75           ; out0 (CCR),a
+0101-                 76
+0101-3E 00            77 (  6)     ld  a,0
+0103-ED 39 36         78 ( 13)     out0 (RCR),a    ; Refresh disable
+0106-                 79
+0106-                 80           ; Temporary stack pointer = $DFFF
+0106-31 FF DF         81 (  9)     ld sp,$DFFF
+0109-                 82
+0109-CD 01 E0         83 ( 16)     call asci0_init
+010C-CD 13 E0         84 ( 16)     call asci1_init
+010F-                 85
+010F-3E 4B            86 (  6)     ld a,$4B
+0111-CD 2B E0         87 ( 16)     call vdu_set_attr
+0114-CD 25 E0         88 ( 16)     call vdu_init
+0117-                 89
+0117-CD 40 E0         90 ( 16)     call kbd_init
+011A-                 91
+011A-                 92           ; setup interupts
+011A-ED 56            93 (  6)     im 1    ; interrupt mode 1
+011C-3E 00            94 (  6)     ld a,0  ; interrupts high order byte : 00H
+011E-ED 47            95 (  6)     ld i,a
+0120-3E 80            96 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
+0122-ED 39 33         97 ( 13)     out0 (IL),a
+0125-                 98
+0125-FB               99 (  3)     ei      ; enable interrupts
+0126-                100
+0126-C3 50 01        101 (  9)     jp COLD
+0129-                102
+0129-                103           .include basic.asm
+0129-            I     1       ;==================================================================================
+0129-            I     2       ; The updates to the original BASIC within this file are copyright Grant Searle
+0129-            I     3       ;
+0129-            I     4       ; You have permission to use this for NON COMMERCIAL USE ONLY
+0129-            I     5       ; If you wish to use it elsewhere, please include an acknowledgement to myself.
+0129-            I     6       ;
+0129-            I     7       ; http://searle.hostei.com/grant/index.html
+0129-            I     8       ;
+0129-            I     9       ; eMail: home.micros01@btinternet.com
+0129-            I    10       ;
+0129-            I    11       ; If the above don't work, please perform an Internet search to see if I have
+0129-            I    12       ; updated the web page hosting service.
+0129-            I    13       ;
+0129-            I    14       ;==================================================================================
+0129-            I    15        ;       .CR z180
+0129-            I    16        ;       .TF basic.hex,INT,24
+0129-            I    17        ;       .LF basic.lst
+0129-            I    18       ; NASCOM ROM BASIC Ver 4.7, (C) 1978 Microsoft
+0129-            I    19       ; Scanned from source published in 80-BUS NEWS from Vol 2, Issue 3
+0129-            I    20       ; (May-June 1983) to Vol 3, Issue 3 (May-June 1984)
+0129-            I    21       ; Adapted for the freeware Zilog Macro Assembler 2.10 to produce
+0129-            I    22       ; the original ROM code (checksum A934H). PA
+0129-            I    23
+0129-            I    24       ; GENERAL EQUATES
+0129-            I    25
 0003-            I    26       CTRLC   .EQU    03H             ; Control "C"
 0007-            I    27       CTRLG   .EQU    07H             ; Control "G"
 0008-            I    28       BKSP    .EQU    08H             ; Back space
@@ -367,9 +385,9 @@ E013-                 17       asci1_init .equ $E013
 0015-            I    36       CTRLU   .EQU    15H             ; Control "U"
 001B-            I    37       ESC     .EQU    1BH             ; Escape
 007F-            I    38       DEL     .EQU    7FH             ; Delete
-011E-            I    39
-011E-            I    40       ; BASIC WORK SPACE LOCATIONS
-011E-            I    41
+0129-            I    39
+0129-            I    40       ; BASIC WORK SPACE LOCATIONS
+0129-            I    41
 2245-            I    42       WRKSPC  .EQU    2245H             ; BASIC Work space
 2248-            I    43       USR     .EQU    WRKSPC+3H           ; "USR (x)" jump
 224B-            I    44       OUTSUB  .EQU    WRKSPC+6H           ; "OUT p,n"
@@ -434,9 +452,9 @@ E013-                 17       asci1_init .equ $E013
 233B-            I   103       MULVAL  .EQU    WRKSPC+0F6H     ; Multiplier
 233E-            I   104       PROGST  .EQU    WRKSPC+0F9H     ; Start of program text area
 23A2-            I   105       STLOOK  .EQU    WRKSPC+15DH     ; Start of memory test
-011E-            I   106
-011E-            I   107       ; BASIC ERROR CODE VALUES
-011E-            I   108
+0129-            I   106
+0129-            I   107       ; BASIC ERROR CODE VALUES
+0129-            I   108
 0000-            I   109       NF      .EQU    00H             ; NEXT without FOR
 0002-            I   110       SN      .EQU    02H             ; Syntax error
 0004-            I   111       RG      .EQU    04H             ; RETURN without GOSUB
@@ -458,7 +476,7 @@ E013-                 17       asci1_init .equ $E013
 0024-            I   127       MO      .EQU    24H             ; Missing operand
 0026-            I   128       HX      .EQU    26H             ; HEX error
 0028-            I   129       BN      .EQU    28H             ; BIN error
-011E-            I   130
+0129-            I   130
 0150-            I   131               .ORG    00150H
 0150-            I   132
 0150-C3 56 01    I   133 (  9) COLD:   JP      STARTB          ; Jump for cold start

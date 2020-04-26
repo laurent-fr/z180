@@ -152,10 +152,10 @@ RLDR0H         .equ $0F
 ; Timer Control Register (TCR: 10H)
 TCR            .equ $10
 
-TCR_TF1        .equ $80
-TCR_TF0        .equ $40
-TCR_TE1        .equ $20
-TCR_TE0        .equ $10
+TCR_TIF1        .equ $80
+TCR_TIF0        .equ $40
+TCR_TIE1        .equ $20
+TCR_TIE0        .equ $10
 TCR_TOC1       .equ $08
 TCR_TOC0       .equ $04
 TCR_TDE1       .equ $02

@@ -15,21 +15,33 @@ int_asci0 .equ $E004
 int_asci1 .equ $E016
 asci0_init .equ $E001
 asci1_init .equ $E013
+vdu_init .equ $E025
+int_vdu .equ $E028
+vdu_set_attr .equ $E02B
+vdu_cls .equ $E02E
+vdu_putc_term .equ $E034
+kbd_init .equ $E040 
+int_kbd .equ $E043 
+kbd_is_empty .equ $E046 
+kbd_get_key .equ $E049
 
     .org $0000
     jp  mreset
 
 rst08:
     .org $0008
-    jp asci1_putc
+    ;jp asci1_putc
+    jp vdu_putc_term
 
 rst10:
     .org $0010
     jp asci1_getc
+    ;jp kbd_get_key
 
 rst18:
     .org $0018
     jp asci1_rx_empty
+    ;jp kbd_is_empty
     
     .org $0038
     jp int_noop    ; INT0
@@ -39,9 +51,9 @@ rst18:
 
 ; interrupt vector table
     .org $0080
-    .dw int_noop    ; INT1
+    .dw int_kbd    ; INT1
     .dw int_noop    ; INT2
-    .dw int_noop    ; PRT0
+    .dw int_vdu    ; PRT0
     .dw int_noop    ; PRT1
     .dw int_noop    ; DMA0
     .dw int_noop    ; DMA1
@@ -70,6 +82,12 @@ mreset:
 
     call asci0_init
     call asci1_init
+
+    ld a,$4B
+    call vdu_set_attr
+    call vdu_init
+
+    call kbd_init
 
     ; setup interupts
     im 1    ; interrupt mode 1

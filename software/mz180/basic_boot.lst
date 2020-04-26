@@ -1,0 +1,9 @@
+Source file: ..\basic\basic_boot.asm
+
+*** Fatal Error: Can't open source file
+     92     .include basic.asm
+
+
+1 Error found during assembly.
+0 Warnings found during assembly.
+

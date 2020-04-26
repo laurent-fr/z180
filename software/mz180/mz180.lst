@@ -154,10 +154,10 @@
 0000-            I   152       ; Timer Control Register (TCR: 10H)
 0010-            I   153       TCR            .equ $10
 0000-            I   154
-0080-            I   155       TCR_TF1        .equ $80
-0040-            I   156       TCR_TF0        .equ $40
-0020-            I   157       TCR_TE1        .equ $20
-0010-            I   158       TCR_TE0        .equ $10
+0080-            I   155       TCR_TIF1        .equ $80
+0040-            I   156       TCR_TIF0        .equ $40
+0020-            I   157       TCR_TIE1        .equ $20
+0010-            I   158       TCR_TIE0        .equ $10
 0008-            I   159       TCR_TOC1       .equ $08
 0004-            I   160       TCR_TOC0       .equ $04
 0002-            I   161       TCR_TDE1       .equ $02
