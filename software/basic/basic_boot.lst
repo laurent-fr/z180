@@ -300,7 +300,7 @@ E049-                 26       kbd_get_key .equ $E049
 0080-43 E0            54           .dw int_kbd    ; INT1
 0082-00 E0            55           .dw int_noop    ; INT2
 0084-28 E0            56           .dw int_vdu    ; PRT0
-0086-00 E0            57           .dw int_noop    ; PRT1
+0086-28 E0            57           .dw int_vdu    ; PRT1
 0088-00 E0            58           .dw int_noop    ; DMA0
 008A-00 E0            59           .dw int_noop    ; DMA1
 008C-00 E0            60           .dw int_noop    ; CSIO

@@ -1,5 +1,6 @@
-0000-                  6
-0000-                  7           .include ../../include/z180_defs.asm
+0000-                  6           .SF bios.sym
+0000-                  7
+0000-                  8           .include ../../include/z180_defs.asm
 0000-            I     1       ; ------------------------------------
 0000-            I     2       ; Z180 constants
 0000-            I     3       ; ------------------------------------
@@ -251,1106 +252,1141 @@
 0080-            I   249       ICR_IOA7       .equ $80
 0040-            I   250       ICR_IOA6       .equ $40
 0020-            I   251       ICR_IOSTP      .equ $20
-0000-                  8
 0000-                  9
 0000-                 10
-E000-                 11           .org $E000
-E000-                 12
-E000-                 13           ; SYSTEM
-E000-C9               14 (  9) .int_noop:      ret
-E001-                 15
-E001-                 16           ; ASCI
-E001-C3 4C E0         17 (  9) .asci0_init:        jp _asci0_init
-E004-C3 6F E0         18 (  9) .int_asci0:         jp _int_asci0
-E007-                 19
-E007-C3 A2 E0         20 (  9) .asci0_getc:        jp _asci0_getc
-E00A-C3 BB E0         21 (  9) .asci0_rx_empty:    jp _asci0_rx_empty
-E00D-C3 C1 E0         22 (  9) .asci0_putc:        jp _asci0_putc
-E010-C3 CE E0         23 (  9) .asci0_puts:        jp _asci0_puts
-E013-                 24
-E013-C3 DE E0         25 (  9) .asci1_init:        jp _asci1_init
-E016-C3 01 E1         26 (  9) .int_asci1:         jp _int_asci1
-E019-                 27
-E019-C3 34 E1         28 (  9) .asci1_getc:        jp _asci1_getc
-E01C-C3 4D E1         29 (  9) .asci1_rx_empty:    jp _asci1_rx_empty
-E01F-C3 53 E1         30 (  9) .asci1_putc:        jp _asci1_putc
-E022-C3 60 E1         31 (  9) .asci1_puts:        jp _asci1_puts
-E025-                 32
-E025-                 33           ; VDU
-E025-C3 70 E1         34 (  9) .vdu_init:          jp _vdu_init
-E028-C3 83 E1         35 (  9) .int_vdu:           jp _int_vdu
-E02B-                 36
-E02B-C3 94 E1         37 (  9) .vdu_set_attr:      jp _vdu_set_attr
-E02E-C3 98 E1         38 (  9) .vdu_cls:           jp _vdu_cls
-E031-C3 C2 E1         39 (  9) .vdu_scroll_up      jp _vdu_scroll_up
-E034-C3 E8 E1         40 (  9) .vdu_putc_term      jp _vdu_putc_term
-E037-C3 3A E2         41 (  9) .vdu_putc           jp _vdu_putc
-E03A-C3 5C E2         42 (  9) .vdu_next_line      jp _vdu_next_line
-E03D-C3 80 E2         43 (  9) .vdu_puts           jp _vdu_puts
-E040-                 44
-E040-                 45           ; KBD
-E040-C3 F0 E2         46 (  9) .kbd_init:          jp _kbd_init
-E043-C3 F9 E2         47 (  9) .int_kbd:           jp _int_kbd
-E046-C3 D9 E3         48 (  9) .kbd_is_empty       jp _kbd_is_empty
-E049-C3 DF E3         49 (  9) .kbd_get_key        jp _kbd_get_key
-E04C-                 50
-E04C-                 51           ; SND
-E04C-                 52
-E04C-                 53           ; RTC
-E04C-                 54
+0000-                 11
+E000-                 12           .org $E000
+E000-                 13
+E000-                 14           ; SYSTEM
+E000-C9               15 (  9) .int_noop:      ret
+E001-                 16
+E001-                 17           ; ASCI
+E001-C3 4C E0         18 (  9) .asci0_init:        jp _asci0_init
+E004-C3 6F E0         19 (  9) .int_asci0:         jp _int_asci0
+E007-                 20
+E007-C3 A2 E0         21 (  9) .asci0_getc:        jp _asci0_getc
+E00A-C3 BB E0         22 (  9) .asci0_rx_empty:    jp _asci0_rx_empty
+E00D-C3 C1 E0         23 (  9) .asci0_putc:        jp _asci0_putc
+E010-C3 CE E0         24 (  9) .asci0_puts:        jp _asci0_puts
+E013-                 25
+E013-C3 DE E0         26 (  9) .asci1_init:        jp _asci1_init
+E016-C3 01 E1         27 (  9) .int_asci1:         jp _int_asci1
+E019-                 28
+E019-C3 34 E1         29 (  9) .asci1_getc:        jp _asci1_getc
+E01C-C3 4D E1         30 (  9) .asci1_rx_empty:    jp _asci1_rx_empty
+E01F-C3 53 E1         31 (  9) .asci1_putc:        jp _asci1_putc
+E022-C3 60 E1         32 (  9) .asci1_puts:        jp _asci1_puts
+E025-                 33
+E025-                 34           ; VDU
+E025-C3 F2 E1         35 (  9) .vdu_init:          jp _vdu_init
+E028-C3 14 E2         36 (  9) .int_vdu:           jp _int_vdu
+E02B-                 37
+E02B-C3 6E E2         38 (  9) .vdu_set_attr:      jp _vdu_set_attr
+E02E-C3 72 E2         39 (  9) .vdu_cls:           jp _vdu_cls
+E031-C3 9C E2         40 (  9) .vdu_scroll_up      jp _vdu_scroll_up
+E034-C3 C2 E2         41 (  9) .vdu_putc_term      jp _vdu_putc_term
+E037-C3 05 E3         42 (  9) .vdu_putc           jp _vdu_putc
+E03A-C3 27 E3         43 (  9) .vdu_next_line      jp _vdu_next_line
+E03D-C3 4B E3         44 (  9) .vdu_puts           jp _vdu_puts
+E040-                 45
+E040-                 46           ; KBD
+E040-C3 C4 E3         47 (  9) .kbd_init:          jp _kbd_init
+E043-C3 CD E3         48 (  9) .int_kbd:           jp _int_kbd
+E046-C3 AD E4         49 (  9) .kbd_is_empty       jp _kbd_is_empty
+E049-C3 B3 E4         50 (  9) .kbd_get_key        jp _kbd_get_key
+E04C-                 51
+E04C-                 52           ; SND
+E04C-                 53
+E04C-                 54           ; RTC
 E04C-                 55
-E04C-                 56           ; SYSTEM
-E04C-                 57
-E04C-                 58
-E04C-                 59       ; ASCI
-E04C-                 60       ; ----------------------------------------------------------------------------
-E04C-                 61
-E04C-                 62       ; init ASCI0
-E04C-                 63       ; input : none
-E04C-                 64       ; output : none
-E04C-                 65       _asci0_init:
-E04C-                 66           ; RE : Receiver Enable
-E04C-                 67           ; TE : Transmitter Enable
-E04C-                 68           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
-E04C-3E 64            69 (  6)     ld a,CNTLA0_RE|CNTLA0_TE|CNTLA0_MOD2
-E04E-ED 39 00         70 ( 13)     out0 (CNTLA0),a
-E051-                 71
-E051-                 72           ; DR=0
-E051-3E 00            73 (  6)     ld a,0
-E053-ED 39 02         74 ( 13)     out0 (CNTLB0),a
-E056-                 75
-E056-                 76           ; BRG0 : Enable 16 bit BRG counter
-E056-                 77           ; X1 ( + DR=0) : Clock mode = /1
-E056-3E 18            78 (  6)     ld a,ASEXT0_BRG0|ASEXT0_X1
-E058-ED 39 12         79 ( 13)     out0 (ASEXT0),a
-E05B-                 80
-E05B-                 81           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
-E05B-                 82           ; TC = fphi/(2*baud rate*clock mode) - 2
-E05B-                 83           ; TC = 32000000/(2*9600*1) - 2
-E05B-3E 81            84 (  6)     ld a,$81
-E05D-ED 39 1A         85 ( 13)     out0 (ASTC0L),a
-E060-3E 06            86 (  6)     ld a,$06
-E062-ED 39 1B         87 ( 13)     out0 (ASTC0H),a
-E065-                 88
-E065-                 89           ; RIE : enable Rx Interrupt
-E065-3E 08            90 (  6)     ld a,STAT0_RIE
-E067-ED 39 04         91 ( 13)     out0 (STAT0),a
-E06A-                 92
-E06A-AF               93 (  4)     xor a                  ; init RX buffer
-E06B-32 8A E5         94 ( 13)     ld (asci0_buffer_pos),a
-E06E-                 95
-E06E-C9               96 (  9)     ret
-E06F-                 97
-E06F-                 98       ; INT ASCI0
-E06F-                 99       ; put received char in ASCI0 RX buffer
-E06F-                100       _int_asci0:
-E06F-F5              101 ( 11)     push af
-E070-C5              102 ( 11)     push bc
-E071-D5              103 ( 11)     push de
-E072-E5              104 ( 11)     push hl
-E073-                105
-E073-                106       _int_asci0_test:
-E073-ED 38 04        107 ( 12)     in0 a,(STAT0)                ; check if there is a char in the FIFO
-E076-ED 64 80        108 (  9)     tst STAT0_RDRF
-E079-28 21           109 ( 6+)     jr Z,_int_asci0_exit
-E07B-                110
-E07B-ED 08 08        111 ( 12)     in0 c,(RDR0)                ; c <- received char
-E07E-                112
-E07E-                113           ; check for error
-E07E-E6 70           114 (  6)     and STAT0_OVRN|STAT0_PE|STAT0_FE
-E080-28 0A           115 ( 6+)     jr Z,_int_asci0_ok
-E082-                116
-E082-ED 38 00        117 ( 12)     in0 a,(CNTLA0)           ; clear error
-E085-E6 F7           118 (  6)     and CNTLA0_EFR!$FF
-E087-ED 39 00        119 ( 13)     out0 (CNTLA0),a
-E08A-18 E7           120 (  8)     jr _int_asci0_test                    ; exit
-E08C-                121
-E08C-                122       _int_asci0_ok:
-E08C-16 00           123 (  6)     ld d,0                      ; hl <- asci0_buffer+(asci0_buffer_pos)
-E08E-3A 8A E5        124 ( 12)     ld a,(asci0_buffer_pos)
-E091-5F              125 (  4)     ld e,a
-E092-21 8B E5        126 (  9)     ld hl,asci0_buffer
-E095-19              127 (  7)     add hl,de
-E096-                128
-E096-3C              129 (  4)     inc a                       ; ; inc kbd_buffer_pos
-E097-32 8A E5        130 ( 13)     ld (asci0_buffer_pos),a
-E09A-                131
-E09A-79              132 (  4)     ld a,c                      ; a <- received char
-E09B-77              133 (  7)     ld (hl),a                   ; save it to asci0_buffer+(asci0_buffer_pos)
-E09C-                134
-E09C-                135       _int_asci0_exit:
-E09C-E1              136 (  9)     pop hl
-E09D-D1              137 (  9)     pop de
-E09E-C1              138 (  9)     pop bc
-E09F-F1              139 (  9)     pop af
-E0A0-FB              140 (  3)     ei
-E0A1-C9              141 (  9)     ret
-E0A2-                142
-E0A2-                143       ; get a char on ASCI0 RX buffer
-E0A2-                144       ; input : none
-E0A2-                145       ; output : a <- received char
-E0A2-                146       _asci0_getc:
-E0A2-E5              147 ( 11)     push hl
-E0A3-D5              148 ( 11)     push de
-E0A4-                149
-E0A4-3A 8A E5        150 ( 12)     ld a,(asci0_buffer_pos)     ; load buffer position
-E0A7-F6 00           151 (  6)     or 0
-E0A9-CA B8 E0        152 ( 6+)     jp  Z,_asci0_getc_exit      ; exit if 0
-E0AC-                153
-E0AC-3D              154 (  4)     dec a                       ; decrement and update buffer position
-E0AD-32 8A E5        155 ( 13)     ld (asci0_buffer_pos),a
-E0B0-                156
-E0B0-16 00           157 (  6)     ld d,0                      ; get char in buffer
-E0B2-5F              158 (  4)     ld e,a
-E0B3-21 8B E5        159 (  9)     ld hl,asci0_buffer
-E0B6-19              160 (  7)     add hl,de
-E0B7-7E              161 (  6)     ld a,(hl)                   ; into A register
-E0B8-                162
-E0B8-                163       _asci0_getc_exit:
-E0B8-                164
-E0B8-D1              165 (  9)     pop de
-E0B9-E1              166 (  9)     pop hl
-E0BA-C9              167 (  9)     ret
-E0BB-                168
-E0BB-                169       ; check if rx buffer is empty
-E0BB-                170       ; input : NONE
-E0BB-                171       ; output : flag=Z if empty
-E0BB-                172       _asci0_rx_empty:
-E0BB-3A 8A E5        173 ( 12)     ld a,(asci0_buffer_pos)
-E0BE-FE 00           174 (  6)     cp 0
-E0C0-C9              175 (  9)     ret
-E0C1-                176
-E0C1-                177       ; put a char on asci0
-E0C1-                178       ; input : a = char ascii code
-E0C1-                179       ; output : none
-E0C1-                180       _asci0_putc:
-E0C1-F5              181 ( 11)     push af
-E0C2-                182
-E0C2-                183       _asci0_putc_wait:  ; wait for asci0 TX ready
-E0C2-ED 38 04        184 ( 12)     in0 a,(STAT0) ; TDRE=1 -> empty
-E0C5-E6 02           185 (  6)     and STAT0_TDRE
-E0C7-28 F9           186 ( 6+)     jr Z,_asci0_putc_wait
-E0C9-                187
-E0C9-F1              188 (  9)     pop af
-E0CA-ED 39 06        189 ( 13)     out0 (TDR0),a ; output the char to asci0
-E0CD-                190
-E0CD-C9              191 (  9)     ret
-E0CE-                192
-E0CE-                193       ; put a string on asci0
-E0CE-                194       ; input : (hl) = address of null terminated string
-E0CE-                195       ; output : none
-E0CE-                196       _asci0_puts:
-E0CE-E5              197 ( 11)     push hl
-E0CF-F5              198 ( 11)     push af
-E0D0-                199
-E0D0-                200       _asci0_puts_loop:
-E0D0-7E              201 (  6)     ld a,(hl)
-E0D1-F6 00           202 (  6)     or 0
-E0D3-28 06           203 ( 6+)     jr z,_asci0_puts_exit
-E0D5-CD C1 E0        204 ( 16)     call _asci0_putc
-E0D8-23              205 (  4)     inc hl
-E0D9-18 F5           206 (  8)     jr _asci0_puts_loop
-E0DB-                207
-E0DB-                208       _asci0_puts_exit:
-E0DB-F1              209 (  9)     pop af
-E0DC-E1              210 (  9)     pop hl
-E0DD-C9              211 (  9)     ret
-E0DE-                212
-E0DE-                213       _asci1_init:
-E0DE-                214           ; RE : Receiver Enable
-E0DE-                215           ; TE : Transmitter Enable
-E0DE-                216           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
-E0DE-3E 64           217 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
-E0E0-ED 39 01        218 ( 13)     out0 (CNTLA1),a
-E0E3-                219
-E0E3-                220           ; DR=0
-E0E3-3E 00           221 (  6)     ld a,0
-E0E5-ED 39 03        222 ( 13)     out0 (CNTLB1),a
-E0E8-                223
-E0E8-                224           ; BRG0 : Enable 16 bit BRG counter
-E0E8-                225           ; X1 ( + DR=0) : Clock mode = /1
-E0E8-3E 18           226 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
-E0EA-ED 39 13        227 ( 13)     out0 (ASEXT1),a
-E0ED-                228
-E0ED-                229           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
-E0ED-                230           ; TC = fphi/(2*baud rate*clock mode) - 2
-E0ED-                231           ; TC = 32000000/(2*9600*1) - 2
-E0ED-3E 81           232 (  6)     ld a,$81
-E0EF-ED 39 1C        233 ( 13)     out0 (ASTC1L),a
-E0F2-3E 06           234 (  6)     ld a,$06
-E0F4-ED 39 1D        235 ( 13)     out0 (ASTC1H),a
-E0F7-                236
-E0F7-                237           ; RIE : enable Rx Interrupt
-E0F7-3E 08           238 (  6)     ld a,STAT1_RIE
-E0F9-ED 39 05        239 ( 13)     out0 (STAT1),a
-E0FC-                240
-E0FC-AF              241 (  4)     xor a                  ; init RX buffer
-E0FD-32 CB E5        242 ( 13)     ld (asci1_buffer_pos),a
-E100-                243
-E100-C9              244 (  9)     ret
-E101-                245
-E101-                246       _int_asci1:
-E101-F5              247 ( 11)     push af
-E102-C5              248 ( 11)     push bc
-E103-D5              249 ( 11)     push de
-E104-E5              250 ( 11)     push hl
-E105-                251
-E105-                252       _int_asci1_test:
-E105-ED 38 05        253 ( 12)     in0 a,(STAT1)                ; check if there is a char in the FIFO
-E108-ED 64 80        254 (  9)     tst STAT1_RDRF
-E10B-28 21           255 ( 6+)     jr Z,_int_asci1_exit
-E10D-                256
-E10D-ED 08 09        257 ( 12)     in0 c,(RDR1)                ; c <- received char
-E110-                258
-E110-                259           ; check for error
-E110-E6 70           260 (  6)     and STAT1_OVRN|STAT1_PE|STAT1_FE
-E112-28 0A           261 ( 6+)     jr Z,_int_asci1_ok
-E114-                262
-E114-ED 38 01        263 ( 12)     in0 a,(CNTLA1)           ; clear error
-E117-E6 F7           264 (  6)     and CNTLA1_EFR!$FF
-E119-ED 39 01        265 ( 13)     out0 (CNTLA1),a
-E11C-18 E7           266 (  8)     jr _int_asci1_test                    ; exit
-E11E-                267
-E11E-                268       _int_asci1_ok:
-E11E-16 00           269 (  6)     ld d,0                      ; hl <- asci0_buffer+(asci0_buffer_pos)
-E120-3A CB E5        270 ( 12)     ld a,(asci1_buffer_pos)
-E123-5F              271 (  4)     ld e,a
-E124-21 CC E5        272 (  9)     ld hl,asci1_buffer
-E127-19              273 (  7)     add hl,de
-E128-                274
-E128-3C              275 (  4)     inc a                       ; ; inc kbd_buffer_pos
-E129-32 CB E5        276 ( 13)     ld (asci1_buffer_pos),a
-E12C-                277
-E12C-79              278 (  4)     ld a,c                      ; a <- received char
-E12D-77              279 (  7)     ld (hl),a                   ; save it to  asci1_buffer+(asci1_buffer_pos)
-E12E-                280
-E12E-                281       _int_asci1_exit:
-E12E-E1              282 (  9)     pop hl
-E12F-D1              283 (  9)     pop de
-E130-C1              284 (  9)     pop bc
-E131-F1              285 (  9)     pop af
-E132-FB              286 (  3)     ei
-E133-C9              287 (  9)     ret
-E134-                288
-E134-                289       _asci1_getc:
-E134-E5              290 ( 11)     push hl
-E135-D5              291 ( 11)     push de
-E136-                292
-E136-3A CB E5        293 ( 12)     ld a,(asci1_buffer_pos)     ; load buffer position
-E139-F6 00           294 (  6)     or 0
-E13B-CA 4A E1        295 ( 6+)     jp  Z,_asci1_getc_exit      ; exit if 0
-E13E-                296
-E13E-3D              297 (  4)     dec a                       ; decrement and update buffer position
-E13F-32 CB E5        298 ( 13)     ld (asci1_buffer_pos),a
-E142-                299
-E142-16 00           300 (  6)     ld d,0                      ; get char in buffer
-E144-5F              301 (  4)     ld e,a
-E145-21 CC E5        302 (  9)     ld hl,asci1_buffer
-E148-19              303 (  7)     add hl,de
-E149-7E              304 (  6)     ld a,(hl)                   ; into A register
-E14A-                305
-E14A-                306       _asci1_getc_exit:
-E14A-                307
-E14A-D1              308 (  9)     pop de
-E14B-E1              309 (  9)     pop hl
-E14C-C9              310 (  9)     ret
-E14D-                311
-E14D-                312       ; check if rx buffer is empty
-E14D-                313       ; input : NONE
-E14D-                314       ; output : flag=Z if empty
-E14D-                315       _asci1_rx_empty:
-E14D-3A CB E5        316 ( 12)     ld a,(asci1_buffer_pos)
-E150-FE 00           317 (  6)     cp 0
-E152-C9              318 (  9)     ret
-E153-                319
-E153-                320       ; put a char on asci1
-E153-                321       ; input : a = char ascii code
-E153-                322       ; output : none
-E153-                323       _asci1_putc:
-E153-F5              324 ( 11)     push af
-E154-                325
-E154-                326       _asci1_putc_wait:  ; wait for asci0 TX ready
-E154-ED 38 05        327 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
-E157-E6 02           328 (  6)     and STAT1_TDRE
-E159-28 F9           329 ( 6+)     jr Z,_asci1_putc_wait
-E15B-                330
-E15B-F1              331 (  9)     pop af
-E15C-ED 39 07        332 ( 13)     out0 (TDR1),a ; output the char to asci0
-E15F-                333
-E15F-C9              334 (  9)     ret
-E160-                335
-E160-                336       ; put a string on asci1
-E160-                337       ; input : (hl) = address of null terminated string
-E160-                338       ; output : none
-E160-                339       _asci1_puts:
-E160-E5              340 ( 11)     push hl
-E161-F5              341 ( 11)     push af
-E162-                342
-E162-                343       _asci1_puts_loop:
-E162-7E              344 (  6)     ld a,(hl)
-E163-F6 00           345 (  6)     or 0
-E165-28 06           346 ( 6+)     jr z,_asci1_puts_exit
-E167-CD 53 E1        347 ( 16)     call _asci1_putc
-E16A-23              348 (  4)     inc hl
-E16B-18 F5           349 (  8)     jr _asci1_puts_loop
-E16D-                350
-E16D-                351       _asci1_puts_exit:
-E16D-F1              352 (  9)     pop af
-E16E-E1              353 (  9)     pop hl
-E16F-C9              354 (  9)     ret
-E170-                355
-E170-                356
-E170-                357       ; VDU
-E170-                358       ; ----------------------------------------------------------------------------
-E170-                359
-F000-                360       VDU_RAM   .equ $F000     ; Start of video RAM address
-E170-                361
-E170-                362       ; vdu_init
-E170-                363       ; init the vdu system
-E170-                364       ; input : none
-E170-                365       ; output : none
-E170-                366       _vdu_init:
-E170-                367
-E170-                368           ; clear screen
-E170-CD 98 E1        369 ( 16)     call _vdu_cls
-E173-                370
-E173-                371           ; set PRT0 interrupt at 1/60s
-E173-3E 0D           372 (  6)      ld a,$0D
-E175-ED 39 0F        373 ( 13)      out0 (RLDR0H),a
-E178-3E 05           374 (  6)      ld a,$05
-E17A-ED 39 0E        375 ( 13)      out0 (RLDR0L),a
-E17D-                376
-E17D-                377           ; enable PRT0 interrupt
-E17D-3E 10           378 (  6)     ld a, TCR_TIE0 | TCR_TDE0
-E17F-ED 39 10        379 ( 13)     out0 (TCR),a
-E182-                380
-E182-C9              381 (  9)     ret
-E183-                382
-E183-                383       _int_vdu:
-E183-F5              384 ( 11)     push af
-E184-E5              385 ( 11)     push hl
-E185-                386
-E185-ED 38 10        387 ( 12)     in0 a,(TCR)         ; clear TIFE0
-E188-ED 38 0C        388 ( 12)     in0 a,(TMDR0L)
-E18B-                389
-E18B-2A 0F E6        390 ( 15)     ld hl,(VDU_PTR)
-E18E-36 58           391 (  9)     ld (hl),'X'
-E190-                392
-E190-E1              393 (  9)     pop hl
-E191-F1              394 (  9)     pop af
-E192-FB              395 (  3)     ei
-E193-C9              396 (  9)     ret
-E194-                397
-E194-                398       ; vdu_set_attr
-E194-                399       ; set the color attribute
-E194-                400       ; input : a = color attribute
-E194-                401       ; output : none
-E194-                402       _vdu_set_attr:
-E194-32 0C E6        403 ( 13)     ld (VDU_ATTR),a
-E197-C9              404 (  9)     ret
-E198-                405
-E198-                406       ; vdu_cls
-E198-                407       ; clear screen using VDU_ATTR color
-E198-                408       ; input : none
-E198-                409       ; output : none
-E198-                410       _vdu_cls:
-E198-D5              411 ( 11)     push de
-E199-E5              412 ( 11)     push hl
-E19A-F5              413 ( 11)     push af
-E19B-                414
-E19B-11 D0 07        415 (  9)     ld de,2000     ; number of chars
-E19E-21 00 F0        416 (  9)     ld hl,VDU_RAM    ; pointer to srart of ram
-E1A1-3A 0C E6        417 ( 12)     ld a,(VDU_ATTR)  ; get color attribute
-E1A4-4F              418 (  4)     ld c,a
-E1A5-                419
-E1A5-                420       _vdu_cls_loop:
-E1A5-36 20           421 (  9)     ld (hl),$20     ; write space char.
-E1A7-23              422 (  4)     inc hl
-E1A8-71              423 (  7)     ld (hl),c       ; set color attribute
-E1A9-23              424 (  4)     inc hl
-E1AA-1B              425 (  4)     dec de          ; update chars counter
-E1AB-7A              426 (  4)     ld a,d         ; check if zero
-E1AC-B3              427 (  4)     or e
-E1AD-C2 A5 E1        428 ( 6+)     jp nz,_vdu_cls_loop
-E1B0-                429
-E1B0-AF              430 (  4)     xor a          ; home cursor
-E1B1-32 0D E6        431 ( 13)     ld (VDU_X),a    ; X=0
-E1B4-32 0E E6        432 ( 13)     ld (VDU_Y),a    ; Y=0
-E1B7-11 00 F0        433 (  9)     ld de,VDU_RAM   ; PTR = start of video RAM
-E1BA-ED 53 0F E6     434 ( 20)     ld (VDU_PTR),de
-E1BE-                435
-E1BE-F1              436 (  9)     pop af
-E1BF-E1              437 (  9)     pop hl
-E1C0-D1              438 (  9)     pop de
-E1C1-                439
-E1C1-C9              440 (  9)     ret
-E1C2-                441
-E1C2-                442       ; vdu_scroll
-E1C2-                443       ; scroll all the screen UP one line
-E1C2-                444       ; input : none
-E1C2-                445       ; output : none
-E1C2-                446       _vdu_scroll_up:
-E1C2-F5              447 ( 11)     push af
-E1C3-E5              448 ( 11)     push hl
-E1C4-D5              449 ( 11)     push de
-E1C5-C5              450 ( 11)     push bc
-E1C6-                451
-E1C6-21 A0 F0        452 (  9)     ld hl,VDU_RAM+160 ; source pointer = start of 2nd line
-E1C9-11 00 F0        453 (  9)     ld de,VDU_RAM ; destination pointer = start of 1st line
-E1CC-01 00 0F        454 (  9)     ld bc,4000-160 ; all screen minus one line to move
-E1CF-                455       _vdu_scroll_loop:
-E1CF-ED A0           456 ( 12)     ldi     ; scroll the screen
-E1D1-EA CF E1        457 ( 6+)     jp pe,_vdu_scroll_loop
-E1D4-                458                   ; here -> (de) points to the start of 25th line
-E1D4-06 50           459 (  6)     ld b,80   ; 80 chars to fill on last line
-E1D6-3A 0C E6        460 ( 12)     ld a,(VDU_ATTR) ; get current color attribute
-E1D9-4F              461 (  4)     ld c,a
-E1DA-                462       _vdu_scroll_loop_line25:
-E1DA-3E 20           463 (  6)     ld a,' '
-E1DC-12              464 (  7)     ld (de),a ; put a space character
-E1DD-13              465 (  4)     inc de
-E1DE-79              466 (  4)     ld a,c
-E1DF-12              467 (  7)     ld (de),a ; ser the color attribute
-E1E0-13              468 (  4)     inc de
-E1E1-10 F7           469 ( 7+)     djnz _vdu_scroll_loop_line25
-E1E3-                470
-E1E3-C1              471 (  9)     pop bc
-E1E4-D1              472 (  9)     pop de
-E1E5-E1              473 (  9)     pop hl
-E1E6-F1              474 (  9)     pop af
-E1E7-C9              475 (  9)     ret
-E1E8-                476
-E1E8-                477       ; vdu_putc_term
-E1E8-                478       ; put a char on the screen, at current location, with current attribute, interpreting special codes :
-E1E8-                479       ;   VT-52 Terminal ( see http://toshyp.atari.org/en/VT_52_terminal.html )
-E1E8-                480       ;   BS - Backspace - 0x08
-E1E8-                481       ;   BEL - Bell - 0x07
-E1E8-                482       ;   ESC J - Clear to end of scren - 0x1b , J
-E1E8-                483       ;   ESC K - Clear to end of line - 0x1b , K
-E1E8-                484       ;   ESC E - Clear Screen - 0x1b , E
-E1E8-                485       ;   ESC l - Clear line - 0x1b , l
-E1E8-                486       ;   ESC o - Clear to start of line - 0x1b , o
-E1E8-                487       ;   ESC d - Clear to start of screen - 0x1b , d
-E1E8-                488       ;   ESC B - Cursor down - 0x1b , B
-E1E8-                489       ;   ESC H - Cursor home - 0x1b , H
-E1E8-                490       ;   ESC D - Cursor left - 0x1b , D
-E1E8-                491       ;   ESC C - Cursor right - 0x1b , C
-E1E8-                492       ;   ESC A - Cursor up - 0x1b , A
-E1E8-                493       ;   ESC M - Delete line - 0x1b , M
-E1E8-                494       ;   ESC Y - Set cursor position - 0x1b , Y , ' '+x , ' '+y
-E1E8-                495       ;   ESC b - Set text color - 0x1b , b , color
-E1E8-                496       ;   ESC L - Insert line - 0x1b , L
-E1E8-                497       ;   LF - Line feed - 0x0a
-E1E8-                498       ;   ESC k - Restore cursor position - 0x1b , k
-E1E8-                499       ;   ESC c - Set Background color - 0x1b , c , color
-E1E8-                500       ;   CR - Carriage return - 0x0d
-E1E8-                501       ;   ESC q - Normal video - 0x1b , q
-E1E8-                502       ;   ESC p - Reverse video - 0x1b , p
-E1E8-                503       ;   ESC j - Save cursor position - 0x1b , j
-E1E8-                504       ;   ESC I - Cursor up and insert - 0x1b , I
-E1E8-                505       ;   FF - Form feed - 0x0c
-E1E8-                506       ;   HT - Tabulator - 0x09
-E1E8-                507       ;   ESC w - Wrap off - 0x1b , w
-E1E8-                508       ;   ESC v - Wrap on - 0x1b , v
-E1E8-                509       ;   ESC e - Show cursor
-E1E8-                510       ;   ESC f - Hide cursor
-E1E8-                511       ;   blink on
-E1E8-                512       ;   blink off
-E1E8-                513       ; input : a = char to print
-E1E8-                514       ; output : none
-E1E8-                515
-E1E8-                516       _vdu_putc_term:
-E1E8-                517
-E1E8-                518
-E1E8-                519       _vdu_putc_term_LF:
-E1E8-FE 0A           520 (  6)     cp $0A
-E1EA-20 05           521 ( 6+)     jr nz,_vdu_putc_term_CS
-E1EC-CD 11 E2        522 ( 16)     call _vdu_do_LF
-E1EF-18 15           523 (  8)     jr _vdu_putc_term_exit
-E1F1-                524
-E1F1-                525       _vdu_putc_term_CS:
-E1F1-FE 0C           526 (  6)     cp $0C
-E1F3-20 05           527 ( 6+)     jr nz,_vdu_putc_term_CR
-E1F5-CD 98 E1        528 ( 16)     call _vdu_cls
-E1F8-18 0C           529 (  8)     jr _vdu_putc_term_exit
-E1FA-                530
-E1FA-                531       _vdu_putc_term_CR:
-E1FA-FE 0D           532 (  6)    cp $0D
-E1FC-20 05           533 ( 6+)    jr nz,_vdu_putc_term_print
-E1FE-CD 07 E2        534 ( 16)    call _vdu_do_CR
-E201-18 03           535 (  8)    jr _vdu_putc_term_exit
-E203-                536
-E203-                537       _vdu_putc_term_print:
-E203-CD 3A E2        538 ( 16)     call _vdu_putc
-E206-                539
-E206-                540       _vdu_putc_term_exit:
-E206-C9              541 (  9)     ret
-E207-                542
-E207-                543       _vdu_do_CR:
-E207-F5              544 ( 11)     push af
-E208-AF              545 (  4)     xor a
-E209-32 0D E6        546 ( 13)     ld (VDU_X),a
-E20C-CD 9E E2        547 ( 16)     call _vdu_xy_to_ptr
-E20F-F1              548 (  9)     pop af
-E210-C9              549 (  9)     ret
-E211-                550
-E211-                551
-E211-                552       _vdu_do_LF:
-E211-F5              553 ( 11)     push af
-E212-3A 0E E6        554 ( 12)     ld a,(VDU_Y)
-E215-3C              555 (  4)     inc a
-E216-32 0E E6        556 ( 13)     ld (VDU_Y),a
-E219-FE 19           557 (  6)     cp 25
-E21B-C2 26 E2        558 ( 6+)     jp nz,_vdu_do_LF_set_ptr
-E21E-CD C2 E1        559 ( 16)     call _vdu_scroll_up
-E221-3E 18           560 (  6)     ld a,24
-E223-32 0E E6        561 ( 13)     ld (VDU_Y),a
-E226-                562       _vdu_do_LF_set_ptr:
-E226-CD 9E E2        563 ( 16)     call _vdu_xy_to_ptr
-E229-F1              564 (  9)     pop af
-E22A-C9              565 (  9)     ret
-E22B-                566
-E22B-                567
-E22B-                568       _vdu_hide_cursor:
-E22B-F5              569 ( 11)     push af
-E22C-E5              570 ( 11)     push hl
-E22D-                571
-E22D-2A 0F E6        572 ( 15)     ld hl,(VDU_PTR)
-E230-23              573 (  4)     inc hl          ; hl <- current color attribute address
-E231-7E              574 (  6)     ld a,(hl)
-E232-07              575 (  3)     rlca
-E233-07              576 (  3)     rlca
-E234-07              577 (  3)     rlca
-E235-07              578 (  3)     rlca
-E236-77              579 (  7)     ld (hl),a
-E237-                580
-E237-E1              581 (  9)     pop hl
-E238-F1              582 (  9)     pop af
-E239-                583
-E239-C9              584 (  9)     ret
-E23A-                585
-E23A-                586
-E23A-                587       ; vdu_putc
-E23A-                588       ; put a char on the screen, at current location, with current attribute
-E23A-                589       ; input : a = char to display
-E23A-                590       ; output : none
-E23A-                591       _vdu_putc:
-E23A-F5              592 ( 11)     push af
-E23B-D5              593 ( 11)     push de
-E23C-                594
-E23C-ED 5B 0F E6     595 ( 18)     ld de,(VDU_PTR)
-E240-12              596 (  7)     ld (de),a           ; put char in a to current video memory location
-E241-13              597 (  4)     inc de              ; go to attribute
-E242-3A 0C E6        598 ( 12)     ld a,(VDU_ATTR)     ; fetch attribute from VDU_ATTR
-E245-12              599 (  7)     ld (de),a           ; write attribute to video memory
-E246-13              600 (  4)     inc de              ; go to next char
-E247-3A 0D E6        601 ( 12)     ld a,(VDU_X)        ; get X position
-E24A-3C              602 (  4)     inc a               ; increment
-E24B-32 0D E6        603 ( 13)     ld (VDU_X),a
-E24E-FE 50           604 (  6)     cp 80              ; next line ?
-E250-20 03           605 ( 6+)     jr nz,_vdu_putc_exit
-E252-CD 5C E2        606 ( 16)     call _vdu_next_line
-E255-                607
-E255-                608       _vdu_putc_exit:
-E255-ED 53 0F E6     609 ( 20)     ld (VDU_PTR),de
-E259-                610
-E259-D1              611 (  9)     pop de
-E25A-F1              612 (  9)     pop af
-E25B-C9              613 (  9)     ret
-E25C-                614
-E25C-                615       ; vdu_next_line
-E25C-                616       ; set cursor at the beginning of next line. Verticall scroll of the screen if we are at 25th line.
-E25C-                617       ; input: none
-E25C-                618       ; output: none
-E25C-                619       _vdu_next_line:
-E25C-F5              620 ( 11)     push af
-E25D-D5              621 ( 11)     push de
-E25E-                622
-E25E-3E 00           623 (  6)     ld a,0              ; reset X
-E260-32 0D E6        624 ( 13)     ld (VDU_X),a
-E263-3A 0E E6        625 ( 12)     ld a,(VDU_Y)        ; increment Y
-E266-3C              626 (  4)     inc a
-E267-32 0E E6        627 ( 13)     ld (VDU_Y),a
-E26A-FE 19           628 (  6)     cp 25               ; bottom of the screen ?
-E26C-20 0F           629 ( 6+)     jr nz,_vdu_next_line_exit
-E26E-CD C2 E1        630 ( 16)     call _vdu_scroll_up
-E271-3E 18           631 (  6)     ld a,24             ; set Y to 24
-E273-32 0E E6        632 ( 13)     ld (VDU_Y),a
-E276-                633
-E276-11 00 FF        634 (  9)     ld de,VDU_RAM+3840   ; set de to start of 24th line
-E279-ED 53 0F E6     635 ( 20)     ld (VDU_PTR),de
-E27D-                636
-E27D-                637       _vdu_next_line_exit:
-E27D-D1              638 (  9)     pop de
-E27E-F1              639 (  9)     pop af
-E27F-C9              640 (  9)     ret
-E280-                641
-E280-                642       ; vdu_puts
-E280-                643       ; display a text on the screen, at current location, with current color attrributes.
-E280-                644       ; input : hl = pointer to a null terminated string
-E280-                645       ; output : none
-E280-                646       _vdu_puts:
-E280-F5              647 ( 11)     push af
-E281-E5              648 ( 11)     push hl
-E282-                649
-E282-                650       _vdu_puts_loop:
-E282-7E              651 (  6)     ld a,(hl)   ; load char fromm string
-E283-F6 00           652 (  6)     or 0
-E285-28 06           653 ( 6+)     jr z,_vdu_puts_exit  ; exit if =0
-E287-CD 3A E2        654 ( 16)     call _vdu_putc
-E28A-23              655 (  4)     inc hl  ; next character
-E28B-18 F5           656 (  8)     jr _vdu_puts_loop
-E28D-                657
-E28D-                658       _vdu_puts_exit:
-E28D-E1              659 (  9)     pop hl
-E28E-F1              660 (  9)     pop af
-E28F-C9              661 (  9)     ret
-E290-                662
-E290-                663       ; vdu_locate
-E290-                664       ; set cursor position
-E290-                665       ; input : b=X (0-79), c=Y (0-24)
-E290-                666       ; output : none
-E290-                667       _vdu_locate:
-E290-F5              668 ( 11)     push af
-E291-78              669 (  4)     ld a,b
-E292-32 0D E6        670 ( 13)     ld (VDU_X),a
-E295-79              671 (  4)     ld a,c
-E296-32 0E E6        672 ( 13)     ld (VDU_Y),a
-E299-CD 9E E2        673 ( 16)     call _vdu_xy_to_ptr
-E29C-F1              674 (  9)     pop af
-E29D-C9              675 (  9)     ret
-E29E-                676
-E29E-                677       _vdu_xy_to_ptr
-E29E-                678
-E29E-F5              679 ( 11)     push af
-E29F-E5              680 ( 11)     push hl
-E2A0-D5              681 ( 11)     push de
-E2A1-                682
-E2A1-21 BE E2        683 (  9)     ld hl,vdu_line_ptr ; hl = pointer to array of start of line addresses
-E2A4-16 00           684 (  6)     ld d,0  ; de = Y*2
-E2A6-3A 0E E6        685 ( 12)     ld a,(VDU_Y)
-E2A9-87              686 (  4)     add a,a
-E2AA-5F              687 (  4)     ld e,a
-E2AB-19              688 (  7)     add hl,de ; hl = pointer to start of line
-E2AC-                689
-E2AC-5E              690 (  6)     ld e,(hl)  ; de = (hl) = start of line address
-E2AD-23              691 (  4)     inc hl
-E2AE-56              692 (  6)     ld d,(hl)
-E2AF-                693
-E2AF-26 00           694 (  6)      ld h,0 ; hl=X*2
-E2B1-3A 0D E6        695 ( 12)      ld a,(VDU_X)
-E2B4-87              696 (  4)      add a,a
-E2B5-6F              697 (  4)      ld l,a
-E2B6-19              698 (  7)     add hl,de ; hl = start of line address + X*2
-E2B7-                699
-E2B7-                700
-E2B7-22 0F E6        701 ( 20)     ld (VDU_PTR),hl ; save PTR
-E2BA-                702
-E2BA-D1              703 (  9)     pop de
-E2BB-E1              704 (  9)     pop hl
-E2BC-F1              705 (  9)     pop af
-E2BD-C9              706 (  9)     ret
-E2BE-                707
-E2BE-                708       ; VDU DATA
-E2BE-00 F0 A0 F0 
+E04C-                 56
+E04C-                 57           .include bios_asci.asm
+E04C-            I     1       ; ASCI
+E04C-            I     2       ; ----------------------------------------------------------------------------
+E04C-            I     3
+E04C-            I     4       ; init ASCI0
+E04C-            I     5       ; input : none
+E04C-            I     6       ; output : none
+E04C-            I     7       _asci0_init:
+E04C-            I     8           ; RE : Receiver Enable
+E04C-            I     9           ; TE : Transmitter Enable
+E04C-            I    10           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+E04C-3E 64       I    11 (  6)     ld a,CNTLA0_RE|CNTLA0_TE|CNTLA0_MOD2
+E04E-ED 39 00    I    12 ( 13)     out0 (CNTLA0),a
+E051-            I    13
+E051-            I    14           ; DR=0
+E051-3E 00       I    15 (  6)     ld a,0
+E053-ED 39 02    I    16 ( 13)     out0 (CNTLB0),a
+E056-            I    17
+E056-            I    18           ; BRG0 : Enable 16 bit BRG counter
+E056-            I    19           ; X1 ( + DR=0) : Clock mode = /1
+E056-3E 18       I    20 (  6)     ld a,ASEXT0_BRG0|ASEXT0_X1
+E058-ED 39 12    I    21 ( 13)     out0 (ASEXT0),a
+E05B-            I    22
+E05B-            I    23           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+E05B-            I    24           ; TC = fphi/(2*baud rate*clock mode) - 2
+E05B-            I    25           ; TC = 32000000/(2*9600*1) - 2
+E05B-3E 81       I    26 (  6)     ld a,$81
+E05D-ED 39 1A    I    27 ( 13)     out0 (ASTC0L),a
+E060-3E 06       I    28 (  6)     ld a,$06
+E062-ED 39 1B    I    29 ( 13)     out0 (ASTC0H),a
+E065-            I    30
+E065-            I    31           ; RIE : enable Rx Interrupt
+E065-3E 08       I    32 (  6)     ld a,STAT0_RIE
+E067-ED 39 04    I    33 ( 13)     out0 (STAT0),a
+E06A-            I    34
+E06A-AF          I    35 (  4)     xor a                  ; init RX buffer
+E06B-32 70 E1    I    36 ( 13)     ld (asci0_buffer_pos),a
+E06E-            I    37
+E06E-C9          I    38 (  9)     ret
+E06F-            I    39
+E06F-            I    40       ; INT ASCI0
+E06F-            I    41       ; put received char in ASCI0 RX buffer
+E06F-            I    42       _int_asci0:
+E06F-F5          I    43 ( 11)     push af
+E070-C5          I    44 ( 11)     push bc
+E071-D5          I    45 ( 11)     push de
+E072-E5          I    46 ( 11)     push hl
+E073-            I    47
+E073-            I    48       _int_asci0_test:
+E073-ED 38 04    I    49 ( 12)     in0 a,(STAT0)                ; check if there is a char in the FIFO
+E076-ED 64 80    I    50 (  9)     tst STAT0_RDRF
+E079-28 21       I    51 ( 6+)     jr Z,_int_asci0_exit
+E07B-            I    52
+E07B-ED 08 08    I    53 ( 12)     in0 c,(RDR0)                ; c <- received char
+E07E-            I    54
+E07E-            I    55           ; check for error
+E07E-E6 70       I    56 (  6)     and STAT0_OVRN|STAT0_PE|STAT0_FE
+E080-28 0A       I    57 ( 6+)     jr Z,_int_asci0_ok
+E082-            I    58
+E082-ED 38 00    I    59 ( 12)     in0 a,(CNTLA0)           ; clear error
+E085-E6 F7       I    60 (  6)     and CNTLA0_EFR!$FF
+E087-ED 39 00    I    61 ( 13)     out0 (CNTLA0),a
+E08A-18 E7       I    62 (  8)     jr _int_asci0_test                    ; exit
+E08C-            I    63
+E08C-            I    64       _int_asci0_ok:
+E08C-16 00       I    65 (  6)     ld d,0                      ; hl <- asci0_buffer+(asci0_buffer_pos)
+E08E-3A 70 E1    I    66 ( 12)     ld a,(asci0_buffer_pos)
+E091-5F          I    67 (  4)     ld e,a
+E092-21 71 E1    I    68 (  9)     ld hl,asci0_buffer
+E095-19          I    69 (  7)     add hl,de
+E096-            I    70
+E096-3C          I    71 (  4)     inc a                       ; ; inc kbd_buffer_pos
+E097-32 70 E1    I    72 ( 13)     ld (asci0_buffer_pos),a
+E09A-            I    73
+E09A-79          I    74 (  4)     ld a,c                      ; a <- received char
+E09B-77          I    75 (  7)     ld (hl),a                   ; save it to asci0_buffer+(asci0_buffer_pos)
+E09C-            I    76
+E09C-            I    77       _int_asci0_exit:
+E09C-E1          I    78 (  9)     pop hl
+E09D-D1          I    79 (  9)     pop de
+E09E-C1          I    80 (  9)     pop bc
+E09F-F1          I    81 (  9)     pop af
+E0A0-FB          I    82 (  3)     ei
+E0A1-C9          I    83 (  9)     ret
+E0A2-            I    84
+E0A2-            I    85       ; get a char on ASCI0 RX buffer
+E0A2-            I    86       ; input : none
+E0A2-            I    87       ; output : a <- received char
+E0A2-            I    88       _asci0_getc:
+E0A2-E5          I    89 ( 11)     push hl
+E0A3-D5          I    90 ( 11)     push de
+E0A4-            I    91
+E0A4-3A 70 E1    I    92 ( 12)     ld a,(asci0_buffer_pos)     ; load buffer position
+E0A7-F6 00       I    93 (  6)     or 0
+E0A9-CA B8 E0    I    94 ( 6+)     jp  Z,_asci0_getc_exit      ; exit if 0
+E0AC-            I    95
+E0AC-3D          I    96 (  4)     dec a                       ; decrement and update buffer position
+E0AD-32 70 E1    I    97 ( 13)     ld (asci0_buffer_pos),a
+E0B0-            I    98
+E0B0-16 00       I    99 (  6)     ld d,0                      ; get char in buffer
+E0B2-5F          I   100 (  4)     ld e,a
+E0B3-21 71 E1    I   101 (  9)     ld hl,asci0_buffer
+E0B6-19          I   102 (  7)     add hl,de
+E0B7-7E          I   103 (  6)     ld a,(hl)                   ; into A register
+E0B8-            I   104
+E0B8-            I   105       _asci0_getc_exit:
+E0B8-            I   106
+E0B8-D1          I   107 (  9)     pop de
+E0B9-E1          I   108 (  9)     pop hl
+E0BA-C9          I   109 (  9)     ret
+E0BB-            I   110
+E0BB-            I   111       ; check if rx buffer is empty
+E0BB-            I   112       ; input : NONE
+E0BB-            I   113       ; output : flag=Z if empty
+E0BB-            I   114       _asci0_rx_empty:
+E0BB-3A 70 E1    I   115 ( 12)     ld a,(asci0_buffer_pos)
+E0BE-FE 00       I   116 (  6)     cp 0
+E0C0-C9          I   117 (  9)     ret
+E0C1-            I   118
+E0C1-            I   119       ; put a char on asci0
+E0C1-            I   120       ; input : a = char ascii code
+E0C1-            I   121       ; output : none
+E0C1-            I   122       _asci0_putc:
+E0C1-F5          I   123 ( 11)     push af
+E0C2-            I   124
+E0C2-            I   125       _asci0_putc_wait:  ; wait for asci0 TX ready
+E0C2-ED 38 04    I   126 ( 12)     in0 a,(STAT0) ; TDRE=1 -> empty
+E0C5-E6 02       I   127 (  6)     and STAT0_TDRE
+E0C7-28 F9       I   128 ( 6+)     jr Z,_asci0_putc_wait
+E0C9-            I   129
+E0C9-F1          I   130 (  9)     pop af
+E0CA-ED 39 06    I   131 ( 13)     out0 (TDR0),a ; output the char to asci0
+E0CD-            I   132
+E0CD-C9          I   133 (  9)     ret
+E0CE-            I   134
+E0CE-            I   135       ; put a string on asci0
+E0CE-            I   136       ; input : (hl) = address of null terminated string
+E0CE-            I   137       ; output : none
+E0CE-            I   138       _asci0_puts:
+E0CE-E5          I   139 ( 11)     push hl
+E0CF-F5          I   140 ( 11)     push af
+E0D0-            I   141
+E0D0-            I   142       _asci0_puts_loop:
+E0D0-7E          I   143 (  6)     ld a,(hl)
+E0D1-F6 00       I   144 (  6)     or 0
+E0D3-28 06       I   145 ( 6+)     jr z,_asci0_puts_exit
+E0D5-CD C1 E0    I   146 ( 16)     call _asci0_putc
+E0D8-23          I   147 (  4)     inc hl
+E0D9-18 F5       I   148 (  8)     jr _asci0_puts_loop
+E0DB-            I   149
+E0DB-            I   150       _asci0_puts_exit:
+E0DB-F1          I   151 (  9)     pop af
+E0DC-E1          I   152 (  9)     pop hl
+E0DD-C9          I   153 (  9)     ret
+E0DE-            I   154
+E0DE-            I   155       _asci1_init:
+E0DE-            I   156           ; RE : Receiver Enable
+E0DE-            I   157           ; TE : Transmitter Enable
+E0DE-            I   158           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+E0DE-3E 64       I   159 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
+E0E0-ED 39 01    I   160 ( 13)     out0 (CNTLA1),a
+E0E3-            I   161
+E0E3-            I   162           ; DR=0
+E0E3-3E 00       I   163 (  6)     ld a,0
+E0E5-ED 39 03    I   164 ( 13)     out0 (CNTLB1),a
+E0E8-            I   165
+E0E8-            I   166           ; BRG0 : Enable 16 bit BRG counter
+E0E8-            I   167           ; X1 ( + DR=0) : Clock mode = /1
+E0E8-3E 18       I   168 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
+E0EA-ED 39 13    I   169 ( 13)     out0 (ASEXT1),a
+E0ED-            I   170
+E0ED-            I   171           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+E0ED-            I   172           ; TC = fphi/(2*baud rate*clock mode) - 2
+E0ED-            I   173           ; TC = 32000000/(2*9600*1) - 2
+E0ED-3E 81       I   174 (  6)     ld a,$81
+E0EF-ED 39 1C    I   175 ( 13)     out0 (ASTC1L),a
+E0F2-3E 06       I   176 (  6)     ld a,$06
+E0F4-ED 39 1D    I   177 ( 13)     out0 (ASTC1H),a
+E0F7-            I   178
+E0F7-            I   179           ; RIE : enable Rx Interrupt
+E0F7-3E 08       I   180 (  6)     ld a,STAT1_RIE
+E0F9-ED 39 05    I   181 ( 13)     out0 (STAT1),a
+E0FC-            I   182
+E0FC-AF          I   183 (  4)     xor a                  ; init RX buffer
+E0FD-32 B1 E1    I   184 ( 13)     ld (asci1_buffer_pos),a
+E100-            I   185
+E100-C9          I   186 (  9)     ret
+E101-            I   187
+E101-            I   188       _int_asci1:
+E101-F5          I   189 ( 11)     push af
+E102-C5          I   190 ( 11)     push bc
+E103-D5          I   191 ( 11)     push de
+E104-E5          I   192 ( 11)     push hl
+E105-            I   193
+E105-            I   194       _int_asci1_test:
+E105-ED 38 05    I   195 ( 12)     in0 a,(STAT1)                ; check if there is a char in the FIFO
+E108-ED 64 80    I   196 (  9)     tst STAT1_RDRF
+E10B-28 21       I   197 ( 6+)     jr Z,_int_asci1_exit
+E10D-            I   198
+E10D-ED 08 09    I   199 ( 12)     in0 c,(RDR1)                ; c <- received char
+E110-            I   200
+E110-            I   201           ; check for error
+E110-E6 70       I   202 (  6)     and STAT1_OVRN|STAT1_PE|STAT1_FE
+E112-28 0A       I   203 ( 6+)     jr Z,_int_asci1_ok
+E114-            I   204
+E114-ED 38 01    I   205 ( 12)     in0 a,(CNTLA1)           ; clear error
+E117-E6 F7       I   206 (  6)     and CNTLA1_EFR!$FF
+E119-ED 39 01    I   207 ( 13)     out0 (CNTLA1),a
+E11C-18 E7       I   208 (  8)     jr _int_asci1_test                    ; exit
+E11E-            I   209
+E11E-            I   210       _int_asci1_ok:
+E11E-16 00       I   211 (  6)     ld d,0                      ; hl <- asci0_buffer+(asci0_buffer_pos)
+E120-3A B1 E1    I   212 ( 12)     ld a,(asci1_buffer_pos)
+E123-5F          I   213 (  4)     ld e,a
+E124-21 B2 E1    I   214 (  9)     ld hl,asci1_buffer
+E127-19          I   215 (  7)     add hl,de
+E128-            I   216
+E128-3C          I   217 (  4)     inc a                       ; ; inc kbd_buffer_pos
+E129-32 B1 E1    I   218 ( 13)     ld (asci1_buffer_pos),a
+E12C-            I   219
+E12C-79          I   220 (  4)     ld a,c                      ; a <- received char
+E12D-77          I   221 (  7)     ld (hl),a                   ; save it to  asci1_buffer+(asci1_buffer_pos)
+E12E-            I   222
+E12E-            I   223       _int_asci1_exit:
+E12E-E1          I   224 (  9)     pop hl
+E12F-D1          I   225 (  9)     pop de
+E130-C1          I   226 (  9)     pop bc
+E131-F1          I   227 (  9)     pop af
+E132-FB          I   228 (  3)     ei
+E133-C9          I   229 (  9)     ret
+E134-            I   230
+E134-            I   231       _asci1_getc:
+E134-E5          I   232 ( 11)     push hl
+E135-D5          I   233 ( 11)     push de
+E136-            I   234
+E136-3A B1 E1    I   235 ( 12)     ld a,(asci1_buffer_pos)     ; load buffer position
+E139-F6 00       I   236 (  6)     or 0
+E13B-CA 4A E1    I   237 ( 6+)     jp  Z,_asci1_getc_exit      ; exit if 0
+E13E-            I   238
+E13E-3D          I   239 (  4)     dec a                       ; decrement and update buffer position
+E13F-32 B1 E1    I   240 ( 13)     ld (asci1_buffer_pos),a
+E142-            I   241
+E142-16 00       I   242 (  6)     ld d,0                      ; get char in buffer
+E144-5F          I   243 (  4)     ld e,a
+E145-21 B2 E1    I   244 (  9)     ld hl,asci1_buffer
+E148-19          I   245 (  7)     add hl,de
+E149-7E          I   246 (  6)     ld a,(hl)                   ; into A register
+E14A-            I   247
+E14A-            I   248       _asci1_getc_exit:
+E14A-            I   249
+E14A-D1          I   250 (  9)     pop de
+E14B-E1          I   251 (  9)     pop hl
+E14C-C9          I   252 (  9)     ret
+E14D-            I   253
+E14D-            I   254       ; check if rx buffer is empty
+E14D-            I   255       ; input : NONE
+E14D-            I   256       ; output : flag=Z if empty
+E14D-            I   257       _asci1_rx_empty:
+E14D-3A B1 E1    I   258 ( 12)     ld a,(asci1_buffer_pos)
+E150-FE 00       I   259 (  6)     cp 0
+E152-C9          I   260 (  9)     ret
+E153-            I   261
+E153-            I   262       ; put a char on asci1
+E153-            I   263       ; input : a = char ascii code
+E153-            I   264       ; output : none
+E153-            I   265       _asci1_putc:
+E153-F5          I   266 ( 11)     push af
+E154-            I   267
+E154-            I   268       _asci1_putc_wait:  ; wait for asci0 TX ready
+E154-ED 38 05    I   269 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
+E157-E6 02       I   270 (  6)     and STAT1_TDRE
+E159-28 F9       I   271 ( 6+)     jr Z,_asci1_putc_wait
+E15B-            I   272
+E15B-F1          I   273 (  9)     pop af
+E15C-ED 39 07    I   274 ( 13)     out0 (TDR1),a ; output the char to asci0
+E15F-            I   275
+E15F-C9          I   276 (  9)     ret
+E160-            I   277
+E160-            I   278       ; put a string on asci1
+E160-            I   279       ; input : (hl) = address of null terminated string
+E160-            I   280       ; output : none
+E160-            I   281       _asci1_puts:
+E160-E5          I   282 ( 11)     push hl
+E161-F5          I   283 ( 11)     push af
+E162-            I   284
+E162-            I   285       _asci1_puts_loop:
+E162-7E          I   286 (  6)     ld a,(hl)
+E163-F6 00       I   287 (  6)     or 0
+E165-28 06       I   288 ( 6+)     jr z,_asci1_puts_exit
+E167-CD 53 E1    I   289 ( 16)     call _asci1_putc
+E16A-23          I   290 (  4)     inc hl
+E16B-18 F5       I   291 (  8)     jr _asci1_puts_loop
+E16D-            I   292
+E16D-            I   293       _asci1_puts_exit:
+E16D-F1          I   294 (  9)     pop af
+E16E-E1          I   295 (  9)     pop hl
+E16F-C9          I   296 (  9)     ret
+E170-            I   297
+E170-            I   298       ; RAM
+E170-            I   299       asci0_buffer_pos:   .bs 1
+E171-            I   300       asci0_buffer:       .bs 64
+E1B1-            I   301       asci1_buffer_pos:   .bs 1
+E1B2-            I   302       asci1_buffer:       .bs 64
+E1F2-                 58           .include bios_vdu.asm
+E1F2-            I     1       ; VDU
+E1F2-            I     2       ; ----------------------------------------------------------------------------
+E1F2-            I     3
+F000-            I     4       VDU_RAM   .equ $F000     ; Start of video RAM address
+E1F2-            I     5
+0001-            I     6       CURSOR_SOLID .equ 1
+E1F2-            I     7
+E1F2-            I     8
+E1F2-            I     9       ; vdu_init
+E1F2-            I    10       ; init the vdu system
+E1F2-            I    11       ; input : none
+E1F2-            I    12       ; output : none
+E1F2-            I    13       _vdu_init:
+E1F2-            I    14
+E1F2-            I    15           ; clear screen
+E1F2-CD 72 E2    I    16 ( 16)     call _vdu_cls
+E1F5-            I    17
+E1F5-            I    18           ; set PRT0 interrupt at 1/60s
+E1F5-3E 1A       I    19 (  6)      ld a,$1A
+E1F7-ED 39 0F    I    20 ( 13)      out0 (RLDR0H),a
+E1FA-3E 0A       I    21 (  6)      ld a,$0A
+E1FC-ED 39 0E    I    22 ( 13)      out0 (RLDR0L),a
+E1FF-            I    23
+E1FF-            I    24           ; enable PRT0 interrupt
+E1FF-3E 11       I    25 (  6)     ld a, TCR_TIE0|TCR_TDE0
+E201-ED 39 10    I    26 ( 13)     out0 (TCR),a
+E204-            I    27
+E204-AF          I    28 (  4)     xor a
+E205-32 C3 E3    I    29 ( 13)     ld (vdu_cursor_status),a
+E208-2A BE E3    I    30 ( 15)     ld hl,(VDU_PTR)
+E20B-22 C0 E3    I    31 ( 20)     ld (vdu_cursor_ptr),hl
+E20E-3E 1E       I    32 (  6)     ld a,30
+E210-32 C2 E3    I    33 ( 13)     ld (vdu_cursor_blink),a
+E213-            I    34
+E213-            I    35
+E213-C9          I    36 (  9)     ret
+E214-            I    37
+E214-            I    38       _int_vdu:
+E214-F5          I    39 ( 11)     push af
+E215-E5          I    40 ( 11)     push hl
+E216-D5          I    41 ( 11)     push de
+E217-            I    42
+E217-ED 38 10    I    43 ( 12)     in0 a,(TCR)         ; clear TIFE0
+E21A-ED 38 0C    I    44 ( 12)     in0 a,(TMDR0L)
+E21D-            I    45
+E21D-2A C0 E3    I    46 ( 15)     ld hl,(vdu_cursor_ptr) ; compare vdu_cusror_ptr and VDU_PTR
+E220-ED 5B BE E3 I    47 ( 18)     ld de,(VDU_PTR)
+E224-            I    48
+E224-B7          I    49 (  4)     or a                    ; "16 bits cp"
+E225-ED 52       I    50 ( 10)     sbc hl,de
+E227-19          I    51 (  7)     add hl,de
+E228-            I    52
+E228-30 1C       I    53 ( 6+)     jr nc,_int_vdu_blink
+E22A-            I    54
+E22A-3E C3       I    55 (  6)     ld a,vdu_cursor_status
+E22C-FE 00       I    56 (  6)     cp 0
+E22E-C2 46 E2    I    57 ( 6+)     jp nz,_int_vdu_blink
+E231-            I    58
+E231-2A C0 E3    I    59 ( 15)     ld hl,(vdu_cursor_ptr)  ; delete cursor at old location
+E234-23          I    60 (  4)     inc hl
+E235-7E          I    61 (  6)     ld a,(hl)
+E236-07          I    62 (  3)     rlca
+E237-07          I    63 (  3)     rlca
+E238-07          I    64 (  3)     rlca
+E239-07          I    65 (  3)     rlca
+E23A-77          I    66 (  7)     ld (hl),a
+E23B-            I    67
+E23B-ED 53 C0 E3 I    68 ( 20)     ld (vdu_cursor_ptr),de  ; update cursor_ptr
+E23F-            I    69
+E23F-3E 01       I    70 (  6)     ld a,1
+E241-32 C3 E3    I    71 ( 13)     ld (vdu_cursor_status),a
+E244-            I    72
+E244-18 19       I    73 (  8)     jr _int_vdu_reverse_cursor ; display cursor at new location
+E246-            I    74
+E246-            I    75       _int_vdu_blink:
+E246-3A C2 E3    I    76 ( 12)     ld a,(vdu_cursor_blink)     ; /60 divider for cursor blink
+E249-3D          I    77 (  4)     dec a
+E24A-32 C2 E3    I    78 ( 13)     ld (vdu_cursor_blink),a
+E24D-FE 00       I    79 (  6)     cp 0
+E24F-C2 69 E2    I    80 ( 6+)     jp nz,_int_vdu_exit
+E252-            I    81
+E252-3E 1E       I    82 (  6)     ld a,30
+E254-32 C2 E3    I    83 ( 13)     ld (vdu_cursor_blink),a
+E257-            I    84
+E257-3A C3 E3    I    85 ( 12)     ld a,(vdu_cursor_status)
+E25A-EE 01       I    86 (  6)     xor 1
+E25C-32 C3 E3    I    87 ( 13)     ld (vdu_cursor_status),a
+E25F-            I    88
+E25F-            I    89       _int_vdu_reverse_cursor:
+E25F-            I    90
+E25F-2A BE E3    I    91 ( 15)     ld hl,(VDU_PTR)
+E262-23          I    92 (  4)     inc hl          ; hl <- current color attribute address
+E263-7E          I    93 (  6)     ld a,(hl)
+E264-07          I    94 (  3)     rlca
+E265-07          I    95 (  3)     rlca
+E266-07          I    96 (  3)     rlca
+E267-07          I    97 (  3)     rlca
+E268-77          I    98 (  7)     ld (hl),a
+E269-            I    99
+E269-            I   100       _int_vdu_exit:
+E269-D1          I   101 (  9)     pop de
+E26A-E1          I   102 (  9)     pop hl
+E26B-F1          I   103 (  9)     pop af
+E26C-FB          I   104 (  3)     ei
+E26D-C9          I   105 (  9)     ret
+E26E-            I   106
+E26E-            I   107       ; vdu_set_attr
+E26E-            I   108       ; set the color attribute
+E26E-            I   109       ; input : a = color attribute
+E26E-            I   110       ; output : none
+E26E-            I   111       _vdu_set_attr:
+E26E-32 BB E3    I   112 ( 13)     ld (VDU_ATTR),a
+E271-C9          I   113 (  9)     ret
+E272-            I   114
+E272-            I   115       ; vdu_cls
+E272-            I   116       ; clear screen using VDU_ATTR color
+E272-            I   117       ; input : none
+E272-            I   118       ; output : none
+E272-            I   119       _vdu_cls:
+E272-D5          I   120 ( 11)     push de
+E273-E5          I   121 ( 11)     push hl
+E274-F5          I   122 ( 11)     push af
+E275-            I   123
+E275-11 D0 07    I   124 (  9)     ld de,2000     ; number of chars
+E278-21 00 F0    I   125 (  9)     ld hl,VDU_RAM    ; pointer to srart of ram
+E27B-3A BB E3    I   126 ( 12)     ld a,(VDU_ATTR)  ; get color attribute
+E27E-4F          I   127 (  4)     ld c,a
+E27F-            I   128
+E27F-            I   129       _vdu_cls_loop:
+E27F-36 20       I   130 (  9)     ld (hl),$20     ; write space char.
+E281-23          I   131 (  4)     inc hl
+E282-71          I   132 (  7)     ld (hl),c       ; set color attribute
+E283-23          I   133 (  4)     inc hl
+E284-1B          I   134 (  4)     dec de          ; update chars counter
+E285-7A          I   135 (  4)     ld a,d         ; check if zero
+E286-B3          I   136 (  4)     or e
+E287-C2 7F E2    I   137 ( 6+)     jp nz,_vdu_cls_loop
+E28A-            I   138
+E28A-AF          I   139 (  4)     xor a          ; home cursor
+E28B-32 BC E3    I   140 ( 13)     ld (VDU_X),a    ; X=0
+E28E-32 BD E3    I   141 ( 13)     ld (VDU_Y),a    ; Y=0
+E291-11 00 F0    I   142 (  9)     ld de,VDU_RAM   ; PTR = start of video RAM
+E294-ED 53 BE E3 I   143 ( 20)     ld (VDU_PTR),de
+E298-            I   144
+E298-F1          I   145 (  9)     pop af
+E299-E1          I   146 (  9)     pop hl
+E29A-D1          I   147 (  9)     pop de
+E29B-            I   148
+E29B-C9          I   149 (  9)     ret
+E29C-            I   150
+E29C-            I   151       ; vdu_scroll
+E29C-            I   152       ; scroll all the screen UP one line
+E29C-            I   153       ; input : none
+E29C-            I   154       ; output : none
+E29C-            I   155       _vdu_scroll_up:
+E29C-F5          I   156 ( 11)     push af
+E29D-E5          I   157 ( 11)     push hl
+E29E-D5          I   158 ( 11)     push de
+E29F-C5          I   159 ( 11)     push bc
+E2A0-            I   160
+E2A0-21 A0 F0    I   161 (  9)     ld hl,VDU_RAM+160 ; source pointer = start of 2nd line
+E2A3-11 00 F0    I   162 (  9)     ld de,VDU_RAM ; destination pointer = start of 1st line
+E2A6-01 00 0F    I   163 (  9)     ld bc,4000-160 ; all screen minus one line to move
+E2A9-            I   164       _vdu_scroll_loop:
+E2A9-ED A0       I   165 ( 12)     ldi     ; scroll the screen
+E2AB-EA A9 E2    I   166 ( 6+)     jp pe,_vdu_scroll_loop
+E2AE-            I   167                   ; here -> (de) points to the start of 25th line
+E2AE-06 50       I   168 (  6)     ld b,80   ; 80 chars to fill on last line
+E2B0-3A BB E3    I   169 ( 12)     ld a,(VDU_ATTR) ; get current color attribute
+E2B3-4F          I   170 (  4)     ld c,a
+E2B4-            I   171       _vdu_scroll_loop_line25:
+E2B4-3E 20       I   172 (  6)     ld a,' '
+E2B6-12          I   173 (  7)     ld (de),a ; put a space character
+E2B7-13          I   174 (  4)     inc de
+E2B8-79          I   175 (  4)     ld a,c
+E2B9-12          I   176 (  7)     ld (de),a ; ser the color attribute
+E2BA-13          I   177 (  4)     inc de
+E2BB-10 F7       I   178 ( 7+)     djnz _vdu_scroll_loop_line25
+E2BD-            I   179
+E2BD-C1          I   180 (  9)     pop bc
+E2BE-D1          I   181 (  9)     pop de
+E2BF-E1          I   182 (  9)     pop hl
+E2C0-F1          I   183 (  9)     pop af
+E2C1-C9          I   184 (  9)     ret
+E2C2-            I   185
+E2C2-            I   186       ; vdu_putc_term
+E2C2-            I   187       ; put a char on the screen, at current location, with current attribute, interpreting special codes :
+E2C2-            I   188       ;   VT-52 Terminal ( see http://toshyp.atari.org/en/VT_52_terminal.html )
+E2C2-            I   189       ;   BS - Backspace - 0x08
+E2C2-            I   190       ;   BEL - Bell - 0x07
+E2C2-            I   191       ;   ESC J - Clear to end of scren - 0x1b , J
+E2C2-            I   192       ;   ESC K - Clear to end of line - 0x1b , K
+E2C2-            I   193       ;   ESC E - Clear Screen - 0x1b , E
+E2C2-            I   194       ;   ESC l - Clear line - 0x1b , l
+E2C2-            I   195       ;   ESC o - Clear to start of line - 0x1b , o
+E2C2-            I   196       ;   ESC d - Clear to start of screen - 0x1b , d
+E2C2-            I   197       ;   ESC B - Cursor down - 0x1b , B
+E2C2-            I   198       ;   ESC H - Cursor home - 0x1b , H
+E2C2-            I   199       ;   ESC D - Cursor left - 0x1b , D
+E2C2-            I   200       ;   ESC C - Cursor right - 0x1b , C
+E2C2-            I   201       ;   ESC A - Cursor up - 0x1b , A
+E2C2-            I   202       ;   ESC M - Delete line - 0x1b , M
+E2C2-            I   203       ;   ESC Y - Set cursor position - 0x1b , Y , ' '+x , ' '+y
+E2C2-            I   204       ;   ESC b - Set text color - 0x1b , b , color
+E2C2-            I   205       ;   ESC L - Insert line - 0x1b , L
+E2C2-            I   206       ;   LF - Line feed - 0x0a
+E2C2-            I   207       ;   ESC k - Restore cursor position - 0x1b , k
+E2C2-            I   208       ;   ESC c - Set Background color - 0x1b , c , color
+E2C2-            I   209       ;   CR - Carriage return - 0x0d
+E2C2-            I   210       ;   ESC q - Normal video - 0x1b , q
+E2C2-            I   211       ;   ESC p - Reverse video - 0x1b , p
+E2C2-            I   212       ;   ESC j - Save cursor position - 0x1b , j
+E2C2-            I   213       ;   ESC I - Cursor up and insert - 0x1b , I
+E2C2-            I   214       ;   FF - Form feed - 0x0c
+E2C2-            I   215       ;   HT - Tabulator - 0x09
+E2C2-            I   216       ;   ESC w - Wrap off - 0x1b , w
+E2C2-            I   217       ;   ESC v - Wrap on - 0x1b , v
+E2C2-            I   218       ;   ESC e - Show cursor
+E2C2-            I   219       ;   ESC f - Hide cursor
+E2C2-            I   220       ;   blink on
+E2C2-            I   221       ;   blink off
+E2C2-            I   222       ; input : a = char to print
+E2C2-            I   223       ; output : none
+E2C2-            I   224
+E2C2-            I   225       _vdu_putc_term:
+E2C2-            I   226
+E2C2-            I   227
+E2C2-            I   228       _vdu_putc_term_LF:
+E2C2-FE 0A       I   229 (  6)     cp $0A
+E2C4-20 05       I   230 ( 6+)     jr nz,_vdu_putc_term_CS
+E2C6-CD EB E2    I   231 ( 16)     call _vdu_do_LF
+E2C9-18 15       I   232 (  8)     jr _vdu_putc_term_exit
+E2CB-            I   233
+E2CB-            I   234       _vdu_putc_term_CS:
+E2CB-FE 0C       I   235 (  6)     cp $0C
+E2CD-20 05       I   236 ( 6+)     jr nz,_vdu_putc_term_CR
+E2CF-CD 72 E2    I   237 ( 16)     call _vdu_cls
+E2D2-18 0C       I   238 (  8)     jr _vdu_putc_term_exit
+E2D4-            I   239
+E2D4-            I   240       _vdu_putc_term_CR:
+E2D4-FE 0D       I   241 (  6)    cp $0D
+E2D6-20 05       I   242 ( 6+)    jr nz,_vdu_putc_term_print
+E2D8-CD E1 E2    I   243 ( 16)    call _vdu_do_CR
+E2DB-18 03       I   244 (  8)    jr _vdu_putc_term_exit
+E2DD-            I   245
+E2DD-            I   246       _vdu_putc_term_print:
+E2DD-CD 05 E3    I   247 ( 16)     call _vdu_putc
+E2E0-            I   248
+E2E0-            I   249       _vdu_putc_term_exit:
+E2E0-C9          I   250 (  9)     ret
+E2E1-            I   251
+E2E1-            I   252       _vdu_do_CR:
+E2E1-F5          I   253 ( 11)     push af
+E2E2-AF          I   254 (  4)     xor a
+E2E3-32 BC E3    I   255 ( 13)     ld (VDU_X),a
+E2E6-CD 69 E3    I   256 ( 16)     call _vdu_xy_to_ptr
+E2E9-F1          I   257 (  9)     pop af
+E2EA-C9          I   258 (  9)     ret
+E2EB-            I   259
+E2EB-            I   260
+E2EB-            I   261       _vdu_do_LF:
+E2EB-F5          I   262 ( 11)     push af
+E2EC-3A BD E3    I   263 ( 12)     ld a,(VDU_Y)
+E2EF-3C          I   264 (  4)     inc a
+E2F0-32 BD E3    I   265 ( 13)     ld (VDU_Y),a
+E2F3-FE 19       I   266 (  6)     cp 25
+E2F5-C2 00 E3    I   267 ( 6+)     jp nz,_vdu_do_LF_set_ptr
+E2F8-CD 9C E2    I   268 ( 16)     call _vdu_scroll_up
+E2FB-3E 18       I   269 (  6)     ld a,24
+E2FD-32 BD E3    I   270 ( 13)     ld (VDU_Y),a
+E300-            I   271       _vdu_do_LF_set_ptr:
+E300-CD 69 E3    I   272 ( 16)     call _vdu_xy_to_ptr
+E303-F1          I   273 (  9)     pop af
+E304-C9          I   274 (  9)     ret
+E305-            I   275
+E305-            I   276
+E305-            I   277       ; vdu_putc
+E305-            I   278       ; put a char on the screen, at current location, with current attribute
+E305-            I   279       ; input : a = char to display
+E305-            I   280       ; output : none
+E305-            I   281       _vdu_putc:
+E305-F5          I   282 ( 11)     push af
+E306-D5          I   283 ( 11)     push de
+E307-            I   284
+E307-ED 5B BE E3 I   285 ( 18)     ld de,(VDU_PTR)
+E30B-12          I   286 (  7)     ld (de),a           ; put char in a to current video memory location
+E30C-13          I   287 (  4)     inc de              ; go to attribute
+E30D-3A BB E3    I   288 ( 12)     ld a,(VDU_ATTR)     ; fetch attribute from VDU_ATTR
+E310-12          I   289 (  7)     ld (de),a           ; write attribute to video memory
+E311-13          I   290 (  4)     inc de              ; go to next char
+E312-3A BC E3    I   291 ( 12)     ld a,(VDU_X)        ; get X position
+E315-3C          I   292 (  4)     inc a               ; increment
+E316-32 BC E3    I   293 ( 13)     ld (VDU_X),a
+E319-FE 50       I   294 (  6)     cp 80              ; next line ?
+E31B-20 03       I   295 ( 6+)     jr nz,_vdu_putc_exit
+E31D-CD 27 E3    I   296 ( 16)     call _vdu_next_line
+E320-            I   297
+E320-            I   298       _vdu_putc_exit:
+E320-ED 53 BE E3 I   299 ( 20)     ld (VDU_PTR),de
+E324-            I   300
+E324-D1          I   301 (  9)     pop de
+E325-F1          I   302 (  9)     pop af
+E326-C9          I   303 (  9)     ret
+E327-            I   304
+E327-            I   305       ; vdu_next_line
+E327-            I   306       ; set cursor at the beginning of next line. Verticall scroll of the screen if we are at 25th line.
+E327-            I   307       ; input: none
+E327-            I   308       ; output: none
+E327-            I   309       _vdu_next_line:
+E327-F5          I   310 ( 11)     push af
+E328-D5          I   311 ( 11)     push de
+E329-            I   312
+E329-3E 00       I   313 (  6)     ld a,0              ; reset X
+E32B-32 BC E3    I   314 ( 13)     ld (VDU_X),a
+E32E-3A BD E3    I   315 ( 12)     ld a,(VDU_Y)        ; increment Y
+E331-3C          I   316 (  4)     inc a
+E332-32 BD E3    I   317 ( 13)     ld (VDU_Y),a
+E335-FE 19       I   318 (  6)     cp 25               ; bottom of the screen ?
+E337-20 0F       I   319 ( 6+)     jr nz,_vdu_next_line_exit
+E339-CD 9C E2    I   320 ( 16)     call _vdu_scroll_up
+E33C-3E 18       I   321 (  6)     ld a,24             ; set Y to 24
+E33E-32 BD E3    I   322 ( 13)     ld (VDU_Y),a
+E341-            I   323
+E341-11 00 FF    I   324 (  9)     ld de,VDU_RAM+3840   ; set de to start of 24th line
+E344-ED 53 BE E3 I   325 ( 20)     ld (VDU_PTR),de
+E348-            I   326
+E348-            I   327       _vdu_next_line_exit:
+E348-D1          I   328 (  9)     pop de
+E349-F1          I   329 (  9)     pop af
+E34A-C9          I   330 (  9)     ret
+E34B-            I   331
+E34B-            I   332       ; vdu_puts
+E34B-            I   333       ; display a text on the screen, at current location, with current color attrributes.
+E34B-            I   334       ; input : hl = pointer to a null terminated string
+E34B-            I   335       ; output : none
+E34B-            I   336       _vdu_puts:
+E34B-F5          I   337 ( 11)     push af
+E34C-E5          I   338 ( 11)     push hl
+E34D-            I   339
+E34D-            I   340       _vdu_puts_loop:
+E34D-7E          I   341 (  6)     ld a,(hl)   ; load char fromm string
+E34E-F6 00       I   342 (  6)     or 0
+E350-28 06       I   343 ( 6+)     jr z,_vdu_puts_exit  ; exit if =0
+E352-CD 05 E3    I   344 ( 16)     call _vdu_putc
+E355-23          I   345 (  4)     inc hl  ; next character
+E356-18 F5       I   346 (  8)     jr _vdu_puts_loop
+E358-            I   347
+E358-            I   348       _vdu_puts_exit:
+E358-E1          I   349 (  9)     pop hl
+E359-F1          I   350 (  9)     pop af
+E35A-C9          I   351 (  9)     ret
+E35B-            I   352
+E35B-            I   353       ; vdu_locate
+E35B-            I   354       ; set cursor position
+E35B-            I   355       ; input : b=X (0-79), c=Y (0-24)
+E35B-            I   356       ; output : none
+E35B-            I   357       _vdu_locate:
+E35B-F5          I   358 ( 11)     push af
+E35C-78          I   359 (  4)     ld a,b
+E35D-32 BC E3    I   360 ( 13)     ld (VDU_X),a
+E360-79          I   361 (  4)     ld a,c
+E361-32 BD E3    I   362 ( 13)     ld (VDU_Y),a
+E364-CD 69 E3    I   363 ( 16)     call _vdu_xy_to_ptr
+E367-F1          I   364 (  9)     pop af
+E368-C9          I   365 (  9)     ret
+E369-            I   366
+E369-            I   367       _vdu_xy_to_ptr
+E369-            I   368
+E369-F5          I   369 ( 11)     push af
+E36A-E5          I   370 ( 11)     push hl
+E36B-D5          I   371 ( 11)     push de
+E36C-            I   372
+E36C-21 89 E3    I   373 (  9)     ld hl,vdu_line_ptr ; hl = pointer to array of start of line addresses
+E36F-16 00       I   374 (  6)     ld d,0  ; de = Y*2
+E371-3A BD E3    I   375 ( 12)     ld a,(VDU_Y)
+E374-87          I   376 (  4)     add a,a
+E375-5F          I   377 (  4)     ld e,a
+E376-19          I   378 (  7)     add hl,de ; hl = pointer to start of line
+E377-            I   379
+E377-5E          I   380 (  6)     ld e,(hl)  ; de = (hl) = start of line address
+E378-23          I   381 (  4)     inc hl
+E379-56          I   382 (  6)     ld d,(hl)
+E37A-            I   383
+E37A-26 00       I   384 (  6)      ld h,0 ; hl=X*2
+E37C-3A BC E3    I   385 ( 12)      ld a,(VDU_X)
+E37F-87          I   386 (  4)      add a,a
+E380-6F          I   387 (  4)      ld l,a
+E381-19          I   388 (  7)     add hl,de ; hl = start of line address + X*2
+E382-            I   389
+E382-            I   390
+E382-22 BE E3    I   391 ( 20)     ld (VDU_PTR),hl ; save PTR
+E385-            I   392
+E385-D1          I   393 (  9)     pop de
+E386-E1          I   394 (  9)     pop hl
+E387-F1          I   395 (  9)     pop af
+E388-C9          I   396 (  9)     ret
+E389-            I   397
+E389-            I   398       ; VDU DATA
+E389-00 F0 A0 F0 
      40 F1 E0 F1 
      80 F2 20 F3 
      C0 F3 60 F4 
      00 F5 A0 F5 
-     40 F6 E0 F6     709       vdu_line_ptr    .dw     $F000,$F0A0,$F140,$F1E0,$F280,$F320,$F3C0,$F460,$F500,$F5A0,$F640,$F6E0
-E2D6-80 F7 20 F8 
+     40 F6 E0 F6 I   399       vdu_line_ptr    .dw     $F000,$F0A0,$F140,$F1E0,$F280,$F320,$F3C0,$F460,$F500,$F5A0,$F640,$F6E0
+E3A1-80 F7 20 F8 
      C0 F8 60 F9 
      00 FA A0 FA 
      40 FB E0 FB 
      80 FC 20 FD 
      C0 FD 60 FE 
-     00 FF           710                       .dw     $F780,$F820,$F8C0,$F960,$FA00,$FAA0,$FB40,$FBE0,$FC80,$FD20,$FDC0,$FE60,$FF00
-E2F0-                711
-E2F0-                712
-E2F0-                713       ; KBD
-E2F0-                714       ; ----------------------------------------------------------------------------
-E2F0-                715
-0080-                716       KBD_DATA    .equ $80
-0081-                717       KBD_STATUS  .equ $81
-E2F0-                718
-E2F0-                719       ; bit 0 : shift
-E2F0-                720       ; bit 1 : alt
-E2F0-                721       ; bit 2 : caps lock
-0000-                722       KBD_STATE_SHIFT .equ 0
-0001-                723       KBD_STATE_ALT .equ 1
-0002-                724       KBD_STATE_CAPS .equ 2
-0003-                725       KBD_STATE_F0   .equ 3
-0004-                726       KBD_STATE_E0  .equ 4
-E2F0-                727
-0004-                728       KBD_XOR_CAPS .equ 4
-E2F0-                729
-E2F0-                730
-E2F0-                731       _kbd_init:
-E2F0-                732           ; enable INT1
-E2F0-ED 38 34        733 ( 12)     in0 a,(ITC)
-E2F3-F6 02           734 (  6)     or ITC_ITE1
-E2F5-ED 39 34        735 ( 13)     out0 (ITC),a
-E2F8-C9              736 (  9)     ret
-E2F9-                737
-E2F9-                738       _int_kbd:
-E2F9-F5              739 ( 11)     push af
-E2FA-E5              740 ( 11)     push hl
-E2FB-D5              741 ( 11)     push de
-E2FC-                742
-E2FC-ED 38 80        743 ( 12)     in0 a,(KBD_DATA)            ; read scancode
-E2FF-47              744 (  4)     ld b,a                      ; stored in B register
-E300-                745
-E300-                746       _int_kbd_test_F0:
-E300-FE F0           747 (  6)     cp $F0                      ; F0 = release key
-E302-C2 0D E3        748 ( 6+)     jp NZ,_int_kbd_test_E0
-E305-                749
-E305-21 13 E6        750 (  9)     ld hl,kbd_state             ; set F0 flag in kbd_state
-E308-CB DE           751 ( 13)     set KBD_STATE_F0,(hl)
-E30A-C3 D4 E3        752 (  9)     jp _int_kbd_exit
-E30D-                753
-E30D-                754       _int_kbd_test_E0:
-E30D-FE E0           755 (  6)     cp $E0                      ; E0 = extended scancodes
-E30F-C2 1A E3        756 ( 6+)     jp NZ,_int_kbd_check_state
-E312-                757
-E312-21 13 E6        758 (  9)     ld hl,kbd_state             ; set E0 flag in kbd_state
-E315-CB E6           759 ( 13)     set KBD_STATE_E0,(hl)
-E317-C3 D4 E3        760 (  9)     jp _int_kbd_exit
-E31A-                761
-E31A-                762       _int_kbd_check_state:
-E31A-3A 13 E6        763 ( 12)     ld a,(kbd_state)
-E31D-                764
-E31D-CB 5F           765 (  6)     bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
-E31F-C2 B5 E3        766 ( 6+)     jp NZ,_int_kbd_F0            ; (release key)
-E322-                767
-E322-CB 67           768 (  6)     bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
-E324-C2 AE E3        769 ( 6+)     jp NZ,_int_kbd_E0            ; (extended scancode)
-E327-                770
-E327-                771       _int_kbd_shift:                  ; manage SHIFT key
-E327-78              772 (  4)     ld a,b
-E328-FE 12           773 (  6)     cp $12 ; lshift
-E32A-CA 32 E3        774 ( 6+)     jp Z,_int_kbd_is_shift
-E32D-FE 59           775 (  6)     cp $59 ; rshift
-E32F-C2 3A E3        776 ( 6+)     jp NZ,_int_kbd_alt
-E332-                777
-E332-                778       _int_kbd_is_shift:
-E332-21 13 E6        779 (  9)     ld hl,kbd_state             ; set SHIFT flag in kbd_state
-E335-CB C6           780 ( 13)     set KBD_STATE_SHIFT,(hl)
-E337-C3 D4 E3        781 (  9)     jp _int_kbd_exit
-E33A-                782
-E33A-                783       _int_kbd_alt:                    ; manage ALT key
-E33A-FE 11           784 (  6)     cp $11
-E33C-C2 47 E3        785 ( 6+)     jp NZ,_int_kbd_capslock
-E33F-                786
-E33F-21 13 E6        787 (  9)     ld hl,kbd_state             ; set ALT flag in kbd_state
-E342-CB CE           788 ( 13)     set KBD_STATE_ALT,(hl)
-E344-C3 D4 E3        789 (  9)     jp _int_kbd_exit
-E347-                790
-E347-                791       _int_kbd_capslock:                ; manage CAPS LOCK key
-E347-FE 58           792 (  6)     cp $58
-E349-C2 56 E3        793 ( 6+)     jp NZ,_int_kbd_get_key
-E34C-                794
-E34C-21 13 E6        795 (  9)     ld hl,kbd_state
-E34F-7E              796 (  6)     ld a,(hl)                   ; toggle CAPS LOCK flag in kbd_stte
-E350-EE 04           797 (  6)     xor KBD_XOR_CAPS
-E352-77              798 (  7)     ld (hl),a
-E353-C3 D4 E3        799 (  9)     jp _int_kbd_exit
-E356-                800
-E356-                801       _int_kbd_get_key:
-E356-16 00           802 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
-E358-3A 14 E6        803 ( 12)     ld a,(kbd_buffer_pos)
-E35B-5F              804 (  4)     ld e,a
-E35C-21 15 E6        805 (  9)     ld hl,kbd_buffer
-E35F-19              806 (  7)     add hl,de
-E360-E5              807 ( 11)     push hl                     ; save current buffer pointer on stack (1)
-E361-                808
-E361-2A 13 E6        809 ( 15)     ld hl,(kbd_state)
-E364-                810
-E364-                811       _int_kbd_get_key_caps:
-E364-3E 01           812 (  6)     ld  a,1                    ; a==1 -> lowercase , a==0 -> shift
-E366-                813
-E366-CB 56           814 (  9)     bit KBD_STATE_CAPS,(hl)
-E368-CA 6D E3        815 ( 6+)     jp Z,_int_kbd_get_key_shift
-E36B-EE 01           816 (  6)     xor 1                      ; a<-0 (shift)
-E36D-                817
-E36D-                818       _int_kbd_get_key_shift:
-E36D-CB 46           819 (  9)     bit KBD_STATE_SHIFT,(hl)
-E36F-CA 74 E3        820 ( 6+)     jp Z,_int_kbd_get_key_set_shift
-E372-EE 01           821 (  6)     xor 1                       ; flip a
-E374-                822
-E374-                823       _int_kbd_get_key_set_shift:
-E374-21 80 E4        824 (  9)     ld hl,scan_codes_shift
-E377-EE 01           825 (  6)     xor 1
-E379-CA 8C E3        826 ( 6+)     jp Z,_int_kbd_get_key_scancode
-E37C-                827
-E37C-21 13 E6        828 (  9)     ld hl,kbd_state
-E37F-CB 4E           829 (  9)     bit KBD_STATE_ALT,(hl)      ; use ALT scancode set if ALT flag==1
-E381-CA 89 E3        830 ( 6+)     jp Z,_int_kbd_get_key_set_lowcase
-E384-21 03 E5        831 (  9)     ld hl,scan_codes_alt
-E387-18 03           832 (  8)     jr _int_kbd_get_key_scancode
-E389-                833
-E389-                834       _int_kbd_get_key_set_lowcase:
-E389-21 FD E3        835 (  9)     ld hl,scan_codes
-E38C-                836
-E38C-                837       _int_kbd_get_key_scancode:
-E38C-78              838 (  4)     ld a,b
-E38D-CD F3 E3        839 ( 16)     call _kbd_decode_scancode
-E390-E1              840 (  9)     pop hl                      ; get back current buffer pointer (see 1)
-E391-                841
-E391-FE 00           842 (  6)     cp 0                        ; do nothing if no code found
-E393-CA D4 E3        843 ( 6+)     jp Z,_int_kbd_exit
-E396-                844
-E396-77              845 (  7)     ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
-E397-                846
-E397-FE 0A           847 (  6)     cp 10                       ; insert CR if ASCII code == LF (10)
-E399-C2 A5 E3        848 ( 6+)     jp NZ,_kbd_int_incr_buffer_pos
-E39C-23              849 (  4)     inc hl
-E39D-3E 0D           850 (  6)     ld a,13
-E39F-77              851 (  7)     ld (hl),a
-E3A0-7B              852 (  4)     ld a,e
-E3A1-3C              853 (  4)     inc a
-E3A2-32 14 E6        854 ( 13)     ld (kbd_buffer_pos),a
-E3A5-                855
-E3A5-                856       _kbd_int_incr_buffer_pos:
-E3A5-3A 14 E6        857 ( 12)     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos
-E3A8-3C              858 (  4)     inc a
-E3A9-32 14 E6        859 ( 13)     ld (kbd_buffer_pos),a
-E3AC-18 26           860 (  8)     jr _int_kbd_exit
-E3AE-                861
-E3AE-                862       _int_kbd_E0:
-E3AE-21 13 E6        863 (  9)     ld hl,kbd_state                     ; clear E0 flag in kbd_state
-E3B1-CB A6           864 ( 13)     res KBD_STATE_E0,(hl)
-E3B3-18 1F           865 (  8)     jr _int_kbd_exit
-E3B5-                866
-E3B5-                867       _int_kbd_F0:
-E3B5-21 13 E6        868 (  9)    ld hl,kbd_state                      ; clear F0 flag in kbd_state
-E3B8-CB 9E           869 ( 13)    res KBD_STATE_F0,(hl)
-E3BA-                870
-E3BA-78              871 (  4)    ld a,b                               ; clear SHIFT flag if key was LSHIFT
-E3BB-FE 12           872 (  6)    cp $12 ; LSHIFT
-E3BD-C2 C4 E3        873 ( 6+)    jp NZ,_int_kbd_F0_rshift
-E3C0-CB 86           874 ( 13)    res KBD_STATE_SHIFT,(hl)
-E3C2-18 10           875 (  8)    jr _int_kbd_exit
-E3C4-                876
-E3C4-                877       _int_kbd_F0_rshift:                      ; clear SHIFT flag if key was LSHIFT
-E3C4-FE 59           878 (  6)    cp $59 ; RSHIFT
-E3C6-C2 CD E3        879 ( 6+)    jp NZ,_int_kbd_F0_alt
-E3C9-CB 86           880 ( 13)    res KBD_STATE_SHIFT,(hl)
-E3CB-18 07           881 (  8)    jr _int_kbd_exit
-E3CD-                882
-E3CD-                883       _int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
-E3CD-FE 11           884 (  6)    cp $11 ; ALT
-E3CF-C2 D4 E3        885 ( 6+)    jp NZ,_int_kbd_exit
-E3D2-CB 8E           886 ( 13)    res KBD_STATE_ALT,(hl)
-E3D4-                887
-E3D4-                888       _int_kbd_exit:                           ; end of keyboard interrupt routine.
-E3D4-D1              889 (  9)     pop de
-E3D5-E1              890 (  9)     pop hl
-E3D6-F1              891 (  9)     pop af
-E3D7-FB              892 (  3)     ei
-E3D8-C9              893 (  9)     ret
-E3D9-                894
-E3D9-                895       ; check if kbd buffer is empty
-E3D9-                896       ; input : NONE
-E3D9-                897       ; output : flag=Z if empty
-E3D9-                898       _kbd_is_empty:
-E3D9-3A 14 E6        899 ( 12)     ld a,(kbd_buffer_pos)
-E3DC-FE 00           900 (  6)     cp 0
-E3DE-C9              901 (  9)     ret
-E3DF-                902
-E3DF-                903       ; Get next key in buffer
-E3DF-                904       _kbd_get_key:
-E3DF-E5              905 ( 11)     push hl
-E3E0-D5              906 ( 11)     push de
-E3E1-3A 14 E6        907 ( 12)     ld a,(kbd_buffer_pos)
-E3E4-3D              908 (  4)     dec a
-E3E5-32 14 E6        909 ( 13)     ld (kbd_buffer_pos),a
-E3E8-16 00           910 (  6)     ld d,0
-E3EA-5F              911 (  4)     ld e,a
-E3EB-21 15 E6        912 (  9)     ld hl,kbd_buffer
-E3EE-19              913 (  7)     add hl,de
-E3EF-7E              914 (  6)     ld a,(hl)
-E3F0-                915
-E3F0-D1              916 (  9)     pop de
-E3F1-E1              917 (  9)     pop hl
-E3F2-C9              918 (  9)     ret
-E3F3-                919
-E3F3-                920
-E3F3-                921
-E3F3-                922       ; input : a = scan code, hl = pointer to scan code table
-E3F3-                923       ; output : a = decoded scan code
-E3F3-                924       _kbd_decode_scancode:
-E3F3-E5              925 ( 11)     push hl
-E3F4-D5              926 ( 11)     push de
-E3F5-                927
-E3F5-16 00           928 (  6)     ld d,0
-E3F7-5F              929 (  4)     ld e,a
-E3F8-19              930 (  7)     add hl,de
-E3F9-7E              931 (  6)     ld a,(hl)
-E3FA-                932
-E3FA-D1              933 (  9)     pop de
-E3FB-E1              934 (  9)     pop hl
-E3FC-C9              935 (  9)     ret
-E3FD-                936
-E3FD-                937       scan_codes:
-E3FD-                938           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
-E3FD-00 00 00 00 
+     00 FF       I   400                       .dw     $F780,$F820,$F8C0,$F960,$FA00,$FAA0,$FB40,$FBE0,$FC80,$FD20,$FDC0,$FE60,$FF00
+E3BB-            I   401
+E3BB-            I   402
+E3BB-            I   403       ; RAM
+E3BB-            I   404
+E3BB-            I   405
+E3BB-            I   406       VDU_ATTR            .bs 1   ; Color Attribute
+E3BC-            I   407       VDU_X               .bs 1   ; Current X position
+E3BD-            I   408       VDU_Y               .bs 1   ; Current Y position
+E3BE-            I   409       VDU_PTR             .bs 2     ; Current position in video RAM, should always be equal to
+E3C0-            I   410                               ; VDU_RAM + X*2 + Y*160
+E3C0-            I   411       vdu_cursor_ptr          .bs 2
+E3C2-            I   412       vdu_cursor_blink      .bs 1
+E3C3-            I   413       vdu_cursor_status     .bs 1
+E3C4-                 59           .include bios_kbd.asm
+E3C4-            I     1       ; KBD
+E3C4-            I     2       ; ----------------------------------------------------------------------------
+E3C4-            I     3
+0080-            I     4       KBD_DATA    .equ $80
+0081-            I     5       KBD_STATUS  .equ $81
+E3C4-            I     6
+E3C4-            I     7       ; bit 0 : shift
+E3C4-            I     8       ; bit 1 : alt
+E3C4-            I     9       ; bit 2 : caps lock
+0000-            I    10       KBD_STATE_SHIFT .equ 0
+0001-            I    11       KBD_STATE_ALT .equ 1
+0002-            I    12       KBD_STATE_CAPS .equ 2
+0003-            I    13       KBD_STATE_F0   .equ 3
+0004-            I    14       KBD_STATE_E0  .equ 4
+E3C4-            I    15
+0004-            I    16       KBD_XOR_CAPS .equ 4
+E3C4-            I    17
+E3C4-            I    18
+E3C4-            I    19       _kbd_init:
+E3C4-            I    20           ; enable INT1
+E3C4-ED 38 34    I    21 ( 12)     in0 a,(ITC)
+E3C7-F6 02       I    22 (  6)     or ITC_ITE1
+E3C9-ED 39 34    I    23 ( 13)     out0 (ITC),a
+E3CC-C9          I    24 (  9)     ret
+E3CD-            I    25
+E3CD-            I    26       _int_kbd:
+E3CD-F5          I    27 ( 11)     push af
+E3CE-E5          I    28 ( 11)     push hl
+E3CF-D5          I    29 ( 11)     push de
+E3D0-            I    30
+E3D0-ED 38 80    I    31 ( 12)     in0 a,(KBD_DATA)            ; read scancode
+E3D3-47          I    32 (  4)     ld b,a                      ; stored in B register
+E3D4-            I    33
+E3D4-            I    34       _int_kbd_test_F0:
+E3D4-FE F0       I    35 (  6)     cp $F0                      ; F0 = release key
+E3D6-C2 E1 E3    I    36 ( 6+)     jp NZ,_int_kbd_test_E0
+E3D9-            I    37
+E3D9-21 5B E6    I    38 (  9)     ld hl,kbd_state             ; set F0 flag in kbd_state
+E3DC-CB DE       I    39 ( 13)     set KBD_STATE_F0,(hl)
+E3DE-C3 A8 E4    I    40 (  9)     jp _int_kbd_exit
+E3E1-            I    41
+E3E1-            I    42       _int_kbd_test_E0:
+E3E1-FE E0       I    43 (  6)     cp $E0                      ; E0 = extended scancodes
+E3E3-C2 EE E3    I    44 ( 6+)     jp NZ,_int_kbd_check_state
+E3E6-            I    45
+E3E6-21 5B E6    I    46 (  9)     ld hl,kbd_state             ; set E0 flag in kbd_state
+E3E9-CB E6       I    47 ( 13)     set KBD_STATE_E0,(hl)
+E3EB-C3 A8 E4    I    48 (  9)     jp _int_kbd_exit
+E3EE-            I    49
+E3EE-            I    50       _int_kbd_check_state:
+E3EE-3A 5B E6    I    51 ( 12)     ld a,(kbd_state)
+E3F1-            I    52
+E3F1-CB 5F       I    53 (  6)     bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
+E3F3-C2 89 E4    I    54 ( 6+)     jp NZ,_int_kbd_F0            ; (release key)
+E3F6-            I    55
+E3F6-CB 67       I    56 (  6)     bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
+E3F8-C2 82 E4    I    57 ( 6+)     jp NZ,_int_kbd_E0            ; (extended scancode)
+E3FB-            I    58
+E3FB-            I    59       _int_kbd_shift:                  ; manage SHIFT key
+E3FB-78          I    60 (  4)     ld a,b
+E3FC-FE 12       I    61 (  6)     cp $12 ; lshift
+E3FE-CA 06 E4    I    62 ( 6+)     jp Z,_int_kbd_is_shift
+E401-FE 59       I    63 (  6)     cp $59 ; rshift
+E403-C2 0E E4    I    64 ( 6+)     jp NZ,_int_kbd_alt
+E406-            I    65
+E406-            I    66       _int_kbd_is_shift:
+E406-21 5B E6    I    67 (  9)     ld hl,kbd_state             ; set SHIFT flag in kbd_state
+E409-CB C6       I    68 ( 13)     set KBD_STATE_SHIFT,(hl)
+E40B-C3 A8 E4    I    69 (  9)     jp _int_kbd_exit
+E40E-            I    70
+E40E-            I    71       _int_kbd_alt:                    ; manage ALT key
+E40E-FE 11       I    72 (  6)     cp $11
+E410-C2 1B E4    I    73 ( 6+)     jp NZ,_int_kbd_capslock
+E413-            I    74
+E413-21 5B E6    I    75 (  9)     ld hl,kbd_state             ; set ALT flag in kbd_state
+E416-CB CE       I    76 ( 13)     set KBD_STATE_ALT,(hl)
+E418-C3 A8 E4    I    77 (  9)     jp _int_kbd_exit
+E41B-            I    78
+E41B-            I    79       _int_kbd_capslock:                ; manage CAPS LOCK key
+E41B-FE 58       I    80 (  6)     cp $58
+E41D-C2 2A E4    I    81 ( 6+)     jp NZ,_int_kbd_get_key
+E420-            I    82
+E420-21 5B E6    I    83 (  9)     ld hl,kbd_state
+E423-7E          I    84 (  6)     ld a,(hl)                   ; toggle CAPS LOCK flag in kbd_stte
+E424-EE 04       I    85 (  6)     xor KBD_XOR_CAPS
+E426-77          I    86 (  7)     ld (hl),a
+E427-C3 A8 E4    I    87 (  9)     jp _int_kbd_exit
+E42A-            I    88
+E42A-            I    89       _int_kbd_get_key:
+E42A-16 00       I    90 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
+E42C-3A 5C E6    I    91 ( 12)     ld a,(kbd_buffer_pos)
+E42F-5F          I    92 (  4)     ld e,a
+E430-21 5D E6    I    93 (  9)     ld hl,kbd_buffer
+E433-19          I    94 (  7)     add hl,de
+E434-E5          I    95 ( 11)     push hl                     ; save current buffer pointer on stack (1)
+E435-            I    96
+E435-2A 5B E6    I    97 ( 15)     ld hl,(kbd_state)
+E438-            I    98
+E438-            I    99       _int_kbd_get_key_caps:
+E438-3E 01       I   100 (  6)     ld  a,1                    ; a==1 -> lowercase , a==0 -> shift
+E43A-            I   101
+E43A-CB 56       I   102 (  9)     bit KBD_STATE_CAPS,(hl)
+E43C-CA 41 E4    I   103 ( 6+)     jp Z,_int_kbd_get_key_shift
+E43F-EE 01       I   104 (  6)     xor 1                      ; a<-0 (shift)
+E441-            I   105
+E441-            I   106       _int_kbd_get_key_shift:
+E441-CB 46       I   107 (  9)     bit KBD_STATE_SHIFT,(hl)
+E443-CA 48 E4    I   108 ( 6+)     jp Z,_int_kbd_get_key_set_shift
+E446-EE 01       I   109 (  6)     xor 1                       ; flip a
+E448-            I   110
+E448-            I   111       _int_kbd_get_key_set_shift:
+E448-21 54 E5    I   112 (  9)     ld hl,scan_codes_shift
+E44B-EE 01       I   113 (  6)     xor 1
+E44D-CA 60 E4    I   114 ( 6+)     jp Z,_int_kbd_get_key_scancode
+E450-            I   115
+E450-21 5B E6    I   116 (  9)     ld hl,kbd_state
+E453-CB 4E       I   117 (  9)     bit KBD_STATE_ALT,(hl)      ; use ALT scancode set if ALT flag==1
+E455-CA 5D E4    I   118 ( 6+)     jp Z,_int_kbd_get_key_set_lowcase
+E458-21 D7 E5    I   119 (  9)     ld hl,scan_codes_alt
+E45B-18 03       I   120 (  8)     jr _int_kbd_get_key_scancode
+E45D-            I   121
+E45D-            I   122       _int_kbd_get_key_set_lowcase:
+E45D-21 D1 E4    I   123 (  9)     ld hl,scan_codes
+E460-            I   124
+E460-            I   125       _int_kbd_get_key_scancode:
+E460-78          I   126 (  4)     ld a,b
+E461-CD C7 E4    I   127 ( 16)     call _kbd_decode_scancode
+E464-E1          I   128 (  9)     pop hl                      ; get back current buffer pointer (see 1)
+E465-            I   129
+E465-FE 00       I   130 (  6)     cp 0                        ; do nothing if no code found
+E467-CA A8 E4    I   131 ( 6+)     jp Z,_int_kbd_exit
+E46A-            I   132
+E46A-77          I   133 (  7)     ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
+E46B-            I   134
+E46B-FE 0A       I   135 (  6)     cp 10                       ; insert CR if ASCII code == LF (10)
+E46D-C2 79 E4    I   136 ( 6+)     jp NZ,_kbd_int_incr_buffer_pos
+E470-23          I   137 (  4)     inc hl
+E471-3E 0D       I   138 (  6)     ld a,13
+E473-77          I   139 (  7)     ld (hl),a
+E474-7B          I   140 (  4)     ld a,e
+E475-3C          I   141 (  4)     inc a
+E476-32 5C E6    I   142 ( 13)     ld (kbd_buffer_pos),a
+E479-            I   143
+E479-            I   144       _kbd_int_incr_buffer_pos:
+E479-3A 5C E6    I   145 ( 12)     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos
+E47C-3C          I   146 (  4)     inc a
+E47D-32 5C E6    I   147 ( 13)     ld (kbd_buffer_pos),a
+E480-18 26       I   148 (  8)     jr _int_kbd_exit
+E482-            I   149
+E482-            I   150       _int_kbd_E0:
+E482-21 5B E6    I   151 (  9)     ld hl,kbd_state                     ; clear E0 flag in kbd_state
+E485-CB A6       I   152 ( 13)     res KBD_STATE_E0,(hl)
+E487-18 1F       I   153 (  8)     jr _int_kbd_exit
+E489-            I   154
+E489-            I   155       _int_kbd_F0:
+E489-21 5B E6    I   156 (  9)    ld hl,kbd_state                      ; clear F0 flag in kbd_state
+E48C-CB 9E       I   157 ( 13)    res KBD_STATE_F0,(hl)
+E48E-            I   158
+E48E-78          I   159 (  4)    ld a,b                               ; clear SHIFT flag if key was LSHIFT
+E48F-FE 12       I   160 (  6)    cp $12 ; LSHIFT
+E491-C2 98 E4    I   161 ( 6+)    jp NZ,_int_kbd_F0_rshift
+E494-CB 86       I   162 ( 13)    res KBD_STATE_SHIFT,(hl)
+E496-18 10       I   163 (  8)    jr _int_kbd_exit
+E498-            I   164
+E498-            I   165       _int_kbd_F0_rshift:                      ; clear SHIFT flag if key was LSHIFT
+E498-FE 59       I   166 (  6)    cp $59 ; RSHIFT
+E49A-C2 A1 E4    I   167 ( 6+)    jp NZ,_int_kbd_F0_alt
+E49D-CB 86       I   168 ( 13)    res KBD_STATE_SHIFT,(hl)
+E49F-18 07       I   169 (  8)    jr _int_kbd_exit
+E4A1-            I   170
+E4A1-            I   171       _int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
+E4A1-FE 11       I   172 (  6)    cp $11 ; ALT
+E4A3-C2 A8 E4    I   173 ( 6+)    jp NZ,_int_kbd_exit
+E4A6-CB 8E       I   174 ( 13)    res KBD_STATE_ALT,(hl)
+E4A8-            I   175
+E4A8-            I   176       _int_kbd_exit:                           ; end of keyboard interrupt routine.
+E4A8-D1          I   177 (  9)     pop de
+E4A9-E1          I   178 (  9)     pop hl
+E4AA-F1          I   179 (  9)     pop af
+E4AB-FB          I   180 (  3)     ei
+E4AC-C9          I   181 (  9)     ret
+E4AD-            I   182
+E4AD-            I   183       ; check if kbd buffer is empty
+E4AD-            I   184       ; input : NONE
+E4AD-            I   185       ; output : flag=Z if empty
+E4AD-            I   186       _kbd_is_empty:
+E4AD-3A 5C E6    I   187 ( 12)     ld a,(kbd_buffer_pos)
+E4B0-FE 00       I   188 (  6)     cp 0
+E4B2-C9          I   189 (  9)     ret
+E4B3-            I   190
+E4B3-            I   191       ; Get next key in buffer
+E4B3-            I   192       _kbd_get_key:
+E4B3-E5          I   193 ( 11)     push hl
+E4B4-D5          I   194 ( 11)     push de
+E4B5-3A 5C E6    I   195 ( 12)     ld a,(kbd_buffer_pos)
+E4B8-3D          I   196 (  4)     dec a
+E4B9-32 5C E6    I   197 ( 13)     ld (kbd_buffer_pos),a
+E4BC-16 00       I   198 (  6)     ld d,0
+E4BE-5F          I   199 (  4)     ld e,a
+E4BF-21 5D E6    I   200 (  9)     ld hl,kbd_buffer
+E4C2-19          I   201 (  7)     add hl,de
+E4C3-7E          I   202 (  6)     ld a,(hl)
+E4C4-            I   203
+E4C4-D1          I   204 (  9)     pop de
+E4C5-E1          I   205 (  9)     pop hl
+E4C6-C9          I   206 (  9)     ret
+E4C7-            I   207
+E4C7-            I   208
+E4C7-            I   209
+E4C7-            I   210       ; input : a = scan code, hl = pointer to scan code table
+E4C7-            I   211       ; output : a = decoded scan code
+E4C7-            I   212       _kbd_decode_scancode:
+E4C7-E5          I   213 ( 11)     push hl
+E4C8-D5          I   214 ( 11)     push de
+E4C9-            I   215
+E4C9-16 00       I   216 (  6)     ld d,0
+E4CB-5F          I   217 (  4)     ld e,a
+E4CC-19          I   218 (  7)     add hl,de
+E4CD-7E          I   219 (  6)     ld a,(hl)
+E4CE-            I   220
+E4CE-D1          I   221 (  9)     pop de
+E4CF-E1          I   222 (  9)     pop hl
+E4D0-C9          I   223 (  9)     ret
+E4D1-            I   224
+E4D1-            I   225       scan_codes:
+E4D1-            I   226           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
+E4D1-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     09 C2 B2 00     939           .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
-E40D-                940           ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
-E40D-00 00 00 00 
+     09 C2 B2 00 I   227           .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
+E4E1-            I   228           ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
+E4E1-00 00 00 00 
      00 61 26 00 
      00 00 77 73 
-     71 7A 82 00     941           .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
-E41D-                942           ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
-E41D-00 63 78 64 
+     71 7A 82 00 I   229           .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
+E4F1-            I   230           ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
+E4F1-00 63 78 64 
      65 27 22 00 
      00 20 76 66 
-     74 72 28 00     943           .db 0,'c','x','d','e',39,34,0,0,' ','v','f','t','r','(',0
-E42D-                944           ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
-E42D-00 6E 62 68 
+     74 72 28 00 I   231           .db 0,'c','x','d','e',39,34,0,0,' ','v','f','t','r','(',0
+E501-            I   232           ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
+E501-00 6E 62 68 
      67 79 2D 00 
      00 00 2C 6A 
-     75 8A 5F 00     945           .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
-E43D-                946           ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
-E43D-00 3B 6B 69 
+     75 8A 5F 00 I   233           .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
+E511-            I   234           ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
+E511-00 3B 6B 69 
      6F 85 87 00 
      00 3A 21 6C 
-     6D 70 29 00     947           .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
-E44D-                948           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
-E44D-00 00 97 00 
+     6D 70 29 00 I   235           .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
+E521-            I   236           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
+E521-00 00 97 00 
      5E 3D 00 00 
      00 00 0A 24 
-     00 2A 00 00     949           .db 0,0,151,0,'^','=',0,0,0,0,10,'$',0,'*',0,0
-E45D-                950           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
-E45D-00 3C 00 00 
+     00 2A 00 00 I   237           .db 0,0,151,0,'^','=',0,0,0,0,10,'$',0,'*',0,0
+E531-            I   238           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+E531-00 3C 00 00 
      00 00 08 00 
      00 31 00 34 
-     37 00 00 00     951           .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
-E46D-                952           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-E46D-30 2C 32 35 
+     37 00 00 00 I   239           .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+E541-            I   240           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+E541-30 2C 32 35 
      36 38 00 00 
      00 2B 33 2D 
-     2A 39 00        953           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
-E47C-                954           ; 80-83 : n/a n/a n/a F7
-E47C-00 00 00 00     955           .db 0,0,0,0
-E480-                956
-E480-                957       scan_codes_shift:
-E480-                958           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
-E480-00 00 00 00 
+     2A 39 00    I   241           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+E550-            I   242           ; 80-83 : n/a n/a n/a F7
+E550-00 00 00 00 I   243           .db 0,0,0,0
+E554-            I   244
+E554-            I   245       scan_codes_shift:
+E554-            I   246           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
+E554-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 09 00 00     959           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
-E490-                960           ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
-E490-00 00 00 00 
+     00 09 00 00 I   247           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
+E564-            I   248           ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
+E564-00 00 00 00 
      00 41 31 00 
      00 00 57 53 
-     51 5A 32 00     961           .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
-E4A0-                962           ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
-E4A0-00 43 58 44 
+     51 5A 32 00 I   249           .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
+E574-            I   250           ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
+E574-00 43 58 44 
      45 34 33 00 
      00 20 56 46 
-     54 52 35 00     963           .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
-E4B0-                964           ; 30-3F : n/a N B H G Y 6 n/a n/a n/a ? J U 7 8 n/a
-E4B0-00 4E 42 48 
+     54 52 35 00 I   251           .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
+E584-            I   252           ; 30-3F : n/a N B H G Y 6 n/a n/a n/a ? J U 7 8 n/a
+E584-00 4E 42 48 
      47 59 36 00 
      00 00 3F 4A 
-     55 37 38 00     965           .db 0,'N','B','H','G','Y','6',0,0,0,'?','J','U','7','8',0
-E4C0-                966           ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
-E4C0-00 2E 4B 49 
+     55 37 38 00 I   253           .db 0,'N','B','H','G','Y','6',0,0,0,'?','J','U','7','8',0
+E594-            I   254           ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
+E594-00 2E 4B 49 
      4F 30 39 00 
      00 2F 9E 4C 
-     4D 50 A7 00     967           .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
-E4D0-                968           ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
-E4D0-00 00 25 00 
+     4D 50 A7 00 I   255           .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
+E5A4-            I   256           ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
+E5A4-00 00 25 00 
      7E 2B 00 00 
      00 00 0A 9C 
-     00 E6 00 00     969           .db 0,0,'%',0,126,'+',0,0,0,0,10,156,0,230,0,0
-E4E0-                970           ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
-E4E0-00 3E 00 00 
+     00 E6 00 00 I   257           .db 0,0,'%',0,126,'+',0,0,0,0,10,156,0,230,0,0
+E5B4-            I   258           ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+E5B4-00 3E 00 00 
      00 00 08 00 
      00 31 00 34 
-     37 00 00 00     971           .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
-E4F0-                972           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-E4F0-30 2C 32 35 
+     37 00 00 00 I   259           .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+E5C4-            I   260           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+E5C4-30 2C 32 35 
      36 38 00 00 
      00 2B 33 2D 
-     2A 39 00        973           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
-E4FF-                974           ; 80-83 : n/a n/a n/a F7
-E4FF-00 00 00 00     975           .db 0,0,0,0
-E503-                976
-E503-                977       scan_codes_alt:
-E503-                978           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E503-00 00 00 00 
+     2A 39 00    I   261           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+E5D3-            I   262           ; 80-83 : n/a n/a n/a F7
+E5D3-00 00 00 00 I   263           .db 0,0,0,0
+E5D7-            I   264
+E5D7-            I   265       scan_codes_alt:
+E5D7-            I   266           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E5D7-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00     979           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-E513-                980           ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
-E513-00 00 00 00 
+     00 00 00 00 I   267           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E5E7-            I   268           ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
+E5E7-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 7E 00     981           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
-E523-                982           ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
-E523-00 00 00 00 
+     00 00 7E 00 I   269           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
+E5F7-            I   270           ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
+E5F7-00 00 00 00 
      00 7B 23 00 
      00 20 00 00 
-     00 00 5B 00     983           .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
-E533-                984           ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
-E533-00 00 00 00 
+     00 00 5B 00 I   271           .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
+E607-            I   272           ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
+E607-00 00 00 00 
      00 00 7C 00 
      00 00 00 00 
-     00 60 5C 00     985           .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
-E543-                986           ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
-E543-00 00 00 00 
+     00 60 5C 00 I   273           .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
+E617-            I   274           ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
+E617-00 00 00 00 
      00 40 5E 00 
      00 00 00 00 
-     00 00 5D 00     987           .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
-E553-                988           ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E553-00 00 00 00 
+     00 00 5D 00 I   275           .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
+E627-            I   276           ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E627-00 00 00 00 
      00 7D 00 00 
      00 00 00 00 
-     00 00 00 00     989           .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
-E563-                990           ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E563-00 00 00 00 
+     00 00 00 00 I   277           .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
+E637-            I   278           ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E637-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00     991           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-E573-                992           ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E573-00 00 00 00 
+     00 00 00 00 I   279           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E647-            I   280           ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E647-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00     993           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-E583-                994           ; 80-83 : n/a n/a n/a F7
-E583-00 00 00 00     995           .db 0,0,0,0
-E587-                996
-E587-                997
-E587-                998
-E587-                999       ; SND
-E587-               1000       ; ----------------------------------------------------------------------------
-E587-               1001
-E587-               1002       _snd_init:
-E587-C9             1003 (  9)     ret
-E588-               1004
-E588-               1005       _snd_play_wav:
-E588-C9             1006 (  9)     ret
-E589-               1007
-E589-               1008       _snd_beep:
-E589-C9             1009 (  9)     ret
-E58A-               1010
-E58A-               1011            ; RAM
-E58A-               1012       asci0_buffer_pos:   .bs 1
-E58B-               1013       asci0_buffer:       .bs 64
-E5CB-               1014       asci1_buffer_pos:   .bs 1
-E5CC-               1015       asci1_buffer:       .bs 64
-E60C-               1016
-E60C-               1017       VDU_ATTR            .bs 1   ; Color Attribute
-E60D-               1018       VDU_X               .bs 1   ; Current X position
-E60E-               1019       VDU_Y               .bs 1   ; Current Y position
-E60F-               1020       VDU_PTR             .bs 2     ; Current position in video RAM, should always be equal to
-E611-               1021                               ; VDU_RAM + X*2 + Y*160
-E611-               1022       vdu_cursor_x          .bs 1
-E612-               1023       vdu_cursor_y          .bs 1
-E613-               1024
-E613-               1025       kbd_state: .bs 1
-E614-               1026       kbd_buffer_pos:    .bs 1
-E615-               1027       kbd_buffer: .bs 64
+     00 00 00 00 I   281           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E657-            I   282           ; 80-83 : n/a n/a n/a F7
+E657-00 00 00 00 I   283           .db 0,0,0,0
+E65B-            I   284
+E65B-            I   285
+E65B-            I   286            ; RAM
+E65B-            I   287       kbd_state: .bs 1
+E65C-            I   288       kbd_buffer_pos:    .bs 1
+E65D-            I   289       kbd_buffer: .bs 64

@@ -54,7 +54,7 @@ rst18:
     .dw int_kbd    ; INT1
     .dw int_noop    ; INT2
     .dw int_vdu    ; PRT0
-    .dw int_noop    ; PRT1
+    .dw int_vdu    ; PRT1
     .dw int_noop    ; DMA0
     .dw int_noop    ; DMA1
     .dw int_noop    ; CSIO
