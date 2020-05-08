@@ -21,12 +21,17 @@ _kbd_init:
     in0 a,(ITC)
     or ITC_ITE1 
     out0 (ITC),a
+
+    ; init keyboad variables
+    xor a
+    ld (kbd_buffer_pos),a
+    ld (kbd_state),a
+
     ret
 
 _int_kbd:
     push af
-    push hl
-    push de
+    exx 
 
     in0 a,(KBD_DATA)            ; read scancode
     ld b,a                      ; stored in B register
@@ -173,9 +178,8 @@ _int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
    jp NZ,_int_kbd_exit
    res KBD_STATE_ALT,(hl)
 
-_int_kbd_exit:                           ; end of keyboard interrupt routine.
-    pop de
-    pop hl
+_int_kbd_exit:  
+    exx                         ; end of keyboard interrupt routine.
     pop af
     ei
     ret
@@ -190,36 +194,40 @@ _kbd_is_empty:
 
 ; Get next key in buffer
 _kbd_get_key:
-    push hl
     push de
-    ld a,(kbd_buffer_pos)
-    dec a
-    ld (kbd_buffer_pos),a
-    ld d,0 
-    ld e,a
-    ld hl,kbd_buffer
-    add hl,de
-    ld a,(hl)
+    push hl
 
-    pop de
+     ld a,(kbd_buffer_pos)
+
+     cp 0                       ; exit value=0 if no key in buffer
+     jr Z,_kbd_get_key_exit
+
+     dec a
+     ld (kbd_buffer_pos),a
+     ld d,0 
+     ld e,a
+     ld hl,kbd_buffer
+     add hl,de
+     ld a,(hl)
+
+_kbd_get_key_exit:
     pop hl
+    pop de
     ret
-
-
 
 ; input : a = scan code, hl = pointer to scan code table
 ; output : a = decoded scan code
 _kbd_decode_scancode:
-    push hl
     push de
+    push hl
 
     ld d,0  
     ld e,a
     add hl,de
     ld a,(hl)
 
-    pop de
     pop hl
+    pop de
     ret
 
 scan_codes:

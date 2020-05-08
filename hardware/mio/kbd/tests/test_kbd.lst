@@ -154,10 +154,10 @@
 0000-            I   152       ; Timer Control Register (TCR: 10H)
 0010-            I   153       TCR            .equ $10
 0000-            I   154
-0080-            I   155       TCR_TF1        .equ $80
-0040-            I   156       TCR_TF0        .equ $40
-0020-            I   157       TCR_TE1        .equ $20
-0010-            I   158       TCR_TE0        .equ $10
+0080-            I   155       TCR_TIF1        .equ $80
+0040-            I   156       TCR_TIF0        .equ $40
+0020-            I   157       TCR_TIE1        .equ $20
+0010-            I   158       TCR_TIE0        .equ $10
 0008-            I   159       TCR_TOC1       .equ $08
 0004-            I   160       TCR_TOC0       .equ $04
 0002-            I   161       TCR_TDE1       .equ $02
@@ -256,22 +256,22 @@
 0000-C3 00 01         11 (  9)     jp mreset        ; RESET
 0003-                 12
 0038-                 13           .org $0038
-0038-C3 76 02         14 (  9)     jp int_noop    ; INT0
+0038-C3 78 02         14 (  9)     jp int_noop    ; INT0
 003B-                 15
 0066-                 16           .org $0066
-0066-C3 76 02         17 (  9)     jp int_noop    ; NMI
+0066-C3 78 02         17 (  9)     jp int_noop    ; NMI
 0069-                 18
 0069-                 19       ; interrupt vector table
 0080-                 20           .org $0080
 0080-5F 01            21           .dw int_kbd    ; INT1
-0082-76 02            22           .dw int_noop    ; INT2
-0084-76 02            23           .dw int_noop    ; PRT0
-0086-76 02            24           .dw int_noop    ; PRT1
-0088-76 02            25           .dw int_noop    ; DMA0
-008A-76 02            26           .dw int_noop    ; DMA1
-008C-76 02            27           .dw int_noop    ; CSIO
-008E-76 02            28           .dw int_noop   ; ASCI0
-0090-76 02            29           .dw int_noop    ; ASCI1
+0082-78 02            22           .dw int_noop    ; INT2
+0084-78 02            23           .dw int_noop    ; PRT0
+0086-78 02            24           .dw int_noop    ; PRT1
+0088-78 02            25           .dw int_noop    ; DMA0
+008A-78 02            26           .dw int_noop    ; DMA1
+008C-78 02            27           .dw int_noop    ; CSIO
+008E-78 02            28           .dw int_noop   ; ASCI0
+0090-78 02            29           .dw int_noop    ; ASCI1
 0092-                 30
 0100-                 31           .org $0100
 0100-                 32       mreset:
@@ -304,7 +304,7 @@
 0115-                 59           ; Stack pointer = $10FF
 0115-31 FF 20         60 (  9)     ld sp,$20FF
 0118-                 61
-0118-CD 3F 02         62 ( 16)     call asci1_init
+0118-CD 41 02         62 ( 16)     call asci1_init
 011B-                 63
 011B-                 64           ; setup interupts
 011B-ED 56            65 (  6)     im 1    ; interrupt mode 1
@@ -323,8 +323,8 @@
 0081-                 78       KBD_STATUS  .equ $81
 012C-                 79
 012C-                 80       main:
-012C-21 78 02         81 (  9)     ld hl,str_welcome ; show welcome message
-012F-CD 59 02         82 ( 16)     call asci1_puts
+012C-21 7A 02         81 (  9)     ld hl,str_welcome ; show welcome message
+012F-CD 5B 02         82 ( 16)     call asci1_puts
 0132-                 83
 0132-                 84           ; init kbd
 0132-3E 00            85 (  6)     ld a,0
@@ -339,7 +339,7 @@
 013F-CA 3A 01         94 ( 6+)     jp Z,loop
 0142-CD 4B 01         95 ( 16)     call kbd_get_key
 0145-                 96          ; ld a,(kbd_buffer_pos)
-0145-CD 69 02         97 ( 16)     call asci1_putc
+0145-CD 6B 02         97 ( 16)     call asci1_putc
 0148-C3 3A 01         98 (  9)     jp loop
 014B-                 99
 014B-                100       ; Get next key in buffer
@@ -362,407 +362,409 @@
 015F-                117       ; Keyboard Interruption
 015F-                118       int_kbd:
 015F-F5              119 ( 11)     push af
-0160-E5              120 ( 11)     push hl
+0160-C5              120 ( 11)     push bc
 0161-D5              121 ( 11)     push de
-0162-                122
-0162-ED 38 80        123 ( 12)     in0 a,(KBD_DATA)            ; read scancode
-0165-47              124 (  4)     ld b,a                      ; stored in B register
-0166-                125
-0166-                126       int_kbd_test_F0:
-0166-FE 70           127 (  6)     cp $70                      ; F0 = release key
-0168-C2 73 01        128 ( 6+)     jp NZ,int_kbd_test_E0
-016B-                129
-016B-21 00 21        130 (  9)     ld hl,kbd_state             ; set F0 flag in kbd_state
-016E-CB DE           131 ( 13)     set KBD_STATE_F0,(hl)
-0170-C3 3A 02        132 (  9)     jp int_kbd_exit
-0173-                133
-0173-                134       int_kbd_test_E0:
-0173-FE 60           135 (  6)     cp $60                      ; E0 = extended scancodes
-0175-C2 80 01        136 ( 6+)     jp NZ,int_kbd_check_state
-0178-                137
-0178-21 00 21        138 (  9)     ld hl,kbd_state             ; set E0 flag in kbd_state
-017B-CB E6           139 ( 13)     set KBD_STATE_E0,(hl)
-017D-C3 3A 02        140 (  9)     jp int_kbd_exit
-0180-                141
-0180-                142       int_kbd_check_state:
-0180-3A 00 21        143 ( 12)     ld a,(kbd_state)
-0183-                144
-0183-CB 5F           145 (  6)     bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
-0185-C2 1B 02        146 ( 6+)     jp NZ,int_kbd_F0            ; (release key)
-0188-                147
-0188-CB 67           148 (  6)     bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
-018A-C2 14 02        149 ( 6+)     jp NZ,int_kbd_E0            ; (extended scancode)
-018D-                150
-018D-                151       int_kbd_shift:                  ; manage SHIFT key
-018D-78              152 (  4)     ld a,b
-018E-FE 12           153 (  6)     cp $12 ; lshift
-0190-CA 98 01        154 ( 6+)     jp Z,int_kbd_is_shift
-0193-FE 59           155 (  6)     cp $59 ; rshift
-0195-C2 A0 01        156 ( 6+)     jp NZ,int_kbd_alt
-0198-                157
-0198-                158       int_kbd_is_shift:
-0198-21 00 21        159 (  9)     ld hl,kbd_state             ; set SHIFT flag in kbd_state
-019B-CB C6           160 ( 13)     set KBD_STATE_SHIFT,(hl)
-019D-C3 3A 02        161 (  9)     jp int_kbd_exit
-01A0-                162
-01A0-                163       int_kbd_alt:                    ; manage ALT key
-01A0-FE 11           164 (  6)     cp $11
-01A2-C2 AD 01        165 ( 6+)     jp NZ,int_kbd_capslock
-01A5-                166
-01A5-21 00 21        167 (  9)     ld hl,kbd_state             ; set ALT flag in kbd_state
-01A8-CB CE           168 ( 13)     set KBD_STATE_ALT,(hl)
-01AA-C3 3A 02        169 (  9)     jp int_kbd_exit
-01AD-                170
-01AD-                171       int_kbd_capslock:                ; manage CAPS LOCK key
-01AD-FE 58           172 (  6)     cp $58
-01AF-C2 BC 01        173 ( 6+)     jp NZ,int_kbd_get_key
-01B2-                174
-01B2-21 00 21        175 (  9)     ld hl,kbd_state
-01B5-7E              176 (  6)     ld a,(hl)                   ; toggle CAPS LOCK flag in kbd_stte
-01B6-EE 04           177 (  6)     xor KBD_XOR_CAPS
-01B8-77              178 (  7)     ld (hl),a
-01B9-C3 3A 02        179 (  9)     jp int_kbd_exit
-01BC-                180
-01BC-                181       int_kbd_get_key:
-01BC-16 00           182 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
-01BE-3A 01 21        183 ( 12)     ld a,(kbd_buffer_pos)
-01C1-5F              184 (  4)     ld e,a
-01C2-21 02 21        185 (  9)     ld hl,kbd_buffer
-01C5-19              186 (  7)     add hl,de
-01C6-E5              187 ( 11)     push hl                     ; save current buffer pointer on stack (1)
-01C7-                188
-01C7-2A 00 21        189 ( 15)     ld hl,(kbd_state)
-01CA-                190
-01CA-                191       int_kbd_get_key_caps:
-01CA-3E 01           192 (  6)     ld  a,1                    ; a==1 -> lowercase , a==0 -> shift
-01CC-                193
-01CC-CB 56           194 (  9)     bit KBD_STATE_CAPS,(hl)
-01CE-CA D3 01        195 ( 6+)     jp Z,int_kbd_get_key_shift
-01D1-EE 01           196 (  6)     xor 1                      ; a<-0 (shift)
-01D3-                197
-01D3-                198       int_kbd_get_key_shift:
-01D3-CB 46           199 (  9)     bit KBD_STATE_SHIFT,(hl)
-01D5-CA DA 01        200 ( 6+)     jp Z,int_kbd_get_key_set_shift
-01D8-EE 01           201 (  6)     xor 1                       ; flip a
-01DA-                202
-01DA-                203       int_kbd_get_key_set_shift:
-01DA-21 19 03        204 (  9)     ld hl,scan_codes_shift
-01DD-EE 01           205 (  6)     xor 1
-01DF-CA F2 01        206 ( 6+)     jp Z,int_kbd_get_key_scancode
-01E2-                207
-01E2-21 00 21        208 (  9)     ld hl,kbd_state
-01E5-CB 4E           209 (  9)     bit KBD_STATE_ALT,(hl)      ; use ALT scancode set if ALT flag==1
-01E7-CA EF 01        210 ( 6+)     jp Z,int_kbd_get_key_set_lowcase
-01EA-21 9C 03        211 (  9)     ld hl,scan_codes_alt
-01ED-18 03           212 (  8)     jr int_kbd_get_key_scancode
-01EF-                213
-01EF-                214       int_kbd_get_key_set_lowcase:
-01EF-21 96 02        215 (  9)     ld hl,scan_codes
-01F2-                216
-01F2-                217
-01F2-                218
-01F2-                219       int_kbd_get_key_scancode:
-01F2-78              220 (  4)     ld a,b
-01F3-CD 8C 02        221 ( 16)     call kbd_decode_scancode
-01F6-E1              222 (  9)     pop hl                      ; get back current buffer pointer (see 1)
-01F7-                223
-01F7-FE 00           224 (  6)     cp 0                        ; do nothing if no code found
-01F9-CA 3A 02        225 ( 6+)     jp Z,int_kbd_exit
-01FC-                226
-01FC-77              227 (  7)     ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
-01FD-                228
-01FD-FE 0A           229 (  6)     cp 10                       ; insert CR if ASCII code == LF (10)
-01FF-C2 0B 02        230 ( 6+)     jp NZ,kbd_int_incr_buffer_pos
-0202-23              231 (  4)     inc hl
-0203-3E 0D           232 (  6)     ld a,13
-0205-77              233 (  7)     ld (hl),a
-0206-7B              234 (  4)     ld a,e
-0207-3C              235 (  4)     inc a
-0208-32 01 21        236 ( 13)     ld (kbd_buffer_pos),a
-020B-                237
-020B-                238       kbd_int_incr_buffer_pos:
-020B-3A 01 21        239 ( 12)     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos
-020E-3C              240 (  4)     inc a
-020F-32 01 21        241 ( 13)     ld (kbd_buffer_pos),a
-0212-18 26           242 (  8)     jr int_kbd_exit
-0214-                243
-0214-                244       int_kbd_E0:
-0214-21 00 21        245 (  9)     ld hl,kbd_state                     ; clear E0 flag in kbd_state
-0217-CB A6           246 ( 13)     res KBD_STATE_E0,(hl)
-0219-18 1F           247 (  8)     jr int_kbd_exit
-021B-                248
-021B-                249       int_kbd_F0:
-021B-21 00 21        250 (  9)    ld hl,kbd_state                      ; clear F0 flag in kbd_state
-021E-CB 9E           251 ( 13)    res KBD_STATE_F0,(hl)
-0220-                252
-0220-78              253 (  4)    ld a,b                               ; clear SHIFT flag if key was LSHIFT
-0221-FE 12           254 (  6)    cp $12 ; LSHIFT
-0223-C2 2A 02        255 ( 6+)    jp NZ,int_kbd_F0_rshift
-0226-CB 86           256 ( 13)    res KBD_STATE_SHIFT,(hl)
-0228-18 10           257 (  8)    jr int_kbd_exit
-022A-                258
-022A-                259       int_kbd_F0_rshift:                      ; clear SHIFT flag if key was LSHIFT
-022A-FE 59           260 (  6)    cp $59 ; RSHIFT
-022C-C2 33 02        261 ( 6+)    jp NZ,int_kbd_F0_alt
-022F-CB 86           262 ( 13)    res KBD_STATE_SHIFT,(hl)
-0231-18 07           263 (  8)    jr int_kbd_exit
-0233-                264
-0233-                265       int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
-0233-FE 11           266 (  6)    cp $11 ; ALT
-0235-C2 3A 02        267 ( 6+)    jp NZ,int_kbd_exit
-0238-CB 8E           268 ( 13)    res KBD_STATE_ALT,(hl)
-023A-                269
-023A-                270       int_kbd_exit:                           ; end of keyboard interrupt routine.
-023A-D1              271 (  9)     pop de
+0162-E5              122 ( 11)     push hl
+0163-                123
+0163-ED 38 80        124 ( 12)     in0 a,(KBD_DATA)            ; read scancode
+0166-47              125 (  4)     ld b,a                      ; stored in B register
+0167-                126
+0167-                127       int_kbd_test_F0:
+0167-                128           ;cp $70                      ; F0 = release key
+0167-FE F0           129 (  6)     cp $F0
+0169-C2 74 01        130 ( 6+)     jp NZ,int_kbd_test_E0
+016C-                131
+016C-21 00 21        132 (  9)     ld hl,kbd_state             ; set F0 flag in kbd_state
+016F-CB DE           133 ( 13)     set KBD_STATE_F0,(hl)
+0171-C3 3B 02        134 (  9)     jp int_kbd_exit
+0174-                135
+0174-                136       int_kbd_test_E0:
+0174-FE 60           137 (  6)     cp $60                      ; E0 = extended scancodes
+0176-C2 81 01        138 ( 6+)     jp NZ,int_kbd_check_state
+0179-                139
+0179-21 00 21        140 (  9)     ld hl,kbd_state             ; set E0 flag in kbd_state
+017C-CB E6           141 ( 13)     set KBD_STATE_E0,(hl)
+017E-C3 3B 02        142 (  9)     jp int_kbd_exit
+0181-                143
+0181-                144       int_kbd_check_state:
+0181-3A 00 21        145 ( 12)     ld a,(kbd_state)
+0184-                146
+0184-CB 5F           147 (  6)     bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
+0186-C2 1C 02        148 ( 6+)     jp NZ,int_kbd_F0            ; (release key)
+0189-                149
+0189-CB 67           150 (  6)     bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
+018B-C2 15 02        151 ( 6+)     jp NZ,int_kbd_E0            ; (extended scancode)
+018E-                152
+018E-                153       int_kbd_shift:                  ; manage SHIFT key
+018E-78              154 (  4)     ld a,b
+018F-FE 12           155 (  6)     cp $12 ; lshift
+0191-CA 99 01        156 ( 6+)     jp Z,int_kbd_is_shift
+0194-FE 59           157 (  6)     cp $59 ; rshift
+0196-C2 A1 01        158 ( 6+)     jp NZ,int_kbd_alt
+0199-                159
+0199-                160       int_kbd_is_shift:
+0199-21 00 21        161 (  9)     ld hl,kbd_state             ; set SHIFT flag in kbd_state
+019C-CB C6           162 ( 13)     set KBD_STATE_SHIFT,(hl)
+019E-C3 3B 02        163 (  9)     jp int_kbd_exit
+01A1-                164
+01A1-                165       int_kbd_alt:                    ; manage ALT key
+01A1-FE 11           166 (  6)     cp $11
+01A3-C2 AE 01        167 ( 6+)     jp NZ,int_kbd_capslock
+01A6-                168
+01A6-21 00 21        169 (  9)     ld hl,kbd_state             ; set ALT flag in kbd_state
+01A9-CB CE           170 ( 13)     set KBD_STATE_ALT,(hl)
+01AB-C3 3B 02        171 (  9)     jp int_kbd_exit
+01AE-                172
+01AE-                173       int_kbd_capslock:                ; manage CAPS LOCK key
+01AE-FE 58           174 (  6)     cp $58
+01B0-C2 BD 01        175 ( 6+)     jp NZ,int_kbd_get_key
+01B3-                176
+01B3-21 00 21        177 (  9)     ld hl,kbd_state
+01B6-7E              178 (  6)     ld a,(hl)                   ; toggle CAPS LOCK flag in kbd_stte
+01B7-EE 04           179 (  6)     xor KBD_XOR_CAPS
+01B9-77              180 (  7)     ld (hl),a
+01BA-C3 3B 02        181 (  9)     jp int_kbd_exit
+01BD-                182
+01BD-                183       int_kbd_get_key:
+01BD-16 00           184 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
+01BF-3A 01 21        185 ( 12)     ld a,(kbd_buffer_pos)
+01C2-5F              186 (  4)     ld e,a
+01C3-21 02 21        187 (  9)     ld hl,kbd_buffer
+01C6-19              188 (  7)     add hl,de
+01C7-E5              189 ( 11)     push hl                     ; save current buffer pointer on stack (1)
+01C8-                190
+01C8-2A 00 21        191 ( 15)     ld hl,(kbd_state)
+01CB-                192
+01CB-                193       int_kbd_get_key_caps:
+01CB-3E 01           194 (  6)     ld  a,1                    ; a==1 -> lowercase , a==0 -> shift
+01CD-                195
+01CD-CB 56           196 (  9)     bit KBD_STATE_CAPS,(hl)
+01CF-CA D4 01        197 ( 6+)     jp Z,int_kbd_get_key_shift
+01D2-EE 01           198 (  6)     xor 1                      ; a<-0 (shift)
+01D4-                199
+01D4-                200       int_kbd_get_key_shift:
+01D4-CB 46           201 (  9)     bit KBD_STATE_SHIFT,(hl)
+01D6-CA DB 01        202 ( 6+)     jp Z,int_kbd_get_key_set_shift
+01D9-EE 01           203 (  6)     xor 1                       ; flip a
+01DB-                204
+01DB-                205       int_kbd_get_key_set_shift:
+01DB-21 1B 03        206 (  9)     ld hl,scan_codes_shift
+01DE-EE 01           207 (  6)     xor 1
+01E0-CA F3 01        208 ( 6+)     jp Z,int_kbd_get_key_scancode
+01E3-                209
+01E3-21 00 21        210 (  9)     ld hl,kbd_state
+01E6-CB 4E           211 (  9)     bit KBD_STATE_ALT,(hl)      ; use ALT scancode set if ALT flag==1
+01E8-CA F0 01        212 ( 6+)     jp Z,int_kbd_get_key_set_lowcase
+01EB-21 9E 03        213 (  9)     ld hl,scan_codes_alt
+01EE-18 03           214 (  8)     jr int_kbd_get_key_scancode
+01F0-                215
+01F0-                216       int_kbd_get_key_set_lowcase:
+01F0-21 98 02        217 (  9)     ld hl,scan_codes
+01F3-                218
+01F3-                219
+01F3-                220       int_kbd_get_key_scancode:
+01F3-78              221 (  4)     ld a,b
+01F4-CD 8E 02        222 ( 16)     call kbd_decode_scancode
+01F7-E1              223 (  9)     pop hl                      ; get back current buffer pointer (see 1)
+01F8-                224
+01F8-FE 00           225 (  6)     cp 0                        ; do nothing if no code found
+01FA-CA 3B 02        226 ( 6+)     jp Z,int_kbd_exit
+01FD-                227
+01FD-77              228 (  7)     ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
+01FE-                229
+01FE-FE 0A           230 (  6)     cp 10                       ; insert CR if ASCII code == LF (10)
+0200-C2 0C 02        231 ( 6+)     jp NZ,kbd_int_incr_buffer_pos
+0203-23              232 (  4)     inc hl
+0204-3E 0D           233 (  6)     ld a,13
+0206-77              234 (  7)     ld (hl),a
+0207-7B              235 (  4)     ld a,e
+0208-3C              236 (  4)     inc a
+0209-32 01 21        237 ( 13)     ld (kbd_buffer_pos),a
+020C-                238
+020C-                239       kbd_int_incr_buffer_pos:
+020C-3A 01 21        240 ( 12)     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos
+020F-3C              241 (  4)     inc a
+0210-32 01 21        242 ( 13)     ld (kbd_buffer_pos),a
+0213-18 26           243 (  8)     jr int_kbd_exit
+0215-                244
+0215-                245       int_kbd_E0:
+0215-21 00 21        246 (  9)     ld hl,kbd_state                     ; clear E0 flag in kbd_state
+0218-CB A6           247 ( 13)     res KBD_STATE_E0,(hl)
+021A-18 1F           248 (  8)     jr int_kbd_exit
+021C-                249
+021C-                250       int_kbd_F0:
+021C-21 00 21        251 (  9)    ld hl,kbd_state                      ; clear F0 flag in kbd_state
+021F-CB 9E           252 ( 13)    res KBD_STATE_F0,(hl)
+0221-                253
+0221-78              254 (  4)    ld a,b                               ; clear SHIFT flag if key was LSHIFT
+0222-FE 12           255 (  6)    cp $12 ; LSHIFT
+0224-C2 2B 02        256 ( 6+)    jp NZ,int_kbd_F0_rshift
+0227-CB 86           257 ( 13)    res KBD_STATE_SHIFT,(hl)
+0229-18 10           258 (  8)    jr int_kbd_exit
+022B-                259
+022B-                260       int_kbd_F0_rshift:                      ; clear SHIFT flag if key was LSHIFT
+022B-FE 59           261 (  6)    cp $59 ; RSHIFT
+022D-C2 34 02        262 ( 6+)    jp NZ,int_kbd_F0_alt
+0230-CB 86           263 ( 13)    res KBD_STATE_SHIFT,(hl)
+0232-18 07           264 (  8)    jr int_kbd_exit
+0234-                265
+0234-                266       int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
+0234-FE 11           267 (  6)    cp $11 ; ALT
+0236-C2 3B 02        268 ( 6+)    jp NZ,int_kbd_exit
+0239-CB 8E           269 ( 13)    res KBD_STATE_ALT,(hl)
+023B-                270
+023B-                271       int_kbd_exit:                           ; end of keyboard interrupt routine.
 023B-E1              272 (  9)     pop hl
-023C-F1              273 (  9)     pop af
-023D-FB              274 (  3)     ei
-023E-C9              275 (  9)     ret
-023F-                276
-023F-                277
-023F-                278       ; -----------------------------------------------------------------
-023F-                279
-023F-                280       ; initialize asci1
-023F-                281       asci1_init:
-023F-                282
-023F-                283           ; RE : Receiver Enable
-023F-                284           ; TE : Transmitter Enable
-023F-                285           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
-023F-3E 64           286 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
-0241-ED 39 01        287 ( 13)     out0 (CNTLA1),a
-0244-                288
-0244-                289           ; DR=0
-0244-3E 00           290 (  6)     ld a,0
-0246-ED 39 03        291 ( 13)     out0 (CNTLB1),a
-0249-                292
-0249-                293           ; BRG0 : Enable 16 bit BRG counter
-0249-                294           ; X1 ( + DR=0) : Clock mode = /1
-0249-3E 18           295 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
-024B-ED 39 13        296 ( 13)     out0 (ASEXT1),a
-024E-                297
-024E-                298           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
-024E-                299           ; TC = fphi/(2*baud rate*clock mode) - 2
-024E-                300           ; TC = 32000000/(2*9600*1) - 2
-024E-3E 81           301 (  6)     ld a,$81
-0250-ED 39 1C        302 ( 13)     out0 (ASTC1L),a
-0253-3E 06           303 (  6)     ld a,$06
-0255-ED 39 1D        304 ( 13)     out0 (ASTC1H),a
-0258-                305
-0258-C9              306 (  9)     ret
-0259-                307
-0259-                308       ; put a string on asci1
-0259-                309       ; input : (hl) = address of null terminated string
-0259-                310       asci1_puts:
-0259-E5              311 ( 11)     push hl
-025A-F5              312 ( 11)     push af
-025B-                313
-025B-                314       asci1_puts_loop:
-025B-7E              315 (  6)     ld a,(hl)
-025C-F6 00           316 (  6)     or 0
-025E-28 06           317 ( 6+)     jr z,asci1_puts_exit
-0260-CD 69 02        318 ( 16)     call asci1_putc
-0263-23              319 (  4)     inc hl
-0264-18 F5           320 (  8)     jr asci1_puts_loop
-0266-                321
-0266-                322       asci1_puts_exit:
-0266-F1              323 (  9)     pop af
-0267-E1              324 (  9)     pop hl
-0268-C9              325 (  9)     ret
-0269-                326
-0269-                327
-0269-                328
-0269-                329       ; put a char on asci1
-0269-                330       ; input : a = char ascii code
-0269-                331       asci1_putc:
-0269-F5              332 ( 11)     push af
-026A-                333
-026A-                334       asci1_putc_wait:  ; wait for asci0 TX ready
-026A-ED 38 05        335 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
-026D-E6 02           336 (  6)     and STAT1_TDRE
-026F-28 F9           337 ( 6+)     jr Z,asci1_putc_wait
-0271-F1              338 (  9)     pop af
-0272-ED 39 07        339 ( 13)     out0 (TDR1),a ; output the char to asci0
-0275-C9              340 (  9)     ret
-0276-                341
-0276-                342
-0276-                343       int_noop:
-0276-FB              344 (  3)     ei
-0277-C9              345 (  9)     ret
-0278-                346
-0278-                347
-0278-1B 5B 32 4A 
+023C-D1              273 (  9)     pop de
+023D-C1              274 (  9)     pop bc
+023E-F1              275 (  9)     pop af
+023F-FB              276 (  3)     ei
+0240-C9              277 (  9)     ret
+0241-                278
+0241-                279
+0241-                280       ; -----------------------------------------------------------------
+0241-                281
+0241-                282       ; initialize asci1
+0241-                283       asci1_init:
+0241-                284
+0241-                285           ; RE : Receiver Enable
+0241-                286           ; TE : Transmitter Enable
+0241-                287           ; MOD2 : 8 bits data ( No parity, 1 stop bit)
+0241-3E 64           288 (  6)     ld a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MOD2
+0243-ED 39 01        289 ( 13)     out0 (CNTLA1),a
+0246-                290
+0246-                291           ; DR=0
+0246-3E 00           292 (  6)     ld a,0
+0248-ED 39 03        293 ( 13)     out0 (CNTLB1),a
+024B-                294
+024B-                295           ; BRG0 : Enable 16 bit BRG counter
+024B-                296           ; X1 ( + DR=0) : Clock mode = /1
+024B-3E 18           297 (  6)     ld a,ASEXT1_BRG1|ASEXT1_X1
+024D-ED 39 13        298 ( 13)     out0 (ASEXT1),a
+0250-                299
+0250-                300           ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
+0250-                301           ; TC = fphi/(2*baud rate*clock mode) - 2
+0250-                302           ; TC = 32000000/(2*9600*1) - 2
+0250-3E 81           303 (  6)     ld a,$81
+0252-ED 39 1C        304 ( 13)     out0 (ASTC1L),a
+0255-3E 06           305 (  6)     ld a,$06
+0257-ED 39 1D        306 ( 13)     out0 (ASTC1H),a
+025A-                307
+025A-C9              308 (  9)     ret
+025B-                309
+025B-                310       ; put a string on asci1
+025B-                311       ; input : (hl) = address of null terminated string
+025B-                312       asci1_puts:
+025B-E5              313 ( 11)     push hl
+025C-F5              314 ( 11)     push af
+025D-                315
+025D-                316       asci1_puts_loop:
+025D-7E              317 (  6)     ld a,(hl)
+025E-F6 00           318 (  6)     or 0
+0260-28 06           319 ( 6+)     jr z,asci1_puts_exit
+0262-CD 6B 02        320 ( 16)     call asci1_putc
+0265-23              321 (  4)     inc hl
+0266-18 F5           322 (  8)     jr asci1_puts_loop
+0268-                323
+0268-                324       asci1_puts_exit:
+0268-F1              325 (  9)     pop af
+0269-E1              326 (  9)     pop hl
+026A-C9              327 (  9)     ret
+026B-                328
+026B-                329
+026B-                330
+026B-                331       ; put a char on asci1
+026B-                332       ; input : a = char ascii code
+026B-                333       asci1_putc:
+026B-F5              334 ( 11)     push af
+026C-                335
+026C-                336       asci1_putc_wait:  ; wait for asci0 TX ready
+026C-ED 38 05        337 ( 12)     in0 a,(STAT1) ; TDRE=1 -> empty
+026F-E6 02           338 (  6)     and STAT1_TDRE
+0271-28 F9           339 ( 6+)     jr Z,asci1_putc_wait
+0273-F1              340 (  9)     pop af
+0274-ED 39 07        341 ( 13)     out0 (TDR1),a ; output the char to asci0
+0277-C9              342 (  9)     ret
+0278-                343
+0278-                344
+0278-                345       int_noop:
+0278-FB              346 (  3)     ei
+0279-C9              347 (  9)     ret
+027A-                348
+027A-                349
+027A-1B 5B 32 4A 
      1B 5B 48 54 
      65 73 74 20 
      4B 62 64 0D 
-     0A 0D 0A 00     348       str_welcome:    .db $1B,"[2J",$1B,"[H","Test Kbd",13,10,13,10,0
-028C-                349
-028C-                350
-028C-                351       ; input : a = scan code, hl = pointer to scan code table
-028C-                352       ; output : a = decoded scan code
-028C-                353       kbd_decode_scancode:
-028C-E5              354 ( 11)     push hl
-028D-D5              355 ( 11)     push de
-028E-                356
-028E-                357           ;ld hl,scan_codes
-028E-16 00           358 (  6)     ld d,0
-0290-5F              359 (  4)     ld e,a
-0291-19              360 (  7)     add hl,de
-0292-7E              361 (  6)     ld a,(hl)
-0293-                362
-0293-                363       decode_scancode_exit:
-0293-                364
-0293-D1              365 (  9)     pop de
-0294-E1              366 (  9)     pop hl
-0295-C9              367 (  9)     ret
-0296-                368
-0296-                369
-0296-                370       scan_codes:
-0296-                371           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
-0296-00 00 00 00 
+     0A 0D 0A 00     350       str_welcome:    .db $1B,"[2J",$1B,"[H","Test Kbd",13,10,13,10,0
+028E-                351
+028E-                352
+028E-                353       ; input : a = scan code, hl = pointer to scan code table
+028E-                354       ; output : a = decoded scan code
+028E-                355       kbd_decode_scancode:
+028E-E5              356 ( 11)     push hl
+028F-D5              357 ( 11)     push de
+0290-                358
+0290-                359           ;ld hl,scan_codes
+0290-16 00           360 (  6)     ld d,0
+0292-5F              361 (  4)     ld e,a
+0293-19              362 (  7)     add hl,de
+0294-7E              363 (  6)     ld a,(hl)
+0295-                364
+0295-                365       decode_scancode_exit:
+0295-                366
+0295-D1              367 (  9)     pop de
+0296-E1              368 (  9)     pop hl
+0297-C9              369 (  9)     ret
+0298-                370
+0298-                371
+0298-                372       scan_codes:
+0298-                373           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
+0298-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     09 C2 B2 00     372           .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
-02A6-                373           ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
-02A6-00 00 00 00 
+     09 C2 B2 00     374           .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
+02A8-                375           ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
+02A8-00 00 00 00 
      00 61 26 00 
      00 00 77 73 
-     71 7A 82 00     374           .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
-02B6-                375           ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
-02B6-00 63 78 64 
+     71 7A 82 00     376           .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
+02B8-                377           ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
+02B8-00 63 78 64 
      65 27 22 00 
      00 20 76 66 
-     74 72 28 00     376           .db 0,'c','x','d','e',39,34,0,0,' ','v','f','t','r','(',0
-02C6-                377           ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
-02C6-00 6E 62 68 
+     74 72 28 00     378           .db 0,'c','x','d','e',39,34,0,0,' ','v','f','t','r','(',0
+02C8-                379           ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
+02C8-00 6E 62 68 
      67 79 2D 00 
      00 00 2C 6A 
-     75 8A 5F 00     378           .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
-02D6-                379           ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
-02D6-00 3B 6B 69 
+     75 8A 5F 00     380           .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
+02D8-                381           ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
+02D8-00 3B 6B 69 
      6F 85 87 00 
      00 3A 21 6C 
-     6D 70 29 00     380           .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
-02E6-                381           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
-02E6-00 00 97 00 
+     6D 70 29 00     382           .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
+02E8-                383           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
+02E8-00 00 97 00 
      5E 3D 00 00 
      00 00 0A 24 
-     00 2A 00 00     382           .db 0,0,151,0,'^','=',0,0,0,0,10,'$',0,'*',0,0
-02F6-                383           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
-02F6-00 3C 00 00 
+     00 2A 00 00     384           .db 0,0,151,0,'^','=',0,0,0,0,10,'$',0,'*',0,0
+02F8-                385           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+02F8-00 3C 00 00 
      00 00 08 00 
      00 31 00 34 
-     37 00 00 00     384           .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
-0306-                385           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-0306-30 2C 32 35 
+     37 00 00 00     386           .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+0308-                387           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+0308-30 2C 32 35 
      36 38 00 00 
      00 2B 33 2D 
-     2A 39 00        386           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
-0315-                387           ; 80-83 : n/a n/a n/a F7
-0315-00 00 00 00     388           .db 0,0,0,0
-0319-                389
-0319-                390       scan_codes_shift:
-0319-                391           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
-0319-00 00 00 00 
+     2A 39 00        388           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+0317-                389           ; 80-83 : n/a n/a n/a F7
+0317-00 00 00 00     390           .db 0,0,0,0
+031B-                391
+031B-                392       scan_codes_shift:
+031B-                393           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
+031B-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 09 00 00     392           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
-0329-                393           ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
-0329-00 00 00 00 
+     00 09 00 00     394           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
+032B-                395           ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
+032B-00 00 00 00 
      00 41 31 00 
      00 00 57 53 
-     51 5A 32 00     394           .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
-0339-                395           ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
-0339-00 43 58 44 
+     51 5A 32 00     396           .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
+033B-                397           ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
+033B-00 43 58 44 
      45 34 33 00 
      00 20 56 46 
-     54 52 35 00     396           .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
-0349-                397           ; 30-3F : n/a N B H G Y 6 n/a n/a n/a ? J U 7 8 n/a
-0349-00 4E 42 48 
+     54 52 35 00     398           .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
+034B-                399           ; 30-3F : n/a N B H G Y 6 n/a n/a n/a ? J U 7 8 n/a
+034B-00 4E 42 48 
      47 59 36 00 
      00 00 3F 4A 
-     55 37 38 00     398           .db 0,'N','B','H','G','Y','6',0,0,0,'?','J','U','7','8',0
-0359-                399           ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
-0359-00 2E 4B 49 
+     55 37 38 00     400           .db 0,'N','B','H','G','Y','6',0,0,0,'?','J','U','7','8',0
+035B-                401           ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
+035B-00 2E 4B 49 
      4F 30 39 00 
      00 2F 9E 4C 
-     4D 50 A7 00     400           .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
-0369-                401           ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
-0369-00 00 25 00 
+     4D 50 A7 00     402           .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
+036B-                403           ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
+036B-00 00 25 00 
      7E 2B 00 00 
      00 00 0A 9C 
-     00 E6 00 00     402           .db 0,0,'%',0,126,'+',0,0,0,0,10,156,0,230,0,0
-0379-                403           ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
-0379-00 3E 00 00 
+     00 E6 00 00     404           .db 0,0,'%',0,126,'+',0,0,0,0,10,156,0,230,0,0
+037B-                405           ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+037B-00 3E 00 00 
      00 00 08 00 
      00 31 00 34 
-     37 00 00 00     404           .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
-0389-                405           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-0389-30 2C 32 35 
+     37 00 00 00     406           .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+038B-                407           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+038B-30 2C 32 35 
      36 38 00 00 
      00 2B 33 2D 
-     2A 39 00        406           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
-0398-                407           ; 80-83 : n/a n/a n/a F7
-0398-00 00 00 00     408           .db 0,0,0,0
-039C-                409
-039C-                410       scan_codes_alt:
-039C-                411           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-039C-00 00 00 00 
+     2A 39 00        408           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+039A-                409           ; 80-83 : n/a n/a n/a F7
+039A-00 00 00 00     410           .db 0,0,0,0
+039E-                411
+039E-                412       scan_codes_alt:
+039E-                413           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+039E-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00     412           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-03AC-                413           ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
-03AC-00 00 00 00 
+     00 00 00 00     414           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+03AE-                415           ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
+03AE-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 7E 00     414           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
-03BC-                415           ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
-03BC-00 00 00 00 
+     00 00 7E 00     416           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
+03BE-                417           ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
+03BE-00 00 00 00 
      00 7B 23 00 
      00 20 00 00 
-     00 00 5B 00     416           .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
-03CC-                417           ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
-03CC-00 00 00 00 
+     00 00 5B 00     418           .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
+03CE-                419           ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
+03CE-00 00 00 00 
      00 00 7C 00 
      00 00 00 00 
-     00 60 5C 00     418           .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
-03DC-                419           ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
-03DC-00 00 00 00 
+     00 60 5C 00     420           .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
+03DE-                421           ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
+03DE-00 00 00 00 
      00 40 5E 00 
      00 00 00 00 
-     00 00 5D 00     420           .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
-03EC-                421           ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-03EC-00 00 00 00 
+     00 00 5D 00     422           .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
+03EE-                423           ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+03EE-00 00 00 00 
      00 7D 00 00 
      00 00 00 00 
-     00 00 00 00     422           .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
-03FC-                423           ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-03FC-00 00 00 00 
-     00 00 00 00 
-     00 00 00 00 
-     00 00 00 00     424           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-040C-                425           ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-040C-00 00 00 00 
+     00 00 00 00     424           .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
+03FE-                425           ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+03FE-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
      00 00 00 00     426           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-041C-                427           ; 80-83 : n/a n/a n/a F7
-041C-00 00 00 00     428           .db 0,0,0,0
-0420-                429
-0420-                430
-2100-                431           .org $2100
-2100-                432
-2100-                433       ; bit 0 : shift
-2100-                434       ; bit 1 : alt
-2100-                435       ; bit 2 : caps lock
-0000-                436       KBD_STATE_SHIFT .equ 0
-0001-                437       KBD_STATE_ALT .equ 1
-0002-                438       KBD_STATE_CAPS .equ 2
-0003-                439       KBD_STATE_F0   .equ 3
-0004-                440       KBD_STATE_E0  .equ 4
-2100-                441
-0004-                442       KBD_XOR_CAPS .equ 4
+040E-                427           ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+040E-00 00 00 00 
+     00 00 00 00 
+     00 00 00 00 
+     00 00 00 00     428           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+041E-                429           ; 80-83 : n/a n/a n/a F7
+041E-00 00 00 00     430           .db 0,0,0,0
+0422-                431
+0422-                432
+2100-                433           .org $2100
+2100-                434
+2100-                435       ; bit 0 : shift
+2100-                436       ; bit 1 : alt
+2100-                437       ; bit 2 : caps lock
+0000-                438       KBD_STATE_SHIFT .equ 0
+0001-                439       KBD_STATE_ALT .equ 1
+0002-                440       KBD_STATE_CAPS .equ 2
+0003-                441       KBD_STATE_F0   .equ 3
+0004-                442       KBD_STATE_E0  .equ 4
 2100-                443
-2100-                444       kbd_state: .bs 1
-2101-                445
-2101-                446       kbd_buffer_pos:    .bs 1
-2102-                447       kbd_buffer: .bs 64
+0004-                444       KBD_XOR_CAPS .equ 4
+2100-                445
+2100-                446       kbd_state: .bs 1
+2101-                447
+2101-                448       kbd_buffer_pos:    .bs 1
+2102-                449       kbd_buffer: .bs 64

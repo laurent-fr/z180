@@ -281,13 +281,13 @@ E049-                 26       kbd_get_key .equ $E049
 000B-                 35
 000B-                 36       rst10:
 0010-                 37           .org $0010
-0010-C3 19 E0         38 (  9)     jp asci1_getc
-0013-                 39           ;jp kbd_get_key
+0010-                 38           ;jp asci1_getc
+0010-C3 49 E0         39 (  9)     jp kbd_get_key
 0013-                 40
 0013-                 41       rst18:
 0018-                 42           .org $0018
-0018-C3 1C E0         43 (  9)     jp asci1_rx_empty
-001B-                 44           ;jp kbd_is_empty
+0018-                 43           ;jp asci1_rx_empty
+0018-C3 46 E0         44 (  9)     jp kbd_is_empty
 001B-                 45
 0038-                 46           .org $0038
 0038-C3 00 E0         47 (  9)     jp int_noop    ; INT0

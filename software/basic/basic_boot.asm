@@ -35,13 +35,13 @@ rst08:
 
 rst10:
     .org $0010
-    jp asci1_getc
-    ;jp kbd_get_key
+    ;jp asci1_getc
+    jp kbd_get_key
 
 rst18:
     .org $0018
-    jp asci1_rx_empty
-    ;jp kbd_is_empty
+    ;jp asci1_rx_empty
+    jp kbd_is_empty
     
     .org $0038
     jp int_noop    ; INT0

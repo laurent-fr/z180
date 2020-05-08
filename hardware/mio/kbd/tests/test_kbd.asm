@@ -117,14 +117,16 @@ kbd_get_key:
 ; Keyboard Interruption
 int_kbd:
     push af
-    push hl
+    push bc
     push de
+    push hl
 
     in0 a,(KBD_DATA)            ; read scancode
     ld b,a                      ; stored in B register
 
 int_kbd_test_F0:
-    cp $70                      ; F0 = release key
+    ;cp $70                      ; F0 = release key
+    cp $F0
     jp NZ,int_kbd_test_E0
  
     ld hl,kbd_state             ; set F0 flag in kbd_state
@@ -214,7 +216,6 @@ int_kbd_get_key_set_shift:
 int_kbd_get_key_set_lowcase:
     ld hl,scan_codes
 
-  
 
 int_kbd_get_key_scancode:
     ld a,b
@@ -268,8 +269,9 @@ int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
    res KBD_STATE_ALT,(hl)
 
 int_kbd_exit:                           ; end of keyboard interrupt routine.
-    pop de
     pop hl
+    pop de
+    pop bc
     pop af
     ei
     ret

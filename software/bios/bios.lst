@@ -291,9 +291,9 @@ E03D-C3 4B E3         44 (  9) .vdu_puts           jp _vdu_puts
 E040-                 45
 E040-                 46           ; KBD
 E040-C3 C4 E3         47 (  9) .kbd_init:          jp _kbd_init
-E043-C3 CD E3         48 (  9) .int_kbd:           jp _int_kbd
-E046-C3 AD E4         49 (  9) .kbd_is_empty       jp _kbd_is_empty
-E049-C3 B3 E4         50 (  9) .kbd_get_key        jp _kbd_get_key
+E043-C3 D4 E3         48 (  9) .int_kbd:           jp _int_kbd
+E046-C3 B2 E4         49 (  9) .kbd_is_empty       jp _kbd_is_empty
+E049-C3 B8 E4         50 (  9) .kbd_get_key        jp _kbd_get_key
 E04C-                 51
 E04C-                 52           ; SND
 E04C-                 53
@@ -1052,341 +1052,349 @@ E3C4-            I    20           ; enable INT1
 E3C4-ED 38 34    I    21 ( 12)     in0 a,(ITC)
 E3C7-F6 02       I    22 (  6)     or ITC_ITE1
 E3C9-ED 39 34    I    23 ( 13)     out0 (ITC),a
-E3CC-C9          I    24 (  9)     ret
-E3CD-            I    25
-E3CD-            I    26       _int_kbd:
-E3CD-F5          I    27 ( 11)     push af
-E3CE-E5          I    28 ( 11)     push hl
-E3CF-D5          I    29 ( 11)     push de
-E3D0-            I    30
-E3D0-ED 38 80    I    31 ( 12)     in0 a,(KBD_DATA)            ; read scancode
-E3D3-47          I    32 (  4)     ld b,a                      ; stored in B register
-E3D4-            I    33
-E3D4-            I    34       _int_kbd_test_F0:
-E3D4-FE F0       I    35 (  6)     cp $F0                      ; F0 = release key
-E3D6-C2 E1 E3    I    36 ( 6+)     jp NZ,_int_kbd_test_E0
-E3D9-            I    37
-E3D9-21 5B E6    I    38 (  9)     ld hl,kbd_state             ; set F0 flag in kbd_state
-E3DC-CB DE       I    39 ( 13)     set KBD_STATE_F0,(hl)
-E3DE-C3 A8 E4    I    40 (  9)     jp _int_kbd_exit
-E3E1-            I    41
-E3E1-            I    42       _int_kbd_test_E0:
-E3E1-FE E0       I    43 (  6)     cp $E0                      ; E0 = extended scancodes
-E3E3-C2 EE E3    I    44 ( 6+)     jp NZ,_int_kbd_check_state
-E3E6-            I    45
-E3E6-21 5B E6    I    46 (  9)     ld hl,kbd_state             ; set E0 flag in kbd_state
-E3E9-CB E6       I    47 ( 13)     set KBD_STATE_E0,(hl)
-E3EB-C3 A8 E4    I    48 (  9)     jp _int_kbd_exit
-E3EE-            I    49
-E3EE-            I    50       _int_kbd_check_state:
-E3EE-3A 5B E6    I    51 ( 12)     ld a,(kbd_state)
-E3F1-            I    52
-E3F1-CB 5F       I    53 (  6)     bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
-E3F3-C2 89 E4    I    54 ( 6+)     jp NZ,_int_kbd_F0            ; (release key)
-E3F6-            I    55
-E3F6-CB 67       I    56 (  6)     bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
-E3F8-C2 82 E4    I    57 ( 6+)     jp NZ,_int_kbd_E0            ; (extended scancode)
-E3FB-            I    58
-E3FB-            I    59       _int_kbd_shift:                  ; manage SHIFT key
-E3FB-78          I    60 (  4)     ld a,b
-E3FC-FE 12       I    61 (  6)     cp $12 ; lshift
-E3FE-CA 06 E4    I    62 ( 6+)     jp Z,_int_kbd_is_shift
-E401-FE 59       I    63 (  6)     cp $59 ; rshift
-E403-C2 0E E4    I    64 ( 6+)     jp NZ,_int_kbd_alt
-E406-            I    65
-E406-            I    66       _int_kbd_is_shift:
-E406-21 5B E6    I    67 (  9)     ld hl,kbd_state             ; set SHIFT flag in kbd_state
-E409-CB C6       I    68 ( 13)     set KBD_STATE_SHIFT,(hl)
-E40B-C3 A8 E4    I    69 (  9)     jp _int_kbd_exit
-E40E-            I    70
-E40E-            I    71       _int_kbd_alt:                    ; manage ALT key
-E40E-FE 11       I    72 (  6)     cp $11
-E410-C2 1B E4    I    73 ( 6+)     jp NZ,_int_kbd_capslock
-E413-            I    74
-E413-21 5B E6    I    75 (  9)     ld hl,kbd_state             ; set ALT flag in kbd_state
-E416-CB CE       I    76 ( 13)     set KBD_STATE_ALT,(hl)
-E418-C3 A8 E4    I    77 (  9)     jp _int_kbd_exit
-E41B-            I    78
-E41B-            I    79       _int_kbd_capslock:                ; manage CAPS LOCK key
-E41B-FE 58       I    80 (  6)     cp $58
-E41D-C2 2A E4    I    81 ( 6+)     jp NZ,_int_kbd_get_key
-E420-            I    82
-E420-21 5B E6    I    83 (  9)     ld hl,kbd_state
-E423-7E          I    84 (  6)     ld a,(hl)                   ; toggle CAPS LOCK flag in kbd_stte
-E424-EE 04       I    85 (  6)     xor KBD_XOR_CAPS
-E426-77          I    86 (  7)     ld (hl),a
-E427-C3 A8 E4    I    87 (  9)     jp _int_kbd_exit
-E42A-            I    88
-E42A-            I    89       _int_kbd_get_key:
-E42A-16 00       I    90 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
-E42C-3A 5C E6    I    91 ( 12)     ld a,(kbd_buffer_pos)
-E42F-5F          I    92 (  4)     ld e,a
-E430-21 5D E6    I    93 (  9)     ld hl,kbd_buffer
-E433-19          I    94 (  7)     add hl,de
-E434-E5          I    95 ( 11)     push hl                     ; save current buffer pointer on stack (1)
-E435-            I    96
-E435-2A 5B E6    I    97 ( 15)     ld hl,(kbd_state)
-E438-            I    98
-E438-            I    99       _int_kbd_get_key_caps:
-E438-3E 01       I   100 (  6)     ld  a,1                    ; a==1 -> lowercase , a==0 -> shift
-E43A-            I   101
-E43A-CB 56       I   102 (  9)     bit KBD_STATE_CAPS,(hl)
-E43C-CA 41 E4    I   103 ( 6+)     jp Z,_int_kbd_get_key_shift
-E43F-EE 01       I   104 (  6)     xor 1                      ; a<-0 (shift)
-E441-            I   105
-E441-            I   106       _int_kbd_get_key_shift:
-E441-CB 46       I   107 (  9)     bit KBD_STATE_SHIFT,(hl)
-E443-CA 48 E4    I   108 ( 6+)     jp Z,_int_kbd_get_key_set_shift
-E446-EE 01       I   109 (  6)     xor 1                       ; flip a
-E448-            I   110
-E448-            I   111       _int_kbd_get_key_set_shift:
-E448-21 54 E5    I   112 (  9)     ld hl,scan_codes_shift
-E44B-EE 01       I   113 (  6)     xor 1
-E44D-CA 60 E4    I   114 ( 6+)     jp Z,_int_kbd_get_key_scancode
-E450-            I   115
-E450-21 5B E6    I   116 (  9)     ld hl,kbd_state
-E453-CB 4E       I   117 (  9)     bit KBD_STATE_ALT,(hl)      ; use ALT scancode set if ALT flag==1
-E455-CA 5D E4    I   118 ( 6+)     jp Z,_int_kbd_get_key_set_lowcase
-E458-21 D7 E5    I   119 (  9)     ld hl,scan_codes_alt
-E45B-18 03       I   120 (  8)     jr _int_kbd_get_key_scancode
-E45D-            I   121
-E45D-            I   122       _int_kbd_get_key_set_lowcase:
-E45D-21 D1 E4    I   123 (  9)     ld hl,scan_codes
-E460-            I   124
-E460-            I   125       _int_kbd_get_key_scancode:
-E460-78          I   126 (  4)     ld a,b
-E461-CD C7 E4    I   127 ( 16)     call _kbd_decode_scancode
-E464-E1          I   128 (  9)     pop hl                      ; get back current buffer pointer (see 1)
-E465-            I   129
-E465-FE 00       I   130 (  6)     cp 0                        ; do nothing if no code found
-E467-CA A8 E4    I   131 ( 6+)     jp Z,_int_kbd_exit
-E46A-            I   132
-E46A-77          I   133 (  7)     ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
+E3CC-            I    24
+E3CC-            I    25           ; init keyboad variables
+E3CC-AF          I    26 (  4)     xor a
+E3CD-32 65 E6    I    27 ( 13)     ld (kbd_buffer_pos),a
+E3D0-32 64 E6    I    28 ( 13)     ld (kbd_state),a
+E3D3-            I    29
+E3D3-C9          I    30 (  9)     ret
+E3D4-            I    31
+E3D4-            I    32       _int_kbd:
+E3D4-F5          I    33 ( 11)     push af
+E3D5-D9          I    34 (  3)     exx
+E3D6-            I    35
+E3D6-ED 38 80    I    36 ( 12)     in0 a,(KBD_DATA)            ; read scancode
+E3D9-47          I    37 (  4)     ld b,a                      ; stored in B register
+E3DA-            I    38
+E3DA-            I    39       _int_kbd_test_F0:
+E3DA-FE F0       I    40 (  6)     cp $F0                      ; F0 = release key
+E3DC-C2 E7 E3    I    41 ( 6+)     jp NZ,_int_kbd_test_E0
+E3DF-            I    42
+E3DF-21 64 E6    I    43 (  9)     ld hl,kbd_state             ; set F0 flag in kbd_state
+E3E2-CB DE       I    44 ( 13)     set KBD_STATE_F0,(hl)
+E3E4-C3 AE E4    I    45 (  9)     jp _int_kbd_exit
+E3E7-            I    46
+E3E7-            I    47       _int_kbd_test_E0:
+E3E7-FE E0       I    48 (  6)     cp $E0                      ; E0 = extended scancodes
+E3E9-C2 F4 E3    I    49 ( 6+)     jp NZ,_int_kbd_check_state
+E3EC-            I    50
+E3EC-21 64 E6    I    51 (  9)     ld hl,kbd_state             ; set E0 flag in kbd_state
+E3EF-CB E6       I    52 ( 13)     set KBD_STATE_E0,(hl)
+E3F1-C3 AE E4    I    53 (  9)     jp _int_kbd_exit
+E3F4-            I    54
+E3F4-            I    55       _int_kbd_check_state:
+E3F4-3A 64 E6    I    56 ( 12)     ld a,(kbd_state)
+E3F7-            I    57
+E3F7-CB 5F       I    58 (  6)     bit KBD_STATE_F0,a          ; if previous scancode was F0, jumps to F0 routine
+E3F9-C2 8F E4    I    59 ( 6+)     jp NZ,_int_kbd_F0            ; (release key)
+E3FC-            I    60
+E3FC-CB 67       I    61 (  6)     bit KBD_STATE_E0,a          ; if previous scancode was E0, jumps to E0 routinr
+E3FE-C2 88 E4    I    62 ( 6+)     jp NZ,_int_kbd_E0            ; (extended scancode)
+E401-            I    63
+E401-            I    64       _int_kbd_shift:                  ; manage SHIFT key
+E401-78          I    65 (  4)     ld a,b
+E402-FE 12       I    66 (  6)     cp $12 ; lshift
+E404-CA 0C E4    I    67 ( 6+)     jp Z,_int_kbd_is_shift
+E407-FE 59       I    68 (  6)     cp $59 ; rshift
+E409-C2 14 E4    I    69 ( 6+)     jp NZ,_int_kbd_alt
+E40C-            I    70
+E40C-            I    71       _int_kbd_is_shift:
+E40C-21 64 E6    I    72 (  9)     ld hl,kbd_state             ; set SHIFT flag in kbd_state
+E40F-CB C6       I    73 ( 13)     set KBD_STATE_SHIFT,(hl)
+E411-C3 AE E4    I    74 (  9)     jp _int_kbd_exit
+E414-            I    75
+E414-            I    76       _int_kbd_alt:                    ; manage ALT key
+E414-FE 11       I    77 (  6)     cp $11
+E416-C2 21 E4    I    78 ( 6+)     jp NZ,_int_kbd_capslock
+E419-            I    79
+E419-21 64 E6    I    80 (  9)     ld hl,kbd_state             ; set ALT flag in kbd_state
+E41C-CB CE       I    81 ( 13)     set KBD_STATE_ALT,(hl)
+E41E-C3 AE E4    I    82 (  9)     jp _int_kbd_exit
+E421-            I    83
+E421-            I    84       _int_kbd_capslock:                ; manage CAPS LOCK key
+E421-FE 58       I    85 (  6)     cp $58
+E423-C2 30 E4    I    86 ( 6+)     jp NZ,_int_kbd_get_key
+E426-            I    87
+E426-21 64 E6    I    88 (  9)     ld hl,kbd_state
+E429-7E          I    89 (  6)     ld a,(hl)                   ; toggle CAPS LOCK flag in kbd_stte
+E42A-EE 04       I    90 (  6)     xor KBD_XOR_CAPS
+E42C-77          I    91 (  7)     ld (hl),a
+E42D-C3 AE E4    I    92 (  9)     jp _int_kbd_exit
+E430-            I    93
+E430-            I    94       _int_kbd_get_key:
+E430-16 00       I    95 (  6)     ld d,0                      ; hl <- kbd_buffer+(kbd_buffer_pos)
+E432-3A 65 E6    I    96 ( 12)     ld a,(kbd_buffer_pos)
+E435-5F          I    97 (  4)     ld e,a
+E436-21 66 E6    I    98 (  9)     ld hl,kbd_buffer
+E439-19          I    99 (  7)     add hl,de
+E43A-E5          I   100 ( 11)     push hl                     ; save current buffer pointer on stack (1)
+E43B-            I   101
+E43B-2A 64 E6    I   102 ( 15)     ld hl,(kbd_state)
+E43E-            I   103
+E43E-            I   104       _int_kbd_get_key_caps:
+E43E-3E 01       I   105 (  6)     ld  a,1                    ; a==1 -> lowercase , a==0 -> shift
+E440-            I   106
+E440-CB 56       I   107 (  9)     bit KBD_STATE_CAPS,(hl)
+E442-CA 47 E4    I   108 ( 6+)     jp Z,_int_kbd_get_key_shift
+E445-EE 01       I   109 (  6)     xor 1                      ; a<-0 (shift)
+E447-            I   110
+E447-            I   111       _int_kbd_get_key_shift:
+E447-CB 46       I   112 (  9)     bit KBD_STATE_SHIFT,(hl)
+E449-CA 4E E4    I   113 ( 6+)     jp Z,_int_kbd_get_key_set_shift
+E44C-EE 01       I   114 (  6)     xor 1                       ; flip a
+E44E-            I   115
+E44E-            I   116       _int_kbd_get_key_set_shift:
+E44E-21 5D E5    I   117 (  9)     ld hl,scan_codes_shift
+E451-EE 01       I   118 (  6)     xor 1
+E453-CA 66 E4    I   119 ( 6+)     jp Z,_int_kbd_get_key_scancode
+E456-            I   120
+E456-21 64 E6    I   121 (  9)     ld hl,kbd_state
+E459-CB 4E       I   122 (  9)     bit KBD_STATE_ALT,(hl)      ; use ALT scancode set if ALT flag==1
+E45B-CA 63 E4    I   123 ( 6+)     jp Z,_int_kbd_get_key_set_lowcase
+E45E-21 E0 E5    I   124 (  9)     ld hl,scan_codes_alt
+E461-18 03       I   125 (  8)     jr _int_kbd_get_key_scancode
+E463-            I   126
+E463-            I   127       _int_kbd_get_key_set_lowcase:
+E463-21 DA E4    I   128 (  9)     ld hl,scan_codes
+E466-            I   129
+E466-            I   130       _int_kbd_get_key_scancode:
+E466-78          I   131 (  4)     ld a,b
+E467-CD D0 E4    I   132 ( 16)     call _kbd_decode_scancode
+E46A-E1          I   133 (  9)     pop hl                      ; get back current buffer pointer (see 1)
 E46B-            I   134
-E46B-FE 0A       I   135 (  6)     cp 10                       ; insert CR if ASCII code == LF (10)
-E46D-C2 79 E4    I   136 ( 6+)     jp NZ,_kbd_int_incr_buffer_pos
-E470-23          I   137 (  4)     inc hl
-E471-3E 0D       I   138 (  6)     ld a,13
-E473-77          I   139 (  7)     ld (hl),a
-E474-7B          I   140 (  4)     ld a,e
-E475-3C          I   141 (  4)     inc a
-E476-32 5C E6    I   142 ( 13)     ld (kbd_buffer_pos),a
-E479-            I   143
-E479-            I   144       _kbd_int_incr_buffer_pos:
-E479-3A 5C E6    I   145 ( 12)     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos
-E47C-3C          I   146 (  4)     inc a
-E47D-32 5C E6    I   147 ( 13)     ld (kbd_buffer_pos),a
-E480-18 26       I   148 (  8)     jr _int_kbd_exit
-E482-            I   149
-E482-            I   150       _int_kbd_E0:
-E482-21 5B E6    I   151 (  9)     ld hl,kbd_state                     ; clear E0 flag in kbd_state
-E485-CB A6       I   152 ( 13)     res KBD_STATE_E0,(hl)
-E487-18 1F       I   153 (  8)     jr _int_kbd_exit
-E489-            I   154
-E489-            I   155       _int_kbd_F0:
-E489-21 5B E6    I   156 (  9)    ld hl,kbd_state                      ; clear F0 flag in kbd_state
-E48C-CB 9E       I   157 ( 13)    res KBD_STATE_F0,(hl)
-E48E-            I   158
-E48E-78          I   159 (  4)    ld a,b                               ; clear SHIFT flag if key was LSHIFT
-E48F-FE 12       I   160 (  6)    cp $12 ; LSHIFT
-E491-C2 98 E4    I   161 ( 6+)    jp NZ,_int_kbd_F0_rshift
-E494-CB 86       I   162 ( 13)    res KBD_STATE_SHIFT,(hl)
-E496-18 10       I   163 (  8)    jr _int_kbd_exit
-E498-            I   164
-E498-            I   165       _int_kbd_F0_rshift:                      ; clear SHIFT flag if key was LSHIFT
-E498-FE 59       I   166 (  6)    cp $59 ; RSHIFT
-E49A-C2 A1 E4    I   167 ( 6+)    jp NZ,_int_kbd_F0_alt
-E49D-CB 86       I   168 ( 13)    res KBD_STATE_SHIFT,(hl)
-E49F-18 07       I   169 (  8)    jr _int_kbd_exit
-E4A1-            I   170
-E4A1-            I   171       _int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
-E4A1-FE 11       I   172 (  6)    cp $11 ; ALT
-E4A3-C2 A8 E4    I   173 ( 6+)    jp NZ,_int_kbd_exit
-E4A6-CB 8E       I   174 ( 13)    res KBD_STATE_ALT,(hl)
-E4A8-            I   175
-E4A8-            I   176       _int_kbd_exit:                           ; end of keyboard interrupt routine.
-E4A8-D1          I   177 (  9)     pop de
-E4A9-E1          I   178 (  9)     pop hl
-E4AA-F1          I   179 (  9)     pop af
-E4AB-FB          I   180 (  3)     ei
-E4AC-C9          I   181 (  9)     ret
-E4AD-            I   182
-E4AD-            I   183       ; check if kbd buffer is empty
-E4AD-            I   184       ; input : NONE
-E4AD-            I   185       ; output : flag=Z if empty
-E4AD-            I   186       _kbd_is_empty:
-E4AD-3A 5C E6    I   187 ( 12)     ld a,(kbd_buffer_pos)
-E4B0-FE 00       I   188 (  6)     cp 0
-E4B2-C9          I   189 (  9)     ret
-E4B3-            I   190
-E4B3-            I   191       ; Get next key in buffer
-E4B3-            I   192       _kbd_get_key:
-E4B3-E5          I   193 ( 11)     push hl
-E4B4-D5          I   194 ( 11)     push de
-E4B5-3A 5C E6    I   195 ( 12)     ld a,(kbd_buffer_pos)
-E4B8-3D          I   196 (  4)     dec a
-E4B9-32 5C E6    I   197 ( 13)     ld (kbd_buffer_pos),a
-E4BC-16 00       I   198 (  6)     ld d,0
-E4BE-5F          I   199 (  4)     ld e,a
-E4BF-21 5D E6    I   200 (  9)     ld hl,kbd_buffer
-E4C2-19          I   201 (  7)     add hl,de
-E4C3-7E          I   202 (  6)     ld a,(hl)
-E4C4-            I   203
-E4C4-D1          I   204 (  9)     pop de
-E4C5-E1          I   205 (  9)     pop hl
-E4C6-C9          I   206 (  9)     ret
-E4C7-            I   207
-E4C7-            I   208
-E4C7-            I   209
-E4C7-            I   210       ; input : a = scan code, hl = pointer to scan code table
-E4C7-            I   211       ; output : a = decoded scan code
-E4C7-            I   212       _kbd_decode_scancode:
-E4C7-E5          I   213 ( 11)     push hl
-E4C8-D5          I   214 ( 11)     push de
-E4C9-            I   215
-E4C9-16 00       I   216 (  6)     ld d,0
-E4CB-5F          I   217 (  4)     ld e,a
-E4CC-19          I   218 (  7)     add hl,de
-E4CD-7E          I   219 (  6)     ld a,(hl)
-E4CE-            I   220
-E4CE-D1          I   221 (  9)     pop de
-E4CF-E1          I   222 (  9)     pop hl
-E4D0-C9          I   223 (  9)     ret
-E4D1-            I   224
-E4D1-            I   225       scan_codes:
-E4D1-            I   226           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
-E4D1-00 00 00 00 
+E46B-FE 00       I   135 (  6)     cp 0                        ; do nothing if no code found
+E46D-CA AE E4    I   136 ( 6+)     jp Z,_int_kbd_exit
+E470-            I   137
+E470-77          I   138 (  7)     ld (hl),a                   ; save it to  kbd_buffer+(kbd_buffer_pos)
+E471-            I   139
+E471-FE 0A       I   140 (  6)     cp 10                       ; insert CR if ASCII code == LF (10)
+E473-C2 7F E4    I   141 ( 6+)     jp NZ,_kbd_int_incr_buffer_pos
+E476-23          I   142 (  4)     inc hl
+E477-3E 0D       I   143 (  6)     ld a,13
+E479-77          I   144 (  7)     ld (hl),a
+E47A-7B          I   145 (  4)     ld a,e
+E47B-3C          I   146 (  4)     inc a
+E47C-32 65 E6    I   147 ( 13)     ld (kbd_buffer_pos),a
+E47F-            I   148
+E47F-            I   149       _kbd_int_incr_buffer_pos:
+E47F-3A 65 E6    I   150 ( 12)     ld a,(kbd_buffer_pos)               ; inc kbd_buffer_pos
+E482-3C          I   151 (  4)     inc a
+E483-32 65 E6    I   152 ( 13)     ld (kbd_buffer_pos),a
+E486-18 26       I   153 (  8)     jr _int_kbd_exit
+E488-            I   154
+E488-            I   155       _int_kbd_E0:
+E488-21 64 E6    I   156 (  9)     ld hl,kbd_state                     ; clear E0 flag in kbd_state
+E48B-CB A6       I   157 ( 13)     res KBD_STATE_E0,(hl)
+E48D-18 1F       I   158 (  8)     jr _int_kbd_exit
+E48F-            I   159
+E48F-            I   160       _int_kbd_F0:
+E48F-21 64 E6    I   161 (  9)    ld hl,kbd_state                      ; clear F0 flag in kbd_state
+E492-CB 9E       I   162 ( 13)    res KBD_STATE_F0,(hl)
+E494-            I   163
+E494-78          I   164 (  4)    ld a,b                               ; clear SHIFT flag if key was LSHIFT
+E495-FE 12       I   165 (  6)    cp $12 ; LSHIFT
+E497-C2 9E E4    I   166 ( 6+)    jp NZ,_int_kbd_F0_rshift
+E49A-CB 86       I   167 ( 13)    res KBD_STATE_SHIFT,(hl)
+E49C-18 10       I   168 (  8)    jr _int_kbd_exit
+E49E-            I   169
+E49E-            I   170       _int_kbd_F0_rshift:                      ; clear SHIFT flag if key was LSHIFT
+E49E-FE 59       I   171 (  6)    cp $59 ; RSHIFT
+E4A0-C2 A7 E4    I   172 ( 6+)    jp NZ,_int_kbd_F0_alt
+E4A3-CB 86       I   173 ( 13)    res KBD_STATE_SHIFT,(hl)
+E4A5-18 07       I   174 (  8)    jr _int_kbd_exit
+E4A7-            I   175
+E4A7-            I   176       _int_kbd_F0_alt:                         ; clear ALT flag if key was LSHIFT
+E4A7-FE 11       I   177 (  6)    cp $11 ; ALT
+E4A9-C2 AE E4    I   178 ( 6+)    jp NZ,_int_kbd_exit
+E4AC-CB 8E       I   179 ( 13)    res KBD_STATE_ALT,(hl)
+E4AE-            I   180
+E4AE-            I   181       _int_kbd_exit:
+E4AE-D9          I   182 (  3)     exx                         ; end of keyboard interrupt routine.
+E4AF-F1          I   183 (  9)     pop af
+E4B0-FB          I   184 (  3)     ei
+E4B1-C9          I   185 (  9)     ret
+E4B2-            I   186
+E4B2-            I   187       ; check if kbd buffer is empty
+E4B2-            I   188       ; input : NONE
+E4B2-            I   189       ; output : flag=Z if empty
+E4B2-            I   190       _kbd_is_empty:
+E4B2-3A 65 E6    I   191 ( 12)     ld a,(kbd_buffer_pos)
+E4B5-FE 00       I   192 (  6)     cp 0
+E4B7-C9          I   193 (  9)     ret
+E4B8-            I   194
+E4B8-            I   195       ; Get next key in buffer
+E4B8-            I   196       _kbd_get_key:
+E4B8-D5          I   197 ( 11)     push de
+E4B9-E5          I   198 ( 11)     push hl
+E4BA-            I   199
+E4BA-3A 65 E6    I   200 ( 12)      ld a,(kbd_buffer_pos)
+E4BD-            I   201
+E4BD-FE 00       I   202 (  6)      cp 0                       ; exit value=0 if no key in buffer
+E4BF-28 0C       I   203 ( 6+)      jr Z,_kbd_get_key_exit
+E4C1-            I   204
+E4C1-3D          I   205 (  4)      dec a
+E4C2-32 65 E6    I   206 ( 13)      ld (kbd_buffer_pos),a
+E4C5-16 00       I   207 (  6)      ld d,0
+E4C7-5F          I   208 (  4)      ld e,a
+E4C8-21 66 E6    I   209 (  9)      ld hl,kbd_buffer
+E4CB-19          I   210 (  7)      add hl,de
+E4CC-7E          I   211 (  6)      ld a,(hl)
+E4CD-            I   212
+E4CD-            I   213       _kbd_get_key_exit:
+E4CD-E1          I   214 (  9)     pop hl
+E4CE-D1          I   215 (  9)     pop de
+E4CF-C9          I   216 (  9)     ret
+E4D0-            I   217
+E4D0-            I   218       ; input : a = scan code, hl = pointer to scan code table
+E4D0-            I   219       ; output : a = decoded scan code
+E4D0-            I   220       _kbd_decode_scancode:
+E4D0-D5          I   221 ( 11)     push de
+E4D1-E5          I   222 ( 11)     push hl
+E4D2-            I   223
+E4D2-16 00       I   224 (  6)     ld d,0
+E4D4-5F          I   225 (  4)     ld e,a
+E4D5-19          I   226 (  7)     add hl,de
+E4D6-7E          I   227 (  6)     ld a,(hl)
+E4D7-            I   228
+E4D7-E1          I   229 (  9)     pop hl
+E4D8-D1          I   230 (  9)     pop de
+E4D9-C9          I   231 (  9)     ret
+E4DA-            I   232
+E4DA-            I   233       scan_codes:
+E4DA-            I   234           ; 00-0F : n/a F9 n/a F5 F3 F1 F2 F12 n/a F10 F8 F6 F4 TAB ² n/a
+E4DA-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     09 C2 B2 00 I   227           .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
-E4E1-            I   228           ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
-E4E1-00 00 00 00 
+     09 C2 B2 00 I   235           .db 0,0,0,0,0,0,0,0,0,0,0,0,9,'²',0
+E4EA-            I   236           ; 10-1F : n/a n/a LSHIFT n/a n/a a & n/a n/a n/a n/a w s q z é n/a
+E4EA-00 00 00 00 
      00 61 26 00 
      00 00 77 73 
-     71 7A 82 00 I   229           .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
-E4F1-            I   230           ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
-E4F1-00 63 78 64 
+     71 7A 82 00 I   237           .db 0,0,0,0,0,'a','&',0,0,0,'w','s','q','z',130,0
+E4FA-            I   238           ; 20-2F : n/a c x d e ' " n/a n/a SPACE v f t r ( n/a
+E4FA-00 63 78 64 
      65 27 22 00 
      00 20 76 66 
-     74 72 28 00 I   231           .db 0,'c','x','d','e',39,34,0,0,' ','v','f','t','r','(',0
-E501-            I   232           ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
-E501-00 6E 62 68 
+     74 72 28 00 I   239           .db 0,'c','x','d','e',39,34,0,0,' ','v','f','t','r','(',0
+E50A-            I   240           ; 30-3F : n/a n b h g y - n/a n/a n/a , j u è _ n/a
+E50A-00 6E 62 68 
      67 79 2D 00 
      00 00 2C 6A 
-     75 8A 5F 00 I   233           .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
-E511-            I   234           ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
-E511-00 3B 6B 69 
+     75 8A 5F 00 I   241           .db 0,'n','b','h','g','y','-',0,0,0,',','j','u',138,'_',0
+E51A-            I   242           ; 40-4F : n/a ; k i o à ç n/a n/a : ! l m p ) n/a
+E51A-00 3B 6B 69 
      6F 85 87 00 
      00 3A 21 6C 
-     6D 70 29 00 I   235           .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
-E521-            I   236           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
-E521-00 00 97 00 
+     6D 70 29 00 I   243           .db 0,59,'k','i','o',133,135,0,0,':','!','l','m','p',')',0
+E52A-            I   244           ; 50-5F : n/a n/a ù n/a ^ = n/a n/a CAPS RSHIFT RETURN $ n/a * n/a n/a
+E52A-00 00 97 00 
      5E 3D 00 00 
      00 00 0A 24 
-     00 2A 00 00 I   237           .db 0,0,151,0,'^','=',0,0,0,0,10,'$',0,'*',0,0
-E531-            I   238           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
-E531-00 3C 00 00 
+     00 2A 00 00 I   245           .db 0,0,151,0,'^','=',0,0,0,0,10,'$',0,'*',0,0
+E53A-            I   246           ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+E53A-00 3C 00 00 
      00 00 08 00 
      00 31 00 34 
-     37 00 00 00 I   239           .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
-E541-            I   240           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-E541-30 2C 32 35 
+     37 00 00 00 I   247           .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+E54A-            I   248           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+E54A-30 2C 32 35 
      36 38 00 00 
      00 2B 33 2D 
-     2A 39 00    I   241           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
-E550-            I   242           ; 80-83 : n/a n/a n/a F7
-E550-00 00 00 00 I   243           .db 0,0,0,0
-E554-            I   244
-E554-            I   245       scan_codes_shift:
-E554-            I   246           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
-E554-00 00 00 00 
+     2A 39 00    I   249           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+E559-            I   250           ; 80-83 : n/a n/a n/a F7
+E559-00 00 00 00 I   251           .db 0,0,0,0
+E55D-            I   252
+E55D-            I   253       scan_codes_shift:
+E55D-            I   254           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a TAB n/a n/a
+E55D-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 09 00 00 I   247           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
-E564-            I   248           ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
-E564-00 00 00 00 
+     00 09 00 00 I   255           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0
+E56D-            I   256           ; 10-1F : n/a n/a n/a n/a n/a A 1 n/a n/a n/a n/a W S Q Z 2 n/a
+E56D-00 00 00 00 
      00 41 31 00 
      00 00 57 53 
-     51 5A 32 00 I   249           .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
-E574-            I   250           ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
-E574-00 43 58 44 
+     51 5A 32 00 I   257           .db 0,0,0,0,0,'A','1',0,0,0,'W','S','Q','Z','2',0
+E57D-            I   258           ; 20-2F : n/a C X D E 4 3 n/a n/a SPACE V F T R 5 n/a
+E57D-00 43 58 44 
      45 34 33 00 
      00 20 56 46 
-     54 52 35 00 I   251           .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
-E584-            I   252           ; 30-3F : n/a N B H G Y 6 n/a n/a n/a ? J U 7 8 n/a
-E584-00 4E 42 48 
+     54 52 35 00 I   259           .db 0,'C','X','D','E','4','3',0,0,' ','V','F','T','R','5',0
+E58D-            I   260           ; 30-3F : n/a N B H G Y 6 n/a n/a n/a ? J U 7 8 n/a
+E58D-00 4E 42 48 
      47 59 36 00 
      00 00 3F 4A 
-     55 37 38 00 I   253           .db 0,'N','B','H','G','Y','6',0,0,0,'?','J','U','7','8',0
-E594-            I   254           ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
-E594-00 2E 4B 49 
+     55 37 38 00 I   261           .db 0,'N','B','H','G','Y','6',0,0,0,'?','J','U','7','8',0
+E59D-            I   262           ; 40-4F : n/a . K I O 0 9 n/a n/a / § L M P ° n/a
+E59D-00 2E 4B 49 
      4F 30 39 00 
      00 2F 9E 4C 
-     4D 50 A7 00 I   255           .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
-E5A4-            I   256           ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
-E5A4-00 00 25 00 
+     4D 50 A7 00 I   263           .db 0,'.','K','I','O','0','9',0,0,'/',158,'L','M','P',167,0
+E5AD-            I   264           ; 50-5F : n/a n/a % n/a ¨ + n/a n/a CAPS RSHIFT RETURN £ n/a µ n/a n/a
+E5AD-00 00 25 00 
      7E 2B 00 00 
      00 00 0A 9C 
-     00 E6 00 00 I   257           .db 0,0,'%',0,126,'+',0,0,0,0,10,156,0,230,0,0
-E5B4-            I   258           ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
-E5B4-00 3E 00 00 
+     00 E6 00 00 I   265           .db 0,0,'%',0,126,'+',0,0,0,0,10,156,0,230,0,0
+E5BD-            I   266           ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
+E5BD-00 3E 00 00 
      00 00 08 00 
      00 31 00 34 
-     37 00 00 00 I   259           .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
-E5C4-            I   260           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-E5C4-30 2C 32 35 
+     37 00 00 00 I   267           .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
+E5CD-            I   268           ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
+E5CD-30 2C 32 35 
      36 38 00 00 
      00 2B 33 2D 
-     2A 39 00    I   261           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
-E5D3-            I   262           ; 80-83 : n/a n/a n/a F7
-E5D3-00 00 00 00 I   263           .db 0,0,0,0
-E5D7-            I   264
-E5D7-            I   265       scan_codes_alt:
-E5D7-            I   266           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E5D7-00 00 00 00 
+     2A 39 00    I   269           .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+E5DC-            I   270           ; 80-83 : n/a n/a n/a F7
+E5DC-00 00 00 00 I   271           .db 0,0,0,0
+E5E0-            I   272
+E5E0-            I   273       scan_codes_alt:
+E5E0-            I   274           ; 00-0F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E5E0-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00 I   267           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-E5E7-            I   268           ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
-E5E7-00 00 00 00 
+     00 00 00 00 I   275           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E5F0-            I   276           ; 10-1F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a ~ n/a
+E5F0-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 7E 00 I   269           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
-E5F7-            I   270           ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
-E5F7-00 00 00 00 
+     00 00 7E 00 I   277           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,'~',0
+E600-            I   278           ; 20-2F : n/a n/a n/a n/a n/a { # n/a n/a SPACE n/a n/a n/a n/a [ n/a
+E600-00 00 00 00 
      00 7B 23 00 
      00 20 00 00 
-     00 00 5B 00 I   271           .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
-E607-            I   272           ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
-E607-00 00 00 00 
+     00 00 5B 00 I   279           .db 0,0,0,0,0,'{','#',0,0,' ',0,0,0,0,'[',0
+E610-            I   280           ; 30-3F : n/a n/a n/a n/a n/a n/a | n/a n/a n/a n/a n/a n/a ` \ n/a
+E610-00 00 00 00 
      00 00 7C 00 
      00 00 00 00 
-     00 60 5C 00 I   273           .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
-E617-            I   274           ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
-E617-00 00 00 00 
+     00 60 5C 00 I   281           .db 0,0,0,0,0,0,'|',0,0,0,0,0,0,'`',92,0
+E620-            I   282           ; 40-4F : n/a n/a n/a n/a n/a @ ^ n/a n/a n/a n/a n/a n/a n/a ] n/a
+E620-00 00 00 00 
      00 40 5E 00 
      00 00 00 00 
-     00 00 5D 00 I   275           .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
-E627-            I   276           ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E627-00 00 00 00 
+     00 00 5D 00 I   283           .db 0,0,0,0,0,'@','^',0,0,0,0,0,0,0,']',0
+E630-            I   284           ; 50-5F : n/a n/a n/a n/a n/a } n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E630-00 00 00 00 
      00 7D 00 00 
      00 00 00 00 
-     00 00 00 00 I   277           .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
-E637-            I   278           ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E637-00 00 00 00 
+     00 00 00 00 I   285           .db 0,0,0,0,0,'}',0,0,0,0,0,0,0,0,0,0
+E640-            I   286           ; 60-6F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E640-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00 I   279           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-E647-            I   280           ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
-E647-00 00 00 00 
+     00 00 00 00 I   287           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E650-            I   288           ; 70-7F : n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a n/a
+E650-00 00 00 00 
      00 00 00 00 
      00 00 00 00 
-     00 00 00 00 I   281           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-E657-            I   282           ; 80-83 : n/a n/a n/a F7
-E657-00 00 00 00 I   283           .db 0,0,0,0
-E65B-            I   284
-E65B-            I   285
-E65B-            I   286            ; RAM
-E65B-            I   287       kbd_state: .bs 1
-E65C-            I   288       kbd_buffer_pos:    .bs 1
-E65D-            I   289       kbd_buffer: .bs 64
+     00 00 00 00 I   289           .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E660-            I   290           ; 80-83 : n/a n/a n/a F7
+E660-00 00 00 00 I   291           .db 0,0,0,0
+E664-            I   292
+E664-            I   293
+E664-            I   294            ; RAM
+E664-            I   295       kbd_state: .bs 1
+E665-            I   296       kbd_buffer_pos:    .bs 1
+E666-            I   297       kbd_buffer: .bs 64
