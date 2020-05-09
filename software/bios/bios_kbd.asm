@@ -246,7 +246,7 @@ scan_codes:
     ; 60-6F : n/a < n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
     .db 0,'<',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
     ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-    .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+    .db '0',',','2','5','6','8',27,0,0,'+','3','-','*','9',0
     ; 80-83 : n/a n/a n/a F7
     .db 0,0,0,0
 
@@ -266,7 +266,7 @@ scan_codes_shift:
     ; 60-6F : n/a > n/a n/a n/a n/a BACKSPACE n/a n/a PAD_1 n/a PAD_4 PAD_7 n/a n/a n/a
     .db 0,'>',0,0,0,0,8,0,0,'1',0,'4','7',0,0,0
     ; 70-7F : PAD_0 PAD_, PAD_2 PAD_5 PAD_6 PAD_8 ESC P_VERNUM F11 PAD_+ PAD_3 PAD_- PAD_* PAD_9 ARRET_DEFIL
-    .db '0',',','2','5','6','8',0,0,0,'+','3','-','*','9',0
+    .db '0',',','2','5','6','8',27,0,0,'+','3','-','*','9',0
     ; 80-83 : n/a n/a n/a F7
     .db 0,0,0,0
 
