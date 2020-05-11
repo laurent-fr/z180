@@ -22,16 +22,21 @@ _vdu_init:
      out0 (RLDR0L),a
 
     ; enable PRT0 interrupt
-    ld a, TCR_TIE0|TCR_TDE0
+    in0 a,(TCR) 
+    or TCR_TIE0|TCR_TDE0
     out0 (TCR),a 
 
+    ; init variables 
     xor a
-    ld (vdu_cursor_status),a
-    ld hl,(VDU_PTR)
+    ld (vdu_cursor_status),a        ; vdu_cursor_status <- 0
+    ld (vdu_term_flag),a            ; vdu_termc_flag <- 0
+    ld hl,(VDU_PTR)                 ; (vdu_cursor_ptr) <- (VDU_PTR)
     ld (vdu_cursor_ptr),hl
-    ld a,30
+    inc hl                          ; (vdu_cursor_save_attr) <- (VDU_ATTR+1)
+    ld a,(hl)
+    ld (vdu_cursor_save_attr),a
+    ld a,30                         ; (vdu_cursor_blink) <- 30
     ld (vdu_cursor_blink),a
-
 
     ret
 
@@ -46,49 +51,49 @@ _int_vdu:
     ld hl,(vdu_cursor_ptr) ; compare vdu_cusror_ptr and VDU_PTR
     ld de,(VDU_PTR)
     
-    or a                    ; "16 bits cp"
-    sbc hl,de
-    add hl,de
-    
-    jr nc,_int_vdu_blink
+    sbc hl,de ; test if hl==de 
+    ld a,h 
+    or l 
 
-    ld a,vdu_cursor_status
+    jr Z,_int_vdu_dec_blink_timer
+
+    ld a,(vdu_cursor_status)  ; test if vdu_cursor_status==0
     cp 0
-    jp nz,_int_vdu_blink
+    jp Z,_int_vdu_update_ptr
 
     ld hl,(vdu_cursor_ptr)  ; delete cursor at old location
     inc hl
-    ld a,(hl)
-    rlca
-    rlca
-    rlca
-    rlca
+    ld a,(vdu_cursor_save_attr)
     ld (hl),a
 
-    ld (vdu_cursor_ptr),de  ; update cursor_ptr
-
-    ld a,1
+    xor a                      ; reset cursor status
     ld (vdu_cursor_status),a
 
-    jr _int_vdu_reverse_cursor ; display cursor at new location
+_int_vdu_update_ptr:
+    ld hl,(VDU_PTR)
+    ld (vdu_cursor_ptr),hl  ; update cursor_ptr
+    jr _int_vdu_do_blink
 
-_int_vdu_blink:
+    inc hl
+    ld a,(hl)
+    ld (vdu_cursor_save_attr),a
+
+_int_vdu_dec_blink_timer:
+
     ld a,(vdu_cursor_blink)     ; /60 divider for cursor blink
     dec a 
     ld (vdu_cursor_blink),a
     cp 0
     jp nz,_int_vdu_exit
 
-    ld a,30
+_int_vdu_blink:
+
+    ld a,30                     ; set blink counter to 30 (1/2s blink speed)
     ld (vdu_cursor_blink),a
 
-    ld a,(vdu_cursor_status)
-    xor 1
-    ld (vdu_cursor_status),a
+_int_vdu_do_blink:
 
-_int_vdu_reverse_cursor:
-    
-    ld hl,(VDU_PTR)
+    ld hl,(VDU_PTR) ; reverse current location colour attribute
     inc hl          ; hl <- current color attribute address
     ld a,(hl)
     rlca
@@ -97,7 +102,81 @@ _int_vdu_reverse_cursor:
     rlca
     ld (hl),a
 
+    ld a,(vdu_cursor_status)     ; reverse cursor_status
+    xor 1
+    ld (vdu_cursor_status),a
+
+
 _int_vdu_exit:
+
+    ; TMP !
+    ;ld a,(vdu_cursor_status)
+    ;add '0'
+    ;ld hl,VDU_RAM
+    ;ld (hl),a
+
+    ;push bc 
+    ;ld a,(VDU_X)
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+10
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+
+    ;ld a,(VDU_Y)
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+16
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+
+    ;ld a,(VDU_PTR+1)
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+22
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+
+    ;ld a,(VDU_PTR)
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+26
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+
+    ;ld a,(vdu_cursor_ptr+1)
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+32
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+
+    ;ld a,(vdu_cursor_ptr)
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+36
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+    ;pop bc
+
     pop de
     pop hl
     pop af
@@ -186,68 +265,112 @@ _vdu_scroll_loop_line25:
 ; vdu_putc_term
 ; put a char on the screen, at current location, with current attribute, interpreting special codes :
 ;   VT-52 Terminal ( see http://toshyp.atari.org/en/VT_52_terminal.html )
-;   BS - Backspace - 0x08
-;   BEL - Bell - 0x07
+;   * NUL - Null - 0x00
+;   ~ BEL - Bell - 0x07
+;   ~ BS - Backspace - 0x08
+;   HT - Tabulator - 0x09
+;   FF - Form feed - 0x0c
+;   * CR - Carriage return - 0x0d
+;   * LF - Line feed - 0x0a
+;   ESC A - Cursor up - 0x1b , A
+;   ESC B - Cursor down - 0x1b , B
+;   ESC C - Cursor right - 0x1b , C
+;   ESC D - Cursor left - 0x1b , D
+;   ~ ESC E - Clear Screen - 0x1b , E
+;   ESC H - Cursor home - 0x1b , H
+;   ESC I - Cursor up and insert - 0x1b , I
 ;   ESC J - Clear to end of scren - 0x1b , J
 ;   ESC K - Clear to end of line - 0x1b , K
-;   ESC E - Clear Screen - 0x1b , E
-;   ESC l - Clear line - 0x1b , l
-;   ESC o - Clear to start of line - 0x1b , o
-;   ESC d - Clear to start of screen - 0x1b , d
-;   ESC B - Cursor down - 0x1b , B
-;   ESC H - Cursor home - 0x1b , H
-;   ESC D - Cursor left - 0x1b , D
-;   ESC C - Cursor right - 0x1b , C
-;   ESC A - Cursor up - 0x1b , A
+;   ESC L - Insert line - 0x1b , L
 ;   ESC M - Delete line - 0x1b , M
 ;   ESC Y - Set cursor position - 0x1b , Y , ' '+x , ' '+y
-;   ESC b - Set text color - 0x1b , b , color
-;   ESC L - Insert line - 0x1b , L
-;   LF - Line feed - 0x0a
-;   ESC k - Restore cursor position - 0x1b , k
-;   ESC c - Set Background color - 0x1b , c , color
-;   CR - Carriage return - 0x0d
-;   ESC q - Normal video - 0x1b , q
-;   ESC p - Reverse video - 0x1b , p
-;   ESC j - Save cursor position - 0x1b , j
-;   ESC I - Cursor up and insert - 0x1b , I
-;   FF - Form feed - 0x0c
-;   HT - Tabulator - 0x09
-;   ESC w - Wrap off - 0x1b , w
-;   ESC v - Wrap on - 0x1b , v
+;   * ESC b - Set text color - 0x1b , b , color
+;   ~ ESC c - Set Background color - 0x1b , c , color
 ;   ESC e - Show cursor
 ;   ESC f - Hide cursor
-;   blink on
-;   blink off
 ; input : a = char to print
 ; output : none
 
 _vdu_putc_term:
 
+    ;call _asci1_putc
 
-_vdu_putc_term_LF:
-    cp $0A
-    jr nz,_vdu_putc_term_CS
-    call _vdu_do_LF
-    jr _vdu_putc_term_exit
+    ; TMP
+    ;push af 
+    ;push bc 
+    ;push hl 
+    ;call _util_byte_to_ascii_hex
+    ;ld hl,VDU_RAM+42
+    ;ld a,b
+    ;ld (hl),a
+    ;inc hl 
+    ;inc hl 
+    ;ld a,c 
+    ;ld (hl),a
+    ;pop hl 
+    ;pop bc 
+    ;pop af 
 
-_vdu_putc_term_CS:  
-    cp $0C
-    jr nz,_vdu_putc_term_CR
-    call _vdu_cls
-    jr _vdu_putc_term_exit
+    ; check if a flag is set in vdu_term_flag
+    push hl                     ; <---- must be POPed in subprogram
+    ld hl,vdu_term_flag
 
-_vdu_putc_term_CR:
-   cp $0D 
-   jr nz,_vdu_putc_term_print
-   call _vdu_do_CR
-   jr _vdu_putc_term_exit
+    bit VDU_TERM_ESC,(hl)       ; check if previous char was ESC
+    jr NZ,_vdu_do_ESC2
+    bit VDU_TERM_FCOL,(hl)      ; check if previous chars were ESC+'b'
+    jp NZ,_vdu_do_set_fcol2
+    bit VDU_TERM_BCOL,(hl)      ; check if previous chars were ESC+'c'
+    jp NZ,_vdu_do_set_bcol2
 
-_vdu_putc_term_print:
+    pop hl                      ; pop HL if no flag matched
+
+    ; non printable chars
+    cp $00 ; NUL
+    ret Z
+    cp $07 ; BEL
+    jr Z,_vdu_do_bell
+    cp  $08 ; BS
+    jr Z,_vdu_do_BS
+    cp $0A ; LF
+    jr Z,_vdu_do_LF
+    cp $0C ; CS
+    jp Z,_vdu_cls
+    cp $0D ; CR 
+    jr Z,_vdu_do_CR
+    cp $1B ; ESC
+    jr Z,_vdu_do_ESC
+
+    ; printable char
     call _vdu_putc
-
-_vdu_putc_term_exit:
     ret
+
+_vdu_do_bell:
+    call _snd_beep
+    ret
+
+_vdu_do_BS:
+    push af
+    push hl
+
+    ld a,(VDU_X)                ; go left if X>0
+    cp 0
+    jp z,_vdu_do_BS_exit
+  
+    ld hl,VDU_RAM+70
+    ld (hl),'B'
+
+    dec a
+    ld (VDU_X),a
+    ld hl,(VDU_PTR)
+    dec hl
+    dec hl
+    ld (VDU_PTR),hl
+
+_vdu_do_BS_exit:
+    pop hl
+    pop af
+    ret
+
 
 _vdu_do_CR:
     push af
@@ -274,6 +397,116 @@ _vdu_do_LF_set_ptr:
     ret
 
 
+; ESC key
+; set VDU_TERM_ESC flag
+_vdu_do_ESC:
+    push hl 
+    ld hl,vdu_term_flag
+    set VDU_TERM_ESC,(hl)
+    pop hl 
+    ret 
+
+; ESC key 2
+; input : a <- char after ESC
+_vdu_do_ESC2:
+                 ; reset ESC flag
+    ld hl,vdu_term_flag
+    res VDU_TERM_ESC,(hl)
+    pop hl                  ; "push hl" was in _vdu_putc_term
+
+    cp 'b'  
+    jr Z,_vdu_do_set_fcol
+    cp 'c'
+    jr Z,_vdu_do_set_bcol
+    ; cp 'e'
+    ; cp 'f'
+    ; cp 'A'
+    ; cp 'B'
+    ; cp 'C'
+    ; cp 'D'
+    cp 'E'
+    jr 'Z',_vdu_cls
+    ; cp 'H'
+    ; cp 'I'
+    ; cp 'J'
+    ; cp 'K'
+    ; cp 'L'
+    ; cp 'M'
+    ; cp 'Y'
+
+    ret
+
+; ESC + "b"
+; set VDU_TERM_FCOL flag 
+_vdu_do_set_fcol:
+    push hl
+    ld hl,vdu_term_flag
+    set VDU_TERM_FCOL,(hl)
+    pop hl
+    ret
+
+; ESC + "b" + color
+; reset VDU_TERM_FCOL flag and update foreground color in VDU_ATTR 
+; input : a : foreground color code (0-15)
+_vdu_do_set_fcol2:
+    push af 
+    push bc 
+                ; reset FCOL flag
+    ld hl,vdu_term_flag
+    res VDU_TERM_FCOL,(hl)
+ 
+    and $0F
+    ld b,a 
+
+    ld a,(VDU_ATTR)
+    and $F0
+    or b 
+    ld (VDU_ATTR),a 
+
+    pop bc 
+    pop af 
+
+    pop hl ; "push hl" was in _vdu_putc_term
+    ret
+
+; ESC + "c"
+; set VDU_TERM_BCOL flag 
+_vdu_do_set_bcol:
+    push hl
+    ld hl,vdu_term_flag
+    set VDU_TERM_BCOL,(hl)
+    pop hl
+    ret
+
+; ESC + "c" + color
+; reset VDU_TERM_FCOL flag and update background color in VDU_ATTR 
+; input : a : background color code (0-15)
+_vdu_do_set_bcol2:
+    push af 
+    push bc 
+                ; reset FCOL flag
+    ld hl,vdu_term_flag
+    res VDU_TERM_BCOL,(hl)
+ 
+    rla
+    rla
+    rla
+    rla
+    and $F0
+    ld b,a 
+
+    ld a,(VDU_ATTR)
+    and $0F
+    or b 
+    ld (VDU_ATTR),a 
+
+    pop bc 
+    pop af 
+
+    pop hl ; "push hl" was in _vdu_putc_term
+    ret
+
+
 ; vdu_putc
 ; put a char on the screen, at current location, with current attribute
 ; input : a = char to display
@@ -288,6 +521,7 @@ _vdu_putc:
     ld a,(VDU_ATTR)     ; fetch attribute from VDU_ATTR
     ld (de),a           ; write attribute to video memory
     inc de              ; go to next char
+    ld (VDU_PTR),de     ; save VDU_PTR
     ld a,(VDU_X)        ; get X position
     inc a               ; increment
     ld (VDU_X),a
@@ -296,7 +530,6 @@ _vdu_putc:
     call _vdu_next_line
 
 _vdu_putc_exit:
-    ld (VDU_PTR),de
 
     pop de
     pop af
@@ -310,7 +543,7 @@ _vdu_next_line:
     push af
     push de
 
-    ld a,0              ; reset X
+    xor a              ; reset X
     ld (VDU_X),a
     ld a,(VDU_Y)        ; increment Y
     inc a
@@ -411,3 +644,13 @@ VDU_PTR             .bs 2     ; Current position in video RAM, should always be 
 vdu_cursor_ptr          .bs 2
 vdu_cursor_blink      .bs 1
 vdu_cursor_status     .bs 1
+vdu_cursor_save_attr    .bs 1
+
+VDU_TERM_ESC        .equ 1
+VDU_TERM_FCOL       .equ 2
+VDU_TERM_BCOL       .equ 3
+VDU_TERM_SETX       .equ 4
+VDU_TERM_SETY       .equ 5
+VDU_TERM_CURSOR     .equ 6
+
+vdu_term_flag   .bs 1

@@ -37,19 +37,23 @@
 
 .vdu_set_attr:      jp _vdu_set_attr
 .vdu_cls:           jp _vdu_cls
-.vdu_scroll_up      jp _vdu_scroll_up
-.vdu_putc_term      jp _vdu_putc_term
-.vdu_putc           jp _vdu_putc
-.vdu_next_line      jp _vdu_next_line
-.vdu_puts           jp _vdu_puts
+.vdu_scroll_up:      jp _vdu_scroll_up
+.vdu_putc_term:      jp _vdu_putc_term
+.vdu_putc:           jp _vdu_putc
+.vdu_next_line:      jp _vdu_next_line
+.vdu_puts:           jp _vdu_puts
 
     ; KBD
 .kbd_init:          jp _kbd_init
 .int_kbd:           jp _int_kbd 
-.kbd_is_empty       jp _kbd_is_empty
-.kbd_get_key        jp _kbd_get_key
+.kbd_is_empty:       jp _kbd_is_empty
+.kbd_get_key:        jp _kbd_get_key
+.kbd_wait_get_key:  jp _kbd_wait_get_key
 
     ; SND
+.snd_init:          jp _snd_init
+.int_snd:           jp _int_snd
+.snd_beep:          jp _snd_beep
 
     ; RTC
 
@@ -57,3 +61,6 @@
     .include bios_asci.asm
     .include bios_vdu.asm
     .include bios_kbd.asm
+    .include bios_snd.asm
+
+    .include bios_util.asm

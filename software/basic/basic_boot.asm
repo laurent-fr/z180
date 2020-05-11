@@ -15,15 +15,21 @@ int_asci0 .equ $E004
 int_asci1 .equ $E016
 asci0_init .equ $E001
 asci1_init .equ $E013
+
 vdu_init .equ $E025
 int_vdu .equ $E028
 vdu_set_attr .equ $E02B
 vdu_cls .equ $E02E
 vdu_putc_term .equ $E034
+
 kbd_init .equ $E040 
 int_kbd .equ $E043 
 kbd_is_empty .equ $E046 
-kbd_get_key .equ $E049
+kbd_wait_get_key .equ $E04C
+
+snd_init .equ $E04F
+int_snd .equ $E052
+snd_beep .equ $E055
 
     .org $0000
     jp  mreset
@@ -36,7 +42,7 @@ rst08:
 rst10:
     .org $0010
     ;jp asci1_getc
-    jp kbd_get_key
+    jp kbd_wait_get_key
 
 rst18:
     .org $0018
@@ -54,7 +60,7 @@ rst18:
     .dw int_kbd    ; INT1
     .dw int_noop    ; INT2
     .dw int_vdu    ; PRT0
-    .dw int_vdu    ; PRT1
+    .dw int_snd    ; PRT1
     .dw int_noop    ; DMA0
     .dw int_noop    ; DMA1
     .dw int_noop    ; CSIO
@@ -83,7 +89,7 @@ mreset:
     call asci0_init
     call asci1_init
 
-    ld a,$4B
+    ld a,$CF
     call vdu_set_attr
     call vdu_init
 
@@ -97,6 +103,9 @@ mreset:
     out0 (IL),a
 
     ei      ; enable interrupts
+
+    call snd_init
+    call snd_beep
 
     jp COLD
 

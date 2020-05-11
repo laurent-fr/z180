@@ -158,37 +158,39 @@ COPY:   LD      A,(DE)          ; Get source
         CALL    PRNTCRLF        ; Output CRLF
         LD      (BUFFER+72+1),A ; Mark end of buffer
         LD      (PROGST),A      ; Initialise program area
-MSIZE:  LD      HL,MEMMSG       ; Point to message
-        CALL    PRS             ; Output "Memory size"
-        CALL    PROMPT          ; Get input with '?'
-        CALL    GETCHR          ; Get next character
-        OR      A               ; Set flags
-        JP      NZ,TSTMEM       ; If number - Test if RAM there
-        LD      HL,STLOOK       ; Point to start of RAM
-MLOOP:  INC     HL              ; Next byte
-        LD      A,H             ; Above address FFFF ?
-        OR      L
-        JP      Z,SETTOP        ; Yes - 64K RAM
-        LD      A,(HL)          ; Get contents
-        LD      B,A             ; Save it
-        CPL                     ; Flip all bits
-        LD      (HL),A          ; Put it back
-        CP      (HL)            ; RAM there if same
-        LD      (HL),B          ; Restore old contents
-        JP      Z,MLOOP         ; If RAM - test next byte
-        JP      SETTOP          ; Top of RAM found
+MSIZE: ; LD      HL,MEMMSG       ; Point to message
+       ; CALL    PRS             ; Output "Memory size"
+       ; CALL    PROMPT          ; Get input with '?'
+       ; CALL    GETCHR          ; Get next character
+       ; OR      A               ; Set flags
+       ; JP      NZ,TSTMEM       ; If number - Test if RAM there
+       ; LD      HL,STLOOK       ; Point to start of RAM
+;MLOOP:  INC     HL              ; Next byte
+       ; LD      A,H             ; Above address FFFF ?
+       ; OR      L
+       ; JP      Z,SETTOP        ; Yes - 64K RAM
+       ; LD      A,(HL)          ; Get contents
+       ; LD      B,A             ; Save it
+       ; CPL                     ; Flip all bits
+       ; LD      (HL),A          ; Put it back
+       ; CP      (HL)            ; RAM there if same
+       ; LD      (HL),B          ; Restore old contents
+       ; JP      Z,MLOOP         ; If RAM - test next byte
+       ; JP      SETTOP          ; Top of RAM found
 
-TSTMEM: CALL    ATOH            ; Get high memory into DE
-        OR      A               ; Set flags on last byte
-        JP      NZ,SNERR        ; ?SN Error if bad character
-        EX      DE,HL           ; Address into HL
-        DEC     HL              ; Back one byte
-        LD      A,11011001B     ; Test byte
-        LD      B,(HL)          ; Get old contents
-        LD      (HL),A          ; Load test byte
-        CP      (HL)            ; RAM there if same
-        LD      (HL),B          ; Restore old contents
-        JP      NZ,MSIZE        ; Ask again if no RAM
+;TSTMEM: CALL    ATOH            ; Get high memory into DE
+       ; OR      A               ; Set flags on last byte
+       ; JP      NZ,SNERR        ; ?SN Error if bad character
+       ; EX      DE,HL           ; Address into HL
+       ; DEC     HL              ; Back one byte
+       ; LD      A,11011001B     ; Test byte
+       ; LD      B,(HL)          ; Get old contents
+       ; LD      (HL),A          ; Load test byte
+       ; CP      (HL)            ; RAM there if same
+       ; LD      (HL),B          ; Restore old contents
+       ; JP      NZ,MSIZE        ; Ask again if no RAM
+
+        LD      HL,65535-4096   ; LF - Hardcoded memory top
 
 SETTOP: DEC     HL              ; Back one byte
         LD      DE,STLOOK-1     ; See if enough RAM
@@ -221,9 +223,9 @@ WARMST: LD      SP,STACK        ; Temporary stack
 BRKRET: CALL    CLREG           ; Clear registers and stack
         JP      PRNTOK          ; Go to get command line
 
-BFREE:  .DB   " Bytes free",CR,LF,0,0
+BFREE:  .DB   " Bytes free",27,"b",15,CR,LF,0,0
 
-SIGNON: .DB   "Z80 BASIC Ver 4.7b",CR,LF
+SIGNON: .DB   27,"b",7,"Z80 BASIC Ver 4.7b",CR,LF
         .DB   "Copyright ",40,"C",41
         .DB   " 1978 by Microsoft",CR,LF,0,0
 
@@ -590,10 +592,10 @@ INITBE:
 
 ; END OF INITIALISATION TABLE ---------------------------------------------------
 
-ERRMSG: .DB   " Error",0
+ERRMSG: .DB   " Error",27,"b",15,0
 INMSG:  .DB   " in ",0
 ZERBYT  .EQU    $-1             ; A zero byte
-OKMSG:  .DB   "Ok",CR,LF,0,0
+OKMSG:  .DB   27,"b",11,"Ok",27,"b",15,CR,LF,0,0
 BRKMSG: .DB   "Break",0
 
 BAKSTK: LD      HL,4            ; Look for "FOR" block with
@@ -673,7 +675,13 @@ ERROR:  CALL    CLREG           ; Clear registers and stack
         LD      (CTLOFG),A      ; Enable output (A is 0)
         CALL    STTLIN          ; Start new line
         LD      HL,ERRORS       ; Point to error codes
-        LD      D,A             ; D = 0 (A is 0)
+        LD      D,A             ; D = 0 (A is 0)     
+        LD      A,27            ; LF - Error msg in RED
+        CALL    OUTC            ; LF
+        LD      A,'b'           ; LF
+        CALL    OUTC            ; LF
+        LD      A,9             ; LF
+        CALL    OUTC            ; LF
         LD      A,'?'
         CALL    OUTC            ; Output '?'
         ADD     HL,DE           ; Offset to correct error code
