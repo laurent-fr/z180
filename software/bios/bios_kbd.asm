@@ -333,6 +333,8 @@ scan_codes_ctrl:
 
 
      ; RAM
+     .SM ram 
 kbd_state: .bs 1
 kbd_buffer_pos:    .bs 1
 kbd_buffer: .bs 64
+    .SM code

@@ -11,20 +11,17 @@ module sound(
 reg [8:0] pwm;
 reg [7:0] preset;
 
-//assign snd = (preset==8'b00000000) ? 1'b0: pwm[8];
 assign snd = pwm[8];
-//assign snd=data_in[0];
+
 	
 	always @(posedge clk)
 	begin
 		if (wr==1)
 			preset<=data_in;
-			//preset<=100;
 	end
 	
 	always@(posedge clk)
 	begin
-		//pwm<= {1'b0,pwm[7:0]}+{1'b0,preset};
 		pwm<=pwm[7:0]+preset;
 	end
 	

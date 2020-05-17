@@ -425,7 +425,7 @@ _vdu_do_ESC2:
     ; cp 'C'
     ; cp 'D'
     cp 'E'
-    jr 'Z',_vdu_cls
+    jp Z,_vdu_cls
     ; cp 'H'
     ; cp 'I'
     ; cp 'J'
@@ -635,6 +635,7 @@ vdu_line_ptr    .dw     $F000,$F0A0,$F140,$F1E0,$F280,$F320,$F3C0,$F460,$F500,$F
 
 ; RAM
 
+    .SM ram 
 
 VDU_ATTR            .bs 1   ; Color Attribute
 VDU_X               .bs 1   ; Current X position
@@ -654,3 +655,5 @@ VDU_TERM_SETY       .equ 5
 VDU_TERM_CURSOR     .equ 6
 
 vdu_term_flag   .bs 1
+
+    .SM code

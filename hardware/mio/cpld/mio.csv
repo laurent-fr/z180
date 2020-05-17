@@ -1,0 +1,53 @@
+# Copyright (C) 1991-2012 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+
+# Quartus II 64-Bit Version 12.1 Build 177 11/07/2012 SJ Web Edition
+# File: C:\Users\Laurent\Documents\altera\mio\output_files\mio.csv
+# Generated on: Sun May 17 15:32:25 2020
+
+# Note: The column header names should not be changed if you wish to import this .csv file into the Quartus II software.
+
+To,Direction,Location,Fitter Location,Reserved
+TCK,Input,,PIN_32,
+TDI,Input,,PIN_7,
+TDO,Output,,PIN_38,
+TMS,Input,,PIN_13,
+addr[4],Input,PIN_4,PIN_4,
+addr[3],Input,PIN_41,PIN_41,
+addr[2],Input,PIN_40,PIN_40,
+addr[1],Input,PIN_39,PIN_39,
+addr[0],Input,PIN_37,PIN_37,
+ce,Input,PIN_34,PIN_34,
+clk,Input,PIN_43,PIN_43,
+cm0,Input,PIN_31,PIN_31,
+cs_compactflash,Output,PIN_26,PIN_26,
+cs_printer,Output,PIN_19,PIN_19,
+cs_rtc,Output,PIN_21,PIN_21,
+data[7],Bidir,PIN_16,PIN_16,
+data[6],Bidir,PIN_11,PIN_11,
+data[5],Bidir,PIN_14,PIN_14,
+data[4],Bidir,PIN_9,PIN_9,
+data[3],Bidir,PIN_12,PIN_12,
+data[2],Bidir,PIN_8,PIN_8,
+data[1],Bidir,PIN_5,PIN_5,
+data[0],Bidir,PIN_6,PIN_6,
+datack,Output,PIN_29,PIN_29,
+int,Output,PIN_25,PIN_25,
+kbd_clk,Input,PIN_18,PIN_18,
+kbd_data,Input,PIN_20,PIN_20,
+rd,Output,PIN_27,PIN_27,
+reset,Input,PIN_33,PIN_33,
+snd,Output,PIN_24,PIN_24,
+wr,Output,PIN_28,PIN_28,
+divclk,Unknown,PIN_2,,

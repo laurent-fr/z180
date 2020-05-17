@@ -5,7 +5,10 @@
     .TF mz180.hex,INT,16
     .LF mz180.lst
     
-    .include ../../include/z180_defs.asm
+CLOCK       .equ 8
+INT_BASE    .equ $0080
+
+    .include ../include/z180_defs.asm
 
 BIOS_ADDR   .equ    $1000
 BIOS_SIZE   .equ    $1000 

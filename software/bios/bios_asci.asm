@@ -23,10 +23,17 @@ _asci0_init:
     ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
     ; TC = fphi/(2*baud rate*clock mode) - 2
     ; TC = 32000000/(2*9600*1) - 2
-    ld a,$81
-    out0 (ASTC0L),a
-    ld a,$06
-    out0 (ASTC0H),a
+    .DO CLOCK=32
+    ld  hl,$0681
+    .EL 
+    .DO CLOCK=16 
+    ld hl,$033F
+    .EL 
+    ld hl,$019F
+    .FI 
+    .FI 
+    out0 (ASTC0L),l
+    out0 (ASTC0H),h
 
     ; RIE : enable Rx Interrupt
     ld a,STAT0_RIE
@@ -171,10 +178,17 @@ _asci1_init:
     ; 9600 bauds : TC=1665 (681H) --> 9603 bauds
     ; TC = fphi/(2*baud rate*clock mode) - 2
     ; TC = 32000000/(2*9600*1) - 2
-    ld a,$81
-    out0 (ASTC1L),a
-    ld a,$06
-    out0 (ASTC1H),a
+    .DO CLOCK=32
+    ld  hl,$0681 ; 9603 bauds
+    .EL 
+    .DO CLOCK=16 
+    ld hl,$033F ; 9604 bauds
+    .EL 
+    ld hl,$019F ; 9592 bauds
+    .FI 
+    .FI 
+    out0 (ASTC1L),l
+    out0 (ASTC1H),h
 
     ; RIE : enable Rx Interrupt
     ld a,STAT1_RIE
@@ -296,7 +310,11 @@ _asci1_puts_exit:
     ret
 
 ; RAM
+    .SM ram 
+
 asci0_buffer_pos:   .bs 1
 asci0_buffer:       .bs 64
 asci1_buffer_pos:   .bs 1
 asci1_buffer:       .bs 64
+
+    .SM code

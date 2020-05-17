@@ -35,3 +35,31 @@ _util_btah_2_af:
 
     pop af
     ret 
+
+
+_util_init_cpu:
+
+    .DO CLOCK>8
+    ; CMR_X2 : clock * 2 => xtal 16Mhz ---> 32Mhz, phi 8Mhz --> 16Mhz
+    ld a,CMR_X2
+    out0 (CMR),a
+    .FI 
+
+    .DO CLOCK>16
+    ; CCR_CD : phi = XTAL/1 => phi 16Mhz ---> 32Mhz !!!
+    ld a,CCR_CD
+    out0 (CCR),a
+    .FI 
+
+    xor a
+    out0 (RCR),a    ; Refresh disable
+
+    ; setup interrupts
+    im 1    ; interrupt mode 1
+    ld a,INT_BASE>>8  ; interrupts high order byte : 00H
+    ld i,a
+    ld a,INT_BASE&$FF ; interrupts low order byte : 80H
+    out0 (IL),a
+
+
+    ret 

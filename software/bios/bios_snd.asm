@@ -73,6 +73,7 @@ _snd_beep:
 
 
 ; RAM
-
+    .SM ram
 snd_length  .bs 2
 snd_value   .bs 1
+    .SM code
