@@ -1,5 +1,9 @@
 # Software
 
+To assemble the software, you will need SBASM available here : https://www.sbprojects.net/sbasm/
+
+As it is written in Python, you will also need a Python interpreter ...
+
 ## BASIC
 
 * nascom.basic.grant.searle : backup of NASCOM BASIC adapted by Grant Searle on his homebrew computer as found on http://searle.x10host.com/z80/SimpleZ80.html
