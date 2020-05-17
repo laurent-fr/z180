@@ -23,4 +23,4 @@ It is not strictly needed to build the computer from the blueprints, but if some
 
 * An EPROM simulator. The fastest way to test a new firmware ! Mine is a MemSIM2 from http://www.momik.pl/ and it works very well.
 * A logic analyzer. Pick your favourite. Mine is a DSLogic.
-* A good old oscilloscpe is useful, too !
+* A good old oscilloscope is useful, too !
