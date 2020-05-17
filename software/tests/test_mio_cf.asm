@@ -63,32 +63,34 @@ main:
     ld hl,str_welcome
     call _asci1_puts
 
-test:
-    in0 a,($88+7)
-  ;  call _util_byte_to_ascii_hex
-  ;  ld a,b 
-  ;  call _asci1_putc
-  ;  ld a,c 
-  ;  call _asci1_putc 
+;test:
+;    in0 a,($88+7)
+;    call _util_byte_to_ascii_hex
+;    ld a,b 
+;    call _asci1_putc
+;    ld a,c 
+;    call _asci1_putc 
 
 ;    out0 ($88),a
-    jp test
+;    jp test
 
-    call test_data_sector
+    
 
     call _cf_init  
 
-    ;ld hl,lba_addr
-    ;call _cf_load_lba 
-    ;ld ix,sector
-    ;call _cf_write_sector
+    call test_data_sector
+
+    ld hl,lba_addr
+    call _cf_load_lba 
+    ld ix,sector
+    call _cf_write_sector
 
     call zero_sector
 
     ld hl,lba_addr
     call _cf_load_lba 
     ld ix,sector
-  ;  call _cf_read_sector
+    call _cf_read_sector
 
     ld hl,sector
 
