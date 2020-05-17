@@ -5,8 +5,10 @@
     .LF bios.lst
     .SF bios.sym
 
-    .include ../../include/z180_defs.asm
+CLOCK       .equ    8
+INT_BASE    .equ    $0080
 
+    .include ../include/z180_defs.asm
 
     .org $E000
 

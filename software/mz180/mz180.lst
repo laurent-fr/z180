@@ -1,5 +1,8 @@
 0000-                  7
-0000-                  8           .include ../../include/z180_defs.asm
+0008-                  8       CLOCK       .equ 8
+0080-                  9       INT_BASE    .equ $0080
+0000-                 10
+0000-                 11           .include ../include/z180_defs.asm
 0000-            I     1       ; ------------------------------------
 0000-            I     2       ; Z180 constants
 0000-            I     3       ; ------------------------------------
@@ -251,81 +254,81 @@
 0080-            I   249       ICR_IOA7       .equ $80
 0040-            I   250       ICR_IOA6       .equ $40
 0020-            I   251       ICR_IOSTP      .equ $20
-0000-                  9
-1000-                 10       BIOS_ADDR   .equ    $1000
-1000-                 11       BIOS_SIZE   .equ    $1000
-2000-                 12       BASIC_ADDR  .equ    $2000
-2000-                 13       BASIC_SIZE  .equ    $2000
-0000-                 14
-8000-                 15       RAM_START   .equ    $8000
-0000-                 16
-0000-                 17           .org $0000
-0000-C3 00 01         18 (  9)     jp rom_reset        ; RESET
-0003-                 19
-0003-                 20           ; switch to all-RAM memory map
-00EC-                 21           .org $00EC
-00EC-                 22       switch_to_ram:
-00EC-                 23           ; $0000-$EFFF = RAM ( $80000 - $8EFFF) - Common Area 0
-00EC-                 24           ; $F000-$FFFF = VDU ( $20000 - $20FFF) - Common Area 1
-00EC-3E F8            25 (  6)     ld a,$F8 ; Commona Area 1 = $F000-$FFFF - Bank Area = $8000-$EFFF
-00EE-ED 39 3A         26 ( 13)     out0 (CBAR),a
-00F1-3E 11            27 (  6)     ld a,$11 ; Common Area Base = $20000
-00F3-ED 39 38         28 ( 13)     out0 (CBR),a
-00F6-3E 80            29 (  6)     ld a,$80 ; Bank Area Base = $80000
-00F8-ED 39 39         30 ( 13)     out0 (BBR),a
-00FB-3E F0            31 (  6)     ld a,$F0 ; Commona Area 1 = $F000-$FFFF - Bank Area = $0000-$EFFF
-00FD-ED 39 3A         32 ( 13)     out0 (CBAR),a
-0100-                 33
-0100-                 34           ; the user program starts HERE
-0100-                 35           ; .org $0100
+0000-                 12
+1000-                 13       BIOS_ADDR   .equ    $1000
+1000-                 14       BIOS_SIZE   .equ    $1000
+2000-                 15       BASIC_ADDR  .equ    $2000
+2000-                 16       BASIC_SIZE  .equ    $2000
+0000-                 17
+8000-                 18       RAM_START   .equ    $8000
+0000-                 19
+0000-                 20           .org $0000
+0000-C3 00 01         21 (  9)     jp rom_reset        ; RESET
+0003-                 22
+0003-                 23           ; switch to all-RAM memory map
+00EC-                 24           .org $00EC
+00EC-                 25       switch_to_ram:
+00EC-                 26           ; $0000-$EFFF = RAM ( $80000 - $8EFFF) - Common Area 0
+00EC-                 27           ; $F000-$FFFF = VDU ( $20000 - $20FFF) - Common Area 1
+00EC-3E F8            28 (  6)     ld a,$F8 ; Commona Area 1 = $F000-$FFFF - Bank Area = $8000-$EFFF
+00EE-ED 39 3A         29 ( 13)     out0 (CBAR),a
+00F1-3E 11            30 (  6)     ld a,$11 ; Common Area Base = $20000
+00F3-ED 39 38         31 ( 13)     out0 (CBR),a
+00F6-3E 80            32 (  6)     ld a,$80 ; Bank Area Base = $80000
+00F8-ED 39 39         33 ( 13)     out0 (BBR),a
+00FB-3E F0            34 (  6)     ld a,$F0 ; Commona Area 1 = $F000-$FFFF - Bank Area = $0000-$EFFF
+00FD-ED 39 3A         35 ( 13)     out0 (CBAR),a
 0100-                 36
-0100-                 37       rom_reset:
-0100-                 38
-0100-F3               39 (  3)     di ; disable interrupts
-0101-                 40
-0101-AF               41 (  4)     xor a           ; a <- 0
-0102-ED 39 36         42 ( 13)     out0 (RCR),a    ; Refresh disable
-0105-                 43
-0105-                 44           ; setup interupts
-0105-ED 56            45 (  6)     im 1    ; interrupt mode 1
-0107-AF               46 (  4)     xor a  ; interrupts high order byte : 00H
-0108-ED 47            47 (  6)     ld i,a
-010A-3E 80            48 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
-010C-ED 39 33         49 ( 13)     out0 (IL),a
-010F-                 50
-010F-                 51
-010F-                 52           ; MMU
-010F-3E 88            53 (  6)     ld a,$88 ; Common Area 1 = Bank Area 1 =  $8000-$FFFF
-0111-ED 39 3A         54 ( 13)     out0 (CBAR),a
-0114-                 55
-0114-                 56           ; Stack pointer = $FFFF
-0114-31 FF FF         57 (  9)     ld sp,$FFFF
-0117-                 58
-0117-                 59           ; copy BIOS from EPROM TO RAM
-0117-                 60
-0117-                 61           ; RAM START $8000 -> $8E000
-0117-3E 86            62 (  6)     ld a,$86
-0119-ED 39 38         63 ( 13)     out0 (CBR),a
-011C-                 64
-011C-21 00 10         65 (  9)     ld hl,BIOS_ADDR ; source pointer
-011F-11 00 80         66 (  9)     ld de,RAM_START ; destination pointer
-0122-01 00 10         67 (  9)     ld bc,BIOS_SIZE ; size of block
-0125-                 68       copy_bios_loop:
-0125-ED A0            69 ( 12)     ldi
-0127-EA 25 01         70 ( 6+)     jp pe,copy_bios_loop
-012A-                 71
-012A-                 72           ; copy BASIC from EPROM TO RAM
-012A-                 73
-012A-                 74           ; RAM START $8000 -> $80000
-012A-3E 78            75 (  6)     ld a,$78
-012C-ED 39 38         76 ( 13)     out0 (CBR),a
-012F-                 77
-012F-21 00 20         78 (  9)     ld hl,BASIC_ADDR ; source pointer
-0132-11 00 80         79 (  9)     ld de,RAM_START ; destination pointer
-0135-01 00 20         80 (  9)     ld bc,BASIC_SIZE ; size of block
-0138-                 81       copy_basic_loop:
-0138-ED A0            82 ( 12)     ldi
-013A-EA 38 01         83 ( 6+)     jp pe,copy_basic_loop
-013D-                 84
-013D-                 85           ; boot to BASIC
-013D-C3 EC 00         86 (  9)     jp switch_to_ram
+0100-                 37           ; the user program starts HERE
+0100-                 38           ; .org $0100
+0100-                 39
+0100-                 40       rom_reset:
+0100-                 41
+0100-F3               42 (  3)     di ; disable interrupts
+0101-                 43
+0101-AF               44 (  4)     xor a           ; a <- 0
+0102-ED 39 36         45 ( 13)     out0 (RCR),a    ; Refresh disable
+0105-                 46
+0105-                 47           ; setup interupts
+0105-ED 56            48 (  6)     im 1    ; interrupt mode 1
+0107-AF               49 (  4)     xor a  ; interrupts high order byte : 00H
+0108-ED 47            50 (  6)     ld i,a
+010A-3E 80            51 (  6)     ld a,0b10000000 ; interrupts low order byte : 80H
+010C-ED 39 33         52 ( 13)     out0 (IL),a
+010F-                 53
+010F-                 54
+010F-                 55           ; MMU
+010F-3E 88            56 (  6)     ld a,$88 ; Common Area 1 = Bank Area 1 =  $8000-$FFFF
+0111-ED 39 3A         57 ( 13)     out0 (CBAR),a
+0114-                 58
+0114-                 59           ; Stack pointer = $FFFF
+0114-31 FF FF         60 (  9)     ld sp,$FFFF
+0117-                 61
+0117-                 62           ; copy BIOS from EPROM TO RAM
+0117-                 63
+0117-                 64           ; RAM START $8000 -> $8E000
+0117-3E 86            65 (  6)     ld a,$86
+0119-ED 39 38         66 ( 13)     out0 (CBR),a
+011C-                 67
+011C-21 00 10         68 (  9)     ld hl,BIOS_ADDR ; source pointer
+011F-11 00 80         69 (  9)     ld de,RAM_START ; destination pointer
+0122-01 00 10         70 (  9)     ld bc,BIOS_SIZE ; size of block
+0125-                 71       copy_bios_loop:
+0125-ED A0            72 ( 12)     ldi
+0127-EA 25 01         73 ( 6+)     jp pe,copy_bios_loop
+012A-                 74
+012A-                 75           ; copy BASIC from EPROM TO RAM
+012A-                 76
+012A-                 77           ; RAM START $8000 -> $80000
+012A-3E 78            78 (  6)     ld a,$78
+012C-ED 39 38         79 ( 13)     out0 (CBR),a
+012F-                 80
+012F-21 00 20         81 (  9)     ld hl,BASIC_ADDR ; source pointer
+0132-11 00 80         82 (  9)     ld de,RAM_START ; destination pointer
+0135-01 00 20         83 (  9)     ld bc,BASIC_SIZE ; size of block
+0138-                 84       copy_basic_loop:
+0138-ED A0            85 ( 12)     ldi
+013A-EA 38 01         86 ( 6+)     jp pe,copy_basic_loop
+013D-                 87
+013D-                 88           ; boot to BASIC
+013D-C3 EC 00         89 (  9)     jp switch_to_ram

@@ -4,7 +4,7 @@
     .TF basic_boot.hex,INT,24
     .LF basic_boot.lst
 
-    .include ../../include/z180_defs.asm
+    .include ../include/z180_defs.asm
 
 ; bios entries
 asci1_putc  .equ $E01F
