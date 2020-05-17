@@ -1,5 +1,7 @@
 # Micro Z180 homebrew computer
 
+![The computer](doc/computer.jpg)
+
 *This is my attempt to create a 80's style computer based on the Zilog Z180 CPU.*
 
 **All the software is GPL v2, and all the hardware is CC-BY-NC-SA**
